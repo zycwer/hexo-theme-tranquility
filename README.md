@@ -1,4 +1,9 @@
-**Archive**: 现在你可以使用 Claude Code 或任何一款 AI Agent 来快速构建自己的个人主页.
+* Archive 👋
+
+现在你可以使用 Claude Code 或任何一款 AI Agent 来快速构建自己的个人主页. 
+
+
+-----
 
 
 <h1> <div align="center"><img align="center" height="40" src="source/images/tranquility.svg"/> 致远</div></h1>
