@@ -1,4 +1,4 @@
-* Archive 👋
+# Archive 👋
 
 现在你可以使用 Claude Code 或任何一款 AI Agent 来快速构建自己的个人主页. 
 
