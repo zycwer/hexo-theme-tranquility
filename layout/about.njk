@@ -1,0 +1,21 @@
+{% extends "_partials/layout.njk" %}
+{% block link %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for("/css/index.css") }}"/>
+{% endblock link %}
+{% block body %}
+  <div class="about-page">
+    <div class="about-page__title">{{ page.title or "关于" }}</div>
+    <div class="about-page__content">
+      {% for line in page.content %}
+        {% if not line %}
+          <br/>
+        {% else %}
+          <p>{{ line }}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if theme.recent_updates and theme.recent_updates.enable and theme.recent_updates.rss_url %}
+      <a class="about-page__rss" href="{{ theme.recent_updates.rss_url }}">订阅博客 RSS →</a>
+    {% endif %}
+  </div>
+{% endblock body %}

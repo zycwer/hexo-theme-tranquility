@@ -442,6 +442,196 @@ for v, k in timeline_colors {
   }
 }
 
+/* 时间线大事件描述 */
+.line-desc {
+  font-size: 13px;
+  color: $gainsboro;
+  margin-top: 4px;
+  max-width: 320px;
+}
+
+/* 关于页 */
+.about-page {
+  max-width: 760px;
+  margin: 120px auto 200px;
+  padding: 0 20px;
+
+  &__title {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    font-family: sourceHanSerif;
+    margin-bottom: 40px;
+  }
+
+  &__content {
+    font-size: 18px;
+    line-height: 2em;
+    letter-spacing: 0.1em;
+
+    p {
+      margin: 0 0 1em;
+    }
+  }
+
+  &__rss {
+    display: inline-block;
+    margin-top: 40px;
+    font-size: 16px;
+    color: $text-color;
+    text-decoration: none;
+    border-bottom: 1px solid $gainsboro;
+    padding-bottom: 2px;
+    transition: color 200ms ease;
+
+    &:hover {
+      color: #568dc4;
+    }
+  }
+}
+
+/* 首页最近更新卡片 */
+.recent-updates {
+  max-width: 900px;
+  margin: 200px auto;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+
+  &__title {
+    font-size: 36px;
+    font-weight: bold;
+    font-family: sourceHanSerif;
+  }
+
+  &__rss {
+    margin-left: 14px;
+    font-size: 14px;
+    color: #fff;
+    background: $gainsboro;
+    border-radius: 3px;
+    padding: 2px 8px;
+    text-decoration: none;
+    transition: background 200ms ease;
+
+    &:hover {
+      background: #568dc4;
+    }
+  }
+
+  &__viewport {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__track {
+    position: relative;
+    flex: 1;
+    min-height: 160px;
+    margin: 0 10px;
+  }
+
+  &__arrow {
+    cursor: pointer;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: $whitesmoke;
+    color: $text-color;
+    font-size: 22px;
+    line-height: 1;
+    transition: all 200ms ease;
+
+    &:hover {
+      background: $gainsboro;
+    }
+  }
+
+  &__dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $whitesmoke;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background 200ms ease;
+
+    &.is-active {
+      background: $gainsboro;
+    }
+  }
+}
+
+.recent-card {
+  display: none;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 28px;
+  background: #fff;
+  border: 1px solid $whitesmoke;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  text-align: center;
+
+  &.is-active {
+    display: block;
+    animation: fadeIn 300ms ease;
+  }
+
+  &__date {
+    font-size: 13px;
+    color: $gainsboro;
+    margin-bottom: 10px;
+  }
+
+  &__title {
+    display: block;
+    font-size: 22px;
+    font-weight: bold;
+    font-family: sourceHanSerif;
+    color: $text-color;
+    text-decoration: none;
+    margin-bottom: 12px;
+    transition: color 200ms ease;
+
+    &:hover {
+      color: #568dc4;
+    }
+  }
+
+  &__excerpt {
+    font-size: 15px;
+    line-height: 1.8em;
+    color: #666;
+    margin: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media screen and (max-width: 1023px) {
   .wall {
     height: calc(100vh - 60px);

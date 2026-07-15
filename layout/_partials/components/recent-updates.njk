@@ -1,0 +1,27 @@
+{% set updates = site.recentUpdates or [] %}
+{% if updates.length %}
+  <div class="recent-updates" id="recent-updates">
+    <div class="recent-updates__head">
+      <div class="recent-updates__title">{{ theme.recent_updates.title or "最近更新" }}</div>
+      <a class="recent-updates__rss" href="{{ theme.recent_updates.rss_url }}" title="订阅博客 RSS">RSS</a>
+    </div>
+    <div class="recent-updates__viewport">
+      <button class="recent-updates__arrow recent-updates__arrow--prev" type="button" aria-label="上一篇">‹</button>
+      <div class="recent-updates__track">
+        {% for item in updates %}
+          <article class="recent-card{% if loop.first %} is-active{% endif %}" data-index="{{ loop.index0 }}">
+            <div class="recent-card__date">{{ item.date }}</div>
+            <a class="recent-card__title" href="{{ item.link }}" target="_blank" rel="noopener">{{ item.title }}</a>
+            {% if item.excerpt %}<p class="recent-card__excerpt">{{ item.excerpt }}</p>{% endif %}
+          </article>
+        {% endfor %}
+      </div>
+      <button class="recent-updates__arrow recent-updates__arrow--next" type="button" aria-label="下一篇">›</button>
+    </div>
+    <div class="recent-updates__dots">
+      {% for item in updates %}
+        <span class="recent-updates__dot{% if loop.first %} is-active{% endif %}" data-index="{{ loop.index0 }}"></span>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}

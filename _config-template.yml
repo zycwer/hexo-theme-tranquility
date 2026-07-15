@@ -6,6 +6,11 @@ logo: "/images/logo.svg"
 # 默认 jsDelivr;unpkg 国内访问不稳定。国内可改为 https://npm.elemecdn.com
 cdn: https://cdn.jsdelivr.net/npm
 
+# 站点模式：
+#   blog    = 默认博客主题（展示子页/博客入口）
+#   landing = 纯个人主页模式（隐藏博客/子页入口，聚焦关于页、大事件与最近更新）
+homepage_mode: blog
+
 mathjax: false # 加载 LateX 数学公式库
 
 favicon: # 配置网页图标
@@ -42,6 +47,27 @@ index: # 配置首页个性化内容
       - 余下的三分啸成剑气
       -
       - 绣口一吐就半个盛唐
+
+# 关于页（独立的 /about 路由，landing 模式下推荐开启）
+about:
+  enable: false
+  showInNav: false # 是否在导航栏显示入口
+  title: 关于
+  # 内容段落，每项一段；空字符串表示空行
+  content:
+    - 这里是关于我的介绍。
+    - 可以写多段文字介绍自己、技能、经历等。
+    - ''
+
+# 首页最近更新卡片（从外部博客 RSS 拉取，构建时抓取并服务端渲染）
+# 适合 landing 模式：本站不含文章，把外部博客的最新文章以卡片形式展示在首页
+recent_updates:
+  enable: false
+  rss_url: # 博客 RSS 源地址，例如 https://example.com/feed.xml（结构要求见 README）
+  max_count: 3 # 最多展示的卡片数量（建议 <= 3）
+  title: 最近更新
+  show_excerpt: true # 是否展示摘要
+  excerpt_length: 80 # 摘要最大字符数
 
 foot:
   title:
@@ -143,6 +169,14 @@ timeline:
       color: "#568dc4"
       icon: /images/icon/icon-event.svg
       checked: false
+  # 大事件：直接在配置中定义，不依赖文章。适合 landing 模式或无对应文章的事件
+  # type 需对应上方 items 中的 name；link 可选，留空则只展示标题
+  events:
+    - date: 2024-01-01
+      title: 开通个人主页
+      description: 使用 Tranquility 主题搭建个人主页
+      type: event
+      link:
 
 # 标签云
 tagcloud:

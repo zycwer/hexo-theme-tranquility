@@ -87,12 +87,17 @@
             <div class="search-outer">{% include("./components/search-btn.njk") %}</div>
           {% endif %}
           <div class="nav-menu">
-            {% if theme.subpage.enable %}
-              {% for nav in theme.subpage.pages %}
-                <a class="nav-menu-item" href="{{ url_for(nav.path or nav.name) }}">{{ nav.title }}</a>
-              {% endfor %}
-            {% else %}
-              <a class="nav-menu-item" href='{{ url_for("/blog/") }}'>博客</a>
+            {% if theme.homepage_mode != 'landing' %}
+              {% if theme.subpage.enable %}
+                {% for nav in theme.subpage.pages %}
+                  <a class="nav-menu-item" href="{{ url_for(nav.path or nav.name) }}">{{ nav.title }}</a>
+                {% endfor %}
+              {% else %}
+                <a class="nav-menu-item" href='{{ url_for("/blog/") }}'>博客</a>
+              {% endif %}
+            {% endif %}
+            {% if theme.about and theme.about.enable and theme.about.showInNav %}
+              <a class="nav-menu-item" href='{{ url_for("/about/") }}'>{{ theme.about.title or "关于" }}</a>
             {% endif %}
             {% if theme.cv.enable and theme.cv.showInNav %}
               <a class="nav-menu-item" href='{{ url_for("/cv/") }}'>简历</a>

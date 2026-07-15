@@ -26,10 +26,13 @@
 ## 特点
 
 - 主页风格，聚焦个性展示
+- 支持[纯个人主页模式](#站点模式)（不含文章，聚合外部博客 RSS）
 - [“子页”设计](#子页)，适应多领域写作
+- [最近更新](#最近更新rss-聚合)卡片，构建时聚合外部博客 RSS，国内加载稳定
+- [关于页](#关于页)、[时间线](#时间线)（支持配置定义大事件）
 - 三端自适应，舒适阅读
 - 自定义字体及提取压缩，兼具美观和性能
-- [简历制作](#简历)、[时间线](#时间线)、[相关文章](#相关文章)、[数学公式](#数学公式)、[Gitalk 评论](#其他)、[赞赏](#文章赞赏)、[SEO](#其他)
+- [简历制作](#简历)、[相关文章](#相关文章)、[数学公式](#数学公式)、[Gitalk 评论](#其他)、[赞赏](#文章赞赏)、[SEO](#其他)
 - 等
 
  -----
@@ -43,8 +46,11 @@
 - [设计逻辑](#设计逻辑)
   - [改变](#改变)
 - [配置](#配置)
+  - [站点模式](#站点模式)
   - [子页](#子页)
   - [时间线](#时间线)
+  - [关于页](#关于页)
+  - [最近更新（RSS 聚合）](#最近更新rss-聚合)
   - [简历](#简历)
   - [代码高亮](#代码高亮)
   - [数学公式](#数学公式)
@@ -144,6 +150,20 @@
 
 本章所有的配置内容你都可以在 [致远](https://theme.www.hozen.site/tranquility/) 网站找到对应的测试文章，并在 [hooozen/hexo-theme-test](https://github.com/hooozen/hexo-theme-test) 仓库中找到对应的配置文件。所以当哪个配置项说明读不懂时不妨去找一下对应的例子。
 
+### 站点模式
+
+通过 `homepage_mode` 切换站点的整体形态：
+
+```yml
+# blog    = 默认博客主题（导航展示子页/博客入口）
+# landing = 纯个人主页模式（隐藏博客/子页入口，聚焦关于页、大事件与最近更新）
+homepage_mode: blog
+```
+
+`landing` 模式适合“本站不含文章、文章托管在独立博客”的场景：导航栏不再显示博客/子页入口，首页聚焦个人介绍（关于区块）、最近更新（从外部博客 RSS 聚合，见[最近更新](#最近更新rss-聚合)）与大事件（见[时间线](#时间线)）。配合 [关于页](#关于页) 与 [最近更新](#最近更新rss-聚合) 一起使用效果最佳。
+
+注意：`landing` 模式仅隐藏导航入口，已存在的文章页面仍会被生成（只是不被链接）。如果你希望完全不生成博客页面，可在博客根目录 `_config.yml` 中将 `source` 指向空目录或移除 `source/_posts`。
+
 ### 子页
 
 子页的配置在 `subpage` 下进行：
@@ -211,7 +231,112 @@ timeline: article  # 展示在时间线列表中
 ---
 ```
 
+#### 配置定义的大事件
+
+除了从文章聚合，时间线也支持**直接在配置文件中定义事件**，无需对应文章。这在 `landing` 纯主页模式（本站不含文章）下尤其有用。在 `timeline.events` 下定义，`type` 需对应上方 `items` 中的某个 `name`：
+
+```yml
+timeline:
+  enable: true
+  order: false
+  items:
+    - name: event
+      color: "#568dc4"
+      icon: /images/icon/icon-event.svg
+      checked: true
+  events:
+    - date: 2024-01-01      # 日期，YYYY-MM-DD
+      title: 开通个人主页     # 事件标题
+      description: 使用本主题搭建  # 可选，描述
+      type: event            # 必填，对应 items 中的 name
+      link: https://...      # 可选，留空则只展示标题（不可点击）
+```
+
+配置定义的事件与文章事件会合并后按 `order` 排序展示。
+
 有关时间线的配置修改**可能需要重新启动服务**才会生效
+
+### 关于页
+
+关于页是一个独立的 `/about` 路由，内容来自 `_config.tranquility.yml` 的 `about` 配置。在 `landing` 模式下推荐开启，作为个人主页的详细介绍页。
+
+```yml
+about:
+  enable: true        # 是否生成 /about 页面
+  showInNav: true     # 是否在导航栏显示“关于”入口
+  title: 关于         # 页面标题
+  content:            # 内容段落，每项一段；空字符串表示空行
+    - 这里是关于我的介绍。
+    - 可以写多段文字介绍自己、技能、经历等。
+    - ''
+```
+
+若同时开启了[最近更新](#最近更新rss-聚合)，关于页底部会展示一个“订阅博客 RSS”的链接。
+
+### 最近更新（RSS 聚合）
+
+“最近更新”把**外部博客**的最新文章以卡片形式展示在首页，左右切换浏览（最多 3 篇）。适合 `landing` 模式：本站不含文章，把独立博客的最新动态聚合到个人主页。
+
+```yml
+recent_updates:
+  enable: true
+  rss_url: https://example.com/feed.xml  # 博客 RSS 源地址
+  max_count: 3        # 最多展示的卡片数量（建议 <= 3）
+  title: 最近更新      # 区块标题
+  show_excerpt: true   # 是否展示摘要
+  excerpt_length: 80   # 摘要最大字符数
+```
+
+#### 工作原理
+
+主题在 **`hexo generate` 构建时**于服务端抓取并解析 RSS，把文章数据直接渲染进静态 HTML。这样做的优点：
+
+- **无 CORS 问题**：客户端不需要跨域请求 RSS；
+- **国内加载稳定**：不依赖任何第三方代理（如 rss2json、allorigins），生成的是纯静态页面；
+- **SEO 友好**：文章卡片直接存在于 HTML 中。
+
+> 抓取失败不会中断构建，只会打印警告并隐藏首页的“最近更新”区块。因此即使博客 RSS 暂时不可达，站点仍可正常生成。
+>
+> 由于数据在构建时抓取，博客更新后需要**重新 `hexo generate`** 才会刷新首页卡片（可配合 CI/定时构建自动刷新）。
+
+#### RSS 结构要求
+
+主题内置一个轻量解析器（无需额外依赖），支持 **RSS 2.0** 与 **Atom 1.0** 两种常见格式。绝大多数博客系统（Hexo 的 `hexo-generator-feed`、WordPress、Ghost、Typecho 等）默认生成的订阅源即符合要求。
+
+**RSS 2.0** —— 每个 `<item>` 需包含：
+
+| 字段 | 标签 | 是否必需 | 说明 |
+| --- | --- | --- | --- |
+| 标题 | `<title>` | 是 | 文章标题 |
+| 链接 | `<link>` | 是 | 文章地址 |
+| 日期 | `<pubDate>` | 是 | RFC 822 格式，如 `Mon, 15 Jan 2024 10:00:00 +0800` |
+| 摘要 | `<description>` 或 `<content:encoded>` | 否 | 支持 CDATA 与 HTML，会自动去标签并截断 |
+
+**Atom 1.0** —— 每个 `<entry>` 需包含：
+
+| 字段 | 标签 | 是否必需 | 说明 |
+| --- | --- | --- | --- |
+| 标题 | `<title>` | 是 | 文章标题 |
+| 链接 | `<link href="..."/>` | 是 | 文章地址（取 `href` 属性） |
+| 日期 | `<updated>` 或 `<published>` | 是 | ISO 8601 格式，如 `2024-01-15T10:00:00Z` |
+| 摘要 | `<summary>` 或 `<content>` | 否 | 支持 CDATA 与 HTML，会自动去标签并截断 |
+
+示例（RSS 2.0）：
+
+```xml
+<rss version="2.0">
+  <channel>
+    <item>
+      <title>我的第一篇文章</title>
+      <link>https://example.com/post-1</link>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 +0800</pubDate>
+      <description><![CDATA[<p>文章摘要内容。</p>]]></description>
+    </item>
+  </channel>
+</rss>
+```
+
+> 推荐使用 Hexo 博客安装 [`hexo-generator-feed`](https://github.com/hexojs/hexo-generator-feed) 生成 RSS：在博客根目录 `_config.yml` 中配置 `feed: { type: atom, path: feed.xml, limit: 20 }`，然后将 `recent_updates.rss_url` 指向该 feed 地址即可。
 
 ### 简历
 

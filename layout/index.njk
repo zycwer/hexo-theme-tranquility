@@ -58,6 +58,9 @@
       </div>
     </div>
   </div>
+  {% if theme.recent_updates and theme.recent_updates.enable %}
+    {% include "_partials/components/recent-updates.njk" %}
+  {% endif %}
   {% if theme.timeline and theme.timeline.enable %}
     <div class="timeline">
       <div class="timeline-head">
@@ -89,5 +92,8 @@
   {% include "_partials/scripts/HeartCurve.njk" %}
   {% from "_partials/scripts/Timeline.njk" import timeline %}
   {% if theme.timeline and theme.timeline.enable %}{{ timeline(site.timelineData) }}
+  {% endif %}
+  {% if theme.recent_updates and theme.recent_updates.enable %}
+    <script defer src="{{ url_for('js/recent.js') }}"></script>
   {% endif %}
 {% endblock script %}

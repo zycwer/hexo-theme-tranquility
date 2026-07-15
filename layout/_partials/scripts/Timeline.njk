@@ -37,12 +37,20 @@
     function getLine(data) {
       const item = document.createElement("DIV");
       item.className = `timeline-item-${data.type} timeline-item--hidden`;
+      // 无 link 的事件仅展示标题文本，有 link 的渲染为超链接
+      const titleHtml = data.path
+        ? `<a class="timeline-post" href="${data.path}">${data.title}</a>`
+        : `<span class="timeline-post">${data.title}</span>`;
+      const descHtml = data.desc
+        ? `<div class="line-desc">${data.desc}</div>`
+        : '';
       item.innerHTML = `
                           <div class="line-date">
                           <div class="line-date-tag">${data.date}</div></div>
                           <div class="line-anchor"></div>
                           <div class="line-title">
-                              <img class="text-icon" src="${data.icon}" /><a class="timeline-post" href="${data.path}">${data.title}</a>
+                              <img class="text-icon" src="${data.icon}" />${titleHtml}
+                              ${descHtml}
                           </div>
                           `;
       return {el: item, type: data.type};
