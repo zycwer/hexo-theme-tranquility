@@ -601,10 +601,11 @@ for v, k in timeline_colors {
     display: block;
     font-size: 22px;
     font-weight: bold;
-    // 加 serif fallback 栈：标题来自外部 RSS，内容不可控，
-    // sourceHanSerif 是提取子字体只含部分汉字，未覆盖字符（拉丁字母/标点等）
-    // 会 fallback 到系统默认 sans-serif 造成 Serif/Sans 交错，故显式 fallback 到系统宋体
-    font-family: sourceHanSerif, "Songti SC", "STSong", "SimSun", serif;
+    // 标题来自外部 RSS，内容不可控；sourceHanSerif 是从主题配置文本提取的子字体，
+    // 无法覆盖外部字符。若以 sourceHanSerif 为主字体，未覆盖字符会 fallback 到另一
+    // 种系统宋体，导致同一标题内两种宋体字面交错。故直接使用单一系统宋体字面，
+    // 保证整段标题字形统一。
+    font-family: "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", serif;
     color: $text-color;
     text-decoration: none;
     margin-bottom: 12px;
