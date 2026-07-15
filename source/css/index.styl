@@ -601,7 +601,10 @@ for v, k in timeline_colors {
     display: block;
     font-size: 22px;
     font-weight: bold;
-    font-family: sourceHanSerif;
+    // 加 serif fallback 栈：标题来自外部 RSS，内容不可控，
+    // sourceHanSerif 是提取子字体只含部分汉字，未覆盖字符（拉丁字母/标点等）
+    // 会 fallback 到系统默认 sans-serif 造成 Serif/Sans 交错，故显式 fallback 到系统宋体
+    font-family: sourceHanSerif, "Songti SC", "STSong", "SimSun", serif;
     color: $text-color;
     text-decoration: none;
     margin-bottom: 12px;
