@@ -1,5 +1,5 @@
 const getObjValues = obj => {
-  if (typeof obj === null) return;
+  if (obj === null || obj === undefined) return;
   if (typeof obj !== 'object') return [obj];
   const res = [];
   for (let k in obj) {

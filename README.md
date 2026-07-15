@@ -12,7 +12,7 @@
 
 <p align="center">
 <a href="https://github.com/hooozen/hexo-theme-tranquility/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/hooozen/hexo-theme-tranquility?label=release&color=orange"></a>
-<a href="https://hexo.io/"><img src="https://img.shields.io/badge/Hexo-%3E%3D6.3.0-blue?logo=hexo"></a>
+<a href="https://hexo.io/"><img src="https://img.shields.io/badge/Hexo-%3E%3D8.0.0-blue?logo=hexo"></a>
 <a href="https://github.com/hooozen/hexo-theme-tranquility/blob/main/LICENSE"><img src="https://img.shields.io/github/license/hooozen/hexo-theme-tranquility"></a>
 
 <img src="./doc/images/index-ios-3.jpg"/>
@@ -220,7 +220,9 @@ timeline: article  # 展示在时间线列表中
 首先需要安装以下依赖：
 
 ```bash
-npm install hexo-fontawesome-icons
+# hexo-fontawesome-icons 声明的 peer 依赖为 hexo@6.x，与 Hexo 8.x 存在冲突，
+# 但实际兼容 Hexo 8.x，加 --legacy-peer-deps 跳过 peer 依赖检查即可
+npm install hexo-fontawesome-icons --legacy-peer-deps
 ```
 
 博客的基础配置如下：
@@ -405,8 +407,8 @@ Mermaid 是一个基于 Javascript 的图表绘制工具，通过解析类 Markd
     ```yml
     mermaid:
       enable: true # 启用 Mermaid 增强
-      version: latest
-      options: 
+      version: 10.9.3 # 固定版本，避免使用 latest 因上游 breaking change 失效
+      options:
         startOnload: true
     ```
 

@@ -67,7 +67,7 @@ function generateSearch(locals) {
     pages.each(function (page) {
       if (page.indexing != undefined && !page.indexing) return;
       var temp_page = new Object()
-      temp_post.title = post.title || 'No Title'
+      temp_page.title = page.title || 'No Title'
       if (page.path) {
         temp_page.url = config.root + page.path
       }

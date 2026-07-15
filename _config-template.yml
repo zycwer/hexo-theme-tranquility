@@ -2,6 +2,10 @@ slogan: “宁静致远”
 email: example@email.com
 logo: "/images/logo.svg"
 
+# 第三方库(MathJax / Mermaid / Gitalk / DocSearch)的 CDN 源
+# 默认 jsDelivr;unpkg 国内访问不稳定。国内可改为 https://npm.elemecdn.com
+cdn: https://cdn.jsdelivr.net/npm
+
 mathjax: false # 加载 LateX 数学公式库
 
 favicon: # 配置网页图标
@@ -84,8 +88,8 @@ gitalk: # gitalk 评论
   clientSecret: # EITHER this or proxy_gateway, Github access secret token for the Gitment
 
   distractionFreeMode: false # Facebook-like distraction free mode
-  # When the official proxy is not available, you can change it to your own proxy address
-  proxy: https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token # This is official proxy adress
+  # OAuth 代理,默认公共代理国内不稳定且有限流,建议自行部署 Cloudflare Worker 代理后替换
+  proxy: https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token
   # Gitalk's display language depends on user's browser or system environment
   # If you want everyone visiting your site to see a uniform language, you can set a force language value
   # Available values: en | es-ES | fr | ru | zh-CN | zh-TW
@@ -148,7 +152,7 @@ tagcloud:
 
 mermaid:
   enable: true # 启用 Mermaid 增强
-  version: latest
+  version: 10.9.3 # 固定版本,避免 latest 因上游 breaking change 失效(11.x 为 ESM,需改用 type="module" 加载)
   options:
     startOnload: true
 

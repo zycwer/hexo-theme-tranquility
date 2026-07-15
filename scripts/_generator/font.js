@@ -38,7 +38,7 @@ function compress(text, params) {
   let data = fs.readFileSync(source);
   data = new Uint8Array(data).buffer;
   const font = opentype.parse(data);
-  glyphs = [notdefGlyph].concat(font.stringToGlyphs(text));
+  const glyphs = [notdefGlyph].concat(font.stringToGlyphs(text));
 
   const sub_font = new opentype.Font({
     unitsPerEm: font.unitsPerEm,
