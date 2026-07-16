@@ -1,103 +1,41 @@
-module.exports = function (hexo) {
-  hexo.extend.generator.register('search', generateSearch);
-}
+// 生成前端本地搜索用的 search.json
+// field: post | page | 空(全部)
+module.exports = hexo => {
+  hexo.extend.generator.register('search', function (locals) {
+    const cfg = {
+      path: 'search.json',
+      field: 'post',
+      ...this.config.search,
+      ...this.theme.config.search,
+      root: this.config.root
+    };
 
+    const sources = [];
+    if (cfg.field === 'post' || cfg.field === '') sources.push(locals.posts.sort('-date'));
+    if (cfg.field === 'page' || cfg.field === '') sources.push(locals.pages);
 
-function generateSearch(locals) {
-  const config = {
-    path: 'search.json',
-    field: 'post',
-    ...this.config.search,
-    ...this.theme.config.search,
-    root: this.config.root
-  }
-
-  var searchfield = config.field;
-  var content = config.content;
-
-  var posts, pages;
-
-  if (searchfield.trim() != '') {
-    searchfield = searchfield.trim();
-    if (searchfield == 'post') {
-      posts = locals.posts.sort('-date');
-    } else if (searchfield == 'page') {
-      pages = locals.pages;
-    } else {
-      posts = locals.posts.sort('-date');
-      pages = locals.pages;
-    }
-  } else {
-    posts = locals.posts.sort('-date');
-  }
-
-  var res = new Array()
-  var index = 0
-
-  if (posts) {
-    posts.each(function (post) {
-      if (post.indexing != undefined && !post.indexing) return;
-      var temp_post = new Object()
-      temp_post.title = post.title || 'No Title'
-      if (post.path) {
-        temp_post.url = config.root + post.path
-      }
-      if (content != false && post._content) {
-        temp_post.content = post._content
-      }
-      if (post.tags && post.tags.length > 0) {
-        var tags = [];
-        post.tags.forEach(function (tag) {
-          tags.push(tag.name);
+    const res = [];
+    sources.forEach(items => {
+      items.each(item => {
+        if (item.indexing === false) return;
+        res.push({
+          title: item.title || 'No Title',
+          url: item.path ? cfg.root + item.path : undefined,
+          content: cfg.content !== false ? (item._content || '') : undefined,
+          tags: pluck(item.tags, 'name'),
+          categories: pluck(item.categories, 'name')
         });
-        temp_post.tags = tags
-      }
-      if (post.categories && post.categories.length > 0) {
-        var categories = [];
-        post.categories.forEach(function (cate) {
-          categories.push(cate.name);
-        });
-        temp_post.categories = categories
-      }
-      res[index] = temp_post;
-      index += 1;
+      });
     });
-  }
-  if (pages) {
-    pages.each(function (page) {
-      if (page.indexing != undefined && !page.indexing) return;
-      var temp_page = new Object()
-      temp_page.title = page.title || 'No Title'
-      if (page.path) {
-        temp_page.url = config.root + page.path
-      }
-      if (content != false && page._content) {
-        temp_page.content = page._content
-      }
-      if (page.tags && page.tags.length > 0) {
-        var tags = new Array()
-        var tag_index = 0
-        page.tags.each(function (tag) {
-          tags[tag_index] = tag.name;
-        });
-        temp_page.tags = tags
-      }
-      if (page.categories && page.categories.length > 0) {
-        temp_page.categories = []
-          (page.categories.each || page.categories.forEach)(function (item) {
-            temp_page.categories.push(item);
-          });
-      }
-      res[index] = temp_page;
-      index += 1;
-    });
-  }
 
-
-  var json = JSON.stringify(res);
-
-  return {
-    path: config.path,
-    data: json
-  };
+    return { path: cfg.path, data: JSON.stringify(res) };
+  });
 };
+
+// 从 Warehouse 集合或普通数组中提取字段，统一处理两种遍历方式
+function pluck(coll, key) {
+  if (!coll || !coll.length) return undefined;
+  const out = [];
+  (coll.each || coll.forEach).call(coll, v => out.push(v[key]));
+  return out;
+}

@@ -1,16 +1,7 @@
-/* global ctx */
-
-'use strict';
-
-// 最近更新生成器：在构建时(hexo generate)抓取外部博客的 RSS，
-// 解析为文章卡片数据并暴露给模板通过 site.recentUpdates 读取。
-//
-// 为什么构建时抓取而非客户端抓取：
-//   - 静态站点客户端抓取 RSS 受 CORS 限制，国内第三方代理不稳定；
-//   - 构建时在服务端抓取无 CORS 问题，生成纯静态 HTML，国内加载稳定且 SEO 友好。
-//
-// 抓取失败不会中断构建，仅打印警告并返回空数组（首页区块会自动隐藏）。
-// 支持 RSS 2.0 与 Atom 1.0，结构要求见 README。
+// 最近更新：构建时抓取外部博客 RSS 并解析为文章卡片数据（site.recentUpdates）
+// 构建时抓取（非客户端）：无 CORS、不依赖第三方代理、SEO 友好、国内加载稳定
+// 抓取失败不中断构建，仅警告并返回空数组（首页区块自动隐藏）
+// 支持 RSS 2.0 与 Atom 1.0，结构要求见 README
 
 const http = require('http');
 const https = require('https');
@@ -18,7 +9,6 @@ const https = require('https');
 let cachedRecent = null;
 
 module.exports = hexo => {
-  // before_generate 过滤器在生成前执行，且会被 await，确保数据就绪
   hexo.extend.filter.register('before_generate', async () => {
     const cfg = hexo.theme.config.recent_updates;
     if (!cfg || !cfg.enable || !cfg.rss_url) {
@@ -27,8 +17,7 @@ module.exports = hexo => {
     }
     try {
       const xml = await fetchText(cfg.rss_url, 8000);
-      const max = cfg.max_count || 3;
-      const items = parseFeed(xml, max);
+      const items = parseFeed(xml, cfg.max_count || 3);
       const excerptLen = cfg.excerpt_length || 80;
       cachedRecent = items.map(item => ({
         title: item.title,
@@ -51,9 +40,8 @@ function fetchText(url, timeout) {
     const lib = url.startsWith('https') ? https : http;
     const req = lib.get(url, { headers: { 'User-Agent': 'hexo-theme-tranquility' } }, res => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        // 跟随一次重定向
         res.resume();
-        return resolve(fetchText(absoluteUrl(res.headers.location, url), timeout));
+        return resolve(fetchText(new URL(res.headers.location, url).href, timeout));
       }
       if (res.statusCode !== 200) {
         res.resume();
@@ -65,87 +53,52 @@ function fetchText(url, timeout) {
       res.on('end', () => resolve(data));
     });
     req.on('error', reject);
-    req.setTimeout(timeout, () => {
-      req.destroy(new Error('timeout'));
-    });
+    req.setTimeout(timeout, () => req.destroy(new Error('timeout')));
   });
 }
 
-function absoluteUrl(location, base) {
-  try {
-    return new URL(location, base).href;
-  } catch (e) {
-    return location;
-  }
-}
-
-// 解析 RSS 2.0 与 Atom 1.0，返回 [{title, link, date, description}]
+// 统一解析 RSS 2.0 与 Atom 1.0：两者结构相似，仅条目标签与字段名不同
 function parseFeed(xml, max) {
-  if (/<feed[\s>]/i.test(xml) && /<entry/i.test(xml)) {
-    return parseAtom(xml, max);
-  }
-  return parseRss(xml, max);
-}
+  const isAtom = /<feed[\s>]/i.test(xml);
+  const entryTag = isAtom ? 'entry' : 'item';
+  const fields = isAtom
+    ? { link: ['href'], date: ['updated', 'published'], desc: ['summary', 'content'] }
+    : { date: ['pubDate', 'dc:date'], desc: ['description', 'content:encoded'] };
 
-function parseRss(xml, max) {
   const items = [];
-  const itemRe = /<item\b[\s\S]*?<\/item>/gi;
+  const re = new RegExp('<' + entryTag + '\\b[\\s\\S]*?</' + entryTag + '>', 'gi');
   let m;
-  while ((m = itemRe.exec(xml)) && items.length < max) {
+  while ((m = re.exec(xml)) && items.length < max) {
     const block = m[0];
-    const title = pick(block, 'title');
-    const link = pick(block, 'link') || pickAttr(block, 'link', 'href');
-    const date = pick(block, 'pubDate') || pick(block, 'dc:date');
-    const description = pick(block, 'description') || pick(block, 'content:encoded');
-    items.push({ title, link, date: formatDate(date), description });
+    const link = isAtom
+      ? (pickAttr(block, 'link', 'href') || pickText(block, 'link'))
+      : (pickText(block, 'link') || pickAttr(block, 'link', 'href'));
+    items.push({
+      title: pickText(block, 'title'),
+      link,
+      date: formatDate(fields.date.reduce((v, t) => v || pickText(block, t), '')),
+      description: fields.desc.reduce((v, t) => v || pickText(block, t), '')
+    });
   }
   return items;
 }
 
-function parseAtom(xml, max) {
-  const items = [];
-  const entryRe = /<entry\b[\s\S]*?<\/entry>/gi;
-  let m;
-  while ((m = entryRe.exec(xml)) && items.length < max) {
-    const block = m[0];
-    const title = pick(block, 'title');
-    const link = pickAttr(block, 'link', 'href') || pick(block, 'link');
-    const date = pick(block, 'updated') || pick(block, 'published');
-    const description = pick(block, 'summary') || pick(block, 'content');
-    items.push({ title, link, date: formatDate(date), description });
-  }
-  return items;
-}
-
-// 提取 <tag>...</tag> 的文本内容（去 CDATA、去标签）
-function pick(block, tag) {
-  const re = new RegExp('<' + tag + '[\\s>][\\s\\S]*?</' + tag + '>', 'i');
-  const m = block.match(re);
+// 提取 <tag>...</tag> 的文本内容（去 CDATA）
+function pickText(block, tag) {
+  const m = block.match(new RegExp('<' + tag + '[\\s>][\\s\\S]*?</' + tag + '>', 'i'));
   if (!m) return '';
-  let s = m[0].replace(/^<[^>]*>/, '').replace(/<\/[^>]*>$/, '');
-  s = stripCdata(s);
-  return s.trim();
+  return stripCdata(m[0].replace(/^<[^>]*>/, '').replace(/<\/[^>]*>$/, '')).trim();
 }
 
-// 提取 <tag href="..."/> 形式的属性
+// 提取 <tag attr="..."/> 的属性值
 function pickAttr(block, tag, attr) {
-  const re = new RegExp('<' + tag + '\\b[^>]*\\b' + attr + '\\s*=\\s*["\']([^"\']*)["\']', 'i');
-  const m = block.match(re);
+  const m = block.match(new RegExp('<' + tag + '\\b[^>]*\\b' + attr + '\\s*=\\s*["\']([^"\']*)["\']', 'i'));
   return m ? m[1].trim() : '';
 }
 
-function stripCdata(s) {
-  return s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
-}
-
-function stripTags(s) {
-  return stripCdata(s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-}
-
-function truncate(s, len) {
-  if (!s) return '';
-  return s.length > len ? s.slice(0, len) + '…' : s;
-}
+const stripCdata = s => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
+const stripTags = s => stripCdata(s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+const truncate = (s, len) => s && s.length > len ? s.slice(0, len) + '…' : (s || '');
 
 function formatDate(s) {
   if (!s) return '';

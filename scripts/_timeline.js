@@ -1,19 +1,17 @@
-moment = require("moment");
+// 时间线：从文章聚合，文章 front-matter 含 timeline 字段（值为 items 中的 name）即展示
+const moment = require('moment');
 
 module.exports = hexo => {
-  hexo.locals.set('timelineData', getTimeline);
-
-  function getTimeline() {
+  hexo.locals.set('timelineData', () => {
     const url_for = hexo.extend.helper.get('url_for').bind(hexo);
+    const cfg = hexo.theme.config.timeline;
+    if (!cfg || !cfg.enable) return {};
 
-    if (!hexo.theme.config.timeline || !hexo.theme.config.timeline.enable) return {};
-    const items = hexo.theme.config.timeline.items;
+    const items = cfg.items;
     const types = items.map(item => item.name);
-    const order = hexo.theme.config.timeline.order ? 'date' : '-date';
+    const order = cfg.order ? 'date' : '-date';
     const iconOf = type => url_for((items.find(item => item.name == type) || {}).icon || '');
 
-    // 时间线条目全部来自文章：文章 front-matter 含 timeline 字段（值为 items 中的 name）
-    // 即可展示在时间线，点击标题进入对应文章查看详情
     const posts = hexo.locals.get('posts').sort(order)
       .filter(post => types.includes(post.timeline))
       .map(p => ({
@@ -25,5 +23,5 @@ module.exports = hexo => {
       }));
 
     return { types, posts };
-  };
+  });
 };
