@@ -1,18 +1,35 @@
+<p align="center">
+  <strong>中文</strong> · <a href="./README_EN.md">English</a>
+</p>
+
 <h1> <div align="center"><img align="center" height="40" src="source/images/tranquility.svg"/> 致远</div></h1>
 
-<p align="center">致远是一款 Hexo 主题，专门为个人主页及多学科领域博主设计</p>
+<p align="center">一款为个人主页及多学科领域博主设计的 Hexo 主题</p>
 
 <p align="center">
-<a href="https://github.com/hooozen/hexo-theme-tranquility/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/hooozen/hexo-theme-tranquility?label=release&color=orange"></a>
+<a href="https://github.com/zycwer/hexo-theme-tranquility/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/zycwer/hexo-theme-tranquility?label=release&color=orange"></a>
 <a href="https://hexo.io/"><img src="https://img.shields.io/badge/Hexo-%3E%3D8.0.0-blue?logo=hexo"></a>
-<a href="https://github.com/hooozen/hexo-theme-tranquility/blob/main/LICENSE"><img src="https://img.shields.io/github/license/hooozen/hexo-theme-tranquility"></a>
+<a href="https://github.com/zycwer/hexo-theme-tranquility/blob/main/LICENSE"><img src="https://img.shields.io/github/license/zycwer/hexo-theme-tranquility"></a>
 
 <img src="./doc/images/index-ios-3.jpg"/>
 </p>
 
-演示站：
+> **💡 Fork 说明**
+>
+> 本仓库是 [hooozen/hexo-theme-tranquility](https://github.com/hooozen/hexo-theme-tranquility) 的 fork。原仓库已于 2026 年 6 月归档、停止维护，本 fork 在其基础上持续维护并新增了以下特性：
+>
+> - 一言（Hitokoto）Slogan 开关
+> - 文章驱动的时间线（取代配置文件事件）
+> - Hexo 原生关于页（取代配置文件内容）
+> - 构建时 RSS 聚合的「最近更新」卡片
+> - 代码精简优化（scripts 目录 -23%）
+> - 删除与关于页重复的简历（CV）功能
+>
+> 详见 [v1.4.0 Release](https://github.com/zycwer/hexo-theme-tranquility/releases/tag/v1.4.0)。
 
-- [致远](https://theme.hozen.site/tranquility/)
+## 演示站
+
+- [致远](https://theme.hozen.site/tranquility/)（原主题演示站）
 - [浩然的主页](https://www.hozen.site)
 
 ## 特点
@@ -22,6 +39,7 @@
 - [“子页”设计](#子页)，适应多领域写作
 - [最近更新](#最近更新rss-聚合)卡片，构建时聚合外部博客 RSS，国内加载稳定
 - [关于页](#关于页)（Hexo 原生页面）、[时间线](#时间线)（文章驱动，点击进入详情）
+- [一言（Hitokoto）](#一言slogan)Slogan，刷新随机切换
 - 三端自适应，舒适阅读
 - 自定义字体及提取压缩，兼具美观和性能
 - [相关文章](#相关文章)、[数学公式](#数学公式)、[Gitalk 评论](#其他)、[赞赏](#文章赞赏)、[SEO](#其他)
@@ -69,7 +87,7 @@
 
     ```sh
     cd hexo
-    git clone https://github.com/hooozen/hexo-theme-tranquility.git themes/tranquility
+    git clone https://github.com/zycwer/hexo-theme-tranquility.git themes/tranquility
     ```
 
 2. 并配置根目录下 `_config.yml` 中的 `theme` 字段为 `tranquility`（参考 [主题 | Hexo](https://hexo.io/zh-cn/docs/themes))。
@@ -116,7 +134,7 @@
     git pull
     ```
 
-- 阅读[更新说明](https://github.com/hooozen/hexo-theme-tranquility/releases)，并查看 `themes/tranquility/_config-template.yml` 的新增和修改项，对应修改你的 `_theme.tranuility.yml` 文件
+- 阅读[更新说明](https://github.com/zycwer/hexo-theme-tranquility/releases)，并查看 `themes/tranquility/_config-template.yml` 的新增和修改项，对应修改你的 `_theme.tranuility.yml` 文件
 
 ## 设计逻辑
 
