@@ -13,7 +13,7 @@
     <div class="wall-main" id="wall-main">
       <div class="wall-title">{{ config.title | upper }}</div>
       <div class="wall-subtitle">{{ config.subtitle }}</div>
-      <div class="wall-description">{{ theme.slogan }}</div>
+      <div class="wall-description{% if theme.slogan_hitokoto %} wall-description--hitokoto{% endif %}"{% if theme.slogan_hitokoto %} id="hitokoto-slogan" data-fallback="{{ theme.slogan }}"{% endif %}>{{ theme.slogan }}</div>
     </div>
     <div class="wall-bg">
       <div class="wall-bg-index">
@@ -95,5 +95,8 @@
   {% endif %}
   {% if theme.recent_updates and theme.recent_updates.enable %}
     <script defer src="{{ url_for('js/recent.js') }}"></script>
+  {% endif %}
+  {% if theme.slogan_hitokoto %}
+    <script defer src="{{ url_for('js/hitokoto.js') }}"></script>
   {% endif %}
 {% endblock script %}

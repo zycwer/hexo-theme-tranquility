@@ -69,6 +69,12 @@ for item in hexo-config('timeline.items') {
   letter-spacing: 0.2em;
 }
 
+// 开启一言后内容随机，sourceHanSerif 子字体无法覆盖，
+// 改用单一系统宋体字面，避免同一句中两种宋体字面交错
+.wall-description--hitokoto {
+  font-family: "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", serif;
+}
+
 #heart-curve {
   position: absolute;
   right: 0;

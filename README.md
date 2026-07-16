@@ -46,6 +46,7 @@
 - [设计逻辑](#设计逻辑)
   - [改变](#改变)
 - [配置](#配置)
+  - [一言（Slogan）](#一言slogan)
   - [站点模式](#站点模式)
   - [子页](#子页)
   - [时间线](#时间线)
@@ -149,6 +150,21 @@
 经过[安装](#安装)步骤，你在博客根目录下已经有了一个 `_config.tranquility.yml` 文件。如没有，请阅读并检查[安装步骤](#安装)。如不加说明，该部分的配置均在博客更目录下的 `_config.tranquility.yml` 文件进行。
 
 本章所有的配置内容你都可以在 [致远](https://theme.www.hozen.site/tranquility/) 网站找到对应的测试文章，并在 [hooozen/hexo-theme-test](https://github.com/hooozen/hexo-theme-test) 仓库中找到对应的配置文件。所以当哪个配置项说明读不懂时不妨去找一下对应的例子。
+
+### 一言（Slogan）
+
+首页顶部展示的 `slogan`（如“宁静致远”）。开启 `slogan_hitokoto` 后，该位置会在浏览器端请求 [hitokoto.cn](https://v1.hitokoto.cn) 的「一言」接口，随机展示一句话，每次刷新都可能不同：
+
+```yml
+slogan: “宁静致远”        # 静态 slogan，作为一言请求失败 / JS 未执行时的回退
+slogan_hitokoto: false   # 开启后首页 slogan 处展示随机一言
+```
+
+说明：
+
+- 一言内容由客户端请求 `https://v1.hitokoto.cn/`，构建时仍把静态 `slogan` 渲染进 HTML，因此 **SEO 友好、无 JS 或请求失败时仍可见**（自动回退到静态 slogan）。
+- 接口 5 秒超时，失败静默回退，不会影响页面其他部分。
+- 开启后该位置字体自动切换为系统宋体（不使用提取子字体），避免随机字符不在子字体中导致的字体交错问题。
 
 ### 站点模式
 
