@@ -1,11 +1,3 @@
-# Archive 👋
-
-现在你可以使用 Claude Code 或任何一款 AI Agent 来快速构建自己的个人主页. 
-
-
------
-
-
 <h1> <div align="center"><img align="center" height="40" src="source/images/tranquility.svg"/> 致远</div></h1>
 
 <p align="center">致远是一款 Hexo 主题，专门为个人主页及多学科领域博主设计</p>
