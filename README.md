@@ -21,10 +21,10 @@
 - 支持[纯个人主页模式](#站点模式)（不含文章，聚合外部博客 RSS）
 - [“子页”设计](#子页)，适应多领域写作
 - [最近更新](#最近更新rss-聚合)卡片，构建时聚合外部博客 RSS，国内加载稳定
-- [关于页](#关于页)、[时间线](#时间线)（支持配置定义大事件）
+- [关于页](#关于页)（Hexo 原生页面）、[时间线](#时间线)（文章驱动，点击进入详情）
 - 三端自适应，舒适阅读
 - 自定义字体及提取压缩，兼具美观和性能
-- [简历制作](#简历)、[相关文章](#相关文章)、[数学公式](#数学公式)、[Gitalk 评论](#其他)、[赞赏](#文章赞赏)、[SEO](#其他)
+- [相关文章](#相关文章)、[数学公式](#数学公式)、[Gitalk 评论](#其他)、[赞赏](#文章赞赏)、[SEO](#其他)
 - 等
 
  -----
@@ -44,7 +44,6 @@
   - [时间线](#时间线)
   - [关于页](#关于页)
   - [最近更新（RSS 聚合）](#最近更新rss-聚合)
-  - [简历](#简历)
   - [代码高亮](#代码高亮)
   - [数学公式](#数学公式)
   - [首页自定义](#首页自定义)
@@ -239,47 +238,42 @@ timeline: article  # 展示在时间线列表中
 ---
 ```
 
-#### 配置定义的大事件
+#### 大事件由文章驱动
 
-除了从文章聚合，时间线也支持**直接在配置文件中定义事件**，无需对应文章。这在 `landing` 纯主页模式（本站不含文章）下尤其有用。在 `timeline.events` 下定义，`type` 需对应上方 `items` 中的某个 `name`：
-
-```yml
-timeline:
-  enable: true
-  order: false
-  items:
-    - name: event
-      color: "#568dc4"
-      icon: /images/icon/icon-event.svg
-      checked: true
-  events:
-    - date: 2024-01-01      # 日期，YYYY-MM-DD
-      title: 开通个人主页     # 事件标题
-      description: 使用本主题搭建  # 可选，描述
-      type: event            # 必填，对应 items 中的 name
-      link: https://...      # 可选，留空则只展示标题（不可点击）
-```
-
-配置定义的事件与文章事件会合并后按 `order` 排序展示。
+时间线的大事件完全由**文章**驱动：在文章 front-matter 中设置 `timeline` 字段（值为 `items` 中某个 `name`），该文章就会出现在首页时间线，点击标题进入文章查看详情。无需在配置文件中单独定义事件，详见上文示例。
 
 有关时间线的配置修改**可能需要重新启动服务**才会生效
 
 ### 关于页
 
-关于页是一个独立的 `/about` 路由，内容来自 `_config.tranquility.yml` 的 `about` 配置。在 `landing` 模式下推荐开启，作为个人主页的详细介绍页。
+关于页使用 Hexo 原生的**页面（Page）**功能实现，内容写在 markdown 文件里，无需在主题配置文件中填写。
 
-```yml
-about:
-  enable: true        # 是否生成 /about 页面
-  showInNav: true     # 是否在导航栏显示“关于”入口
-  title: 关于         # 页面标题
-  content:            # 内容段落，每项一段；空字符串表示空行
-    - 这里是关于我的介绍。
-    - 可以写多段文字介绍自己、技能、经历等。
-    - ''
+1. 在博客 `source` 目录下新建 `about/index.md`：
+
+```markdown
+---
+title: 关于
+layout: about
+date: 2024-01-01 00:00:00
+---
+
+这里是关于我的介绍，支持完整的 markdown 语法。
+
+## 经历
+
+- 内容直接写在页面文件中
+- 由 markdown 渲染为 HTML，使用主题提供的 `about` 布局
 ```
 
-若同时开启了[最近更新](#最近更新rss-聚合)，关于页底部会展示一个“订阅博客 RSS”的链接。
+2. 在 `_config.tranquility.yml` 中开启导航入口：
+
+```yml
+nav:
+  sticky: false
+  about: true   # 在导航栏显示“关于”入口，指向 /about/
+```
+
+主题提供 `layout: about` 页面模板，会渲染页面标题与 markdown 正文，并在底部自动展示博客 RSS 订阅链接（若开启了[最近更新](#最近更新rss-聚合)）。
 
 ### 最近更新（RSS 聚合）
 
@@ -345,81 +339,6 @@ recent_updates:
 ```
 
 > 推荐使用 Hexo 博客安装 [`hexo-generator-feed`](https://github.com/hexojs/hexo-generator-feed) 生成 RSS：在博客根目录 `_config.yml` 中配置 `feed: { type: atom, path: feed.xml, limit: 20 }`，然后将 `recent_updates.rss_url` 指向该 feed 地址即可。
-
-### 简历
-
-此功能提供一个线上简历页面，通过浏览器的打印功能可以导出 PDF，并且通过超链接保持简历的时效。通过主题配置文件的 `cv` 字段配置。
-
-首先需要安装以下依赖：
-
-```bash
-# hexo-fontawesome-icons 声明的 peer 依赖为 hexo@6.x，与 Hexo 8.x 存在冲突，
-# 但实际兼容 Hexo 8.x，加 --legacy-peer-deps 跳过 peer 依赖检查即可
-npm install hexo-fontawesome-icons --legacy-peer-deps
-```
-
-博客的基础配置如下：
-
-- `enable: true` 是否开启简历功能
-- `showInNav: true` 是否在网站导航栏显示(需 `enable` 为 `true`)
-- `keywords: ...` 简历页的关键词(SEO)
-- `description: ...` 简历页的描述(SEO)
-- `title: ...'cv` 简历页的标题
-- `iconPrefix: fas` 简历中 fontawesome 图标使用的风格
-
-博客的内容配置(`cv.content`)分为以下几块：
-
-1. 标题(title)
-2. 基本信息(baseInfo)
-3. 教育背景(edu)
-4. 超链接(tel | email | github | (blog & blogHref))
-5. 自定义模块(chapters)
-
-其中前 4 个配置是必需的(超链接可任选若干)，配置比较简单请参考演示项目的配置。
-
-对于自定义模块用户根据自身情况自行添加，例如“工作经历”、“项目经历”、“自我评价”等。其配置方法如下：
-
-任何一个自定义模块视为 `chapters` 数组中的一个章节，有以下基本属性：
-
-- `title: string` 标题
-- `icon: string` 图标
-- `tips?: string` 提示，可选
-- `content?: string[]` 内容(与 `sections` 二选一)
-- `sections?: Section[]` 分节(与 `content` 二选一)
-
-其中图标使用 fontawesome 的图标插件，去它的[图标库](https://fontawesome.com/search?o=r&m=free)搜索你想使用的图标名称即可。
-
-内容的配置分为 `content` 和 `sections` 两种，若使用 `content` 则在该字段下输入分段数组来构成所在模块的内容。适合简单的场景，例如自我评价.
-
-```yml
-chapters:
-  - ...
-    ...
-  - title: 个人小结
-    icon: ranking-star
-    content:
-      - 第一段文本
-      - 第二段文本
-      - ...
-```
-
-而对于工作经历等模块，需要在模块中分节来介绍若干个工作经历或项目经历，则使用 `sections` 配置:
-
-```yml
-  - ...
-    ...
-  - title: 个人小结
-    icon: ranking-star
-    sections:
-      - ...
-```
-
-每个 `section` 的配置字段如下：
-
-- `title: string` 标题
-- `link?: string` 链接，可选
-- `description: string` 描述
-- `content: string[]` 内容
 
 ### 代码高亮
 

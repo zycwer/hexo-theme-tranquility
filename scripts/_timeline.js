@@ -12,35 +12,17 @@ module.exports = hexo => {
     const order = hexo.theme.config.timeline.order ? 'date' : '-date';
     const iconOf = type => url_for((items.find(item => item.name == type) || {}).icon || '');
 
-    // 来自本地文章（文章 front-matter 含 timeline 字段）
-    const postItems = hexo.locals.get('posts').sort(order)
+    // 时间线条目全部来自文章：文章 front-matter 含 timeline 字段（值为 items 中的 name）
+    // 即可展示在时间线，点击标题进入对应文章查看详情
+    const posts = hexo.locals.get('posts').sort(order)
       .filter(post => types.includes(post.timeline))
       .map(p => ({
         title: p.title,
         path: url_for(p.path),
         icon: iconOf(p.timeline),
         type: p.timeline,
-        date: moment(p.date).format('YYYY-MM-DD'),
-        desc: ''
+        date: moment(p.date).format('YYYY-MM-DD')
       }));
-
-    // 来自配置定义的大事件（不依赖文章，适合 landing 模式）
-    const configEvents = (hexo.theme.config.timeline.events || [])
-      .filter(ev => types.includes(ev.type))
-      .map(ev => ({
-        title: ev.title,
-        path: ev.link || '',
-        icon: iconOf(ev.type),
-        type: ev.type,
-        date: moment(ev.date).format('YYYY-MM-DD'),
-        desc: ev.description || ''
-      }));
-
-    const posts = postItems.concat(configEvents).sort((a, b) => {
-      return order === 'date'
-        ? a.date.localeCompare(b.date)
-        : b.date.localeCompare(a.date);
-    });
 
     return { types, posts };
   };

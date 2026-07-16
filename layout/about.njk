@@ -1,18 +1,14 @@
 {% extends "_partials/layout.njk" %}
 {% block link %}
   <link rel="stylesheet" type="text/css" href="{{ url_for("/css/index.css") }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for("/css/post.css") }}"/>
 {% endblock link %}
 {% block body %}
   <div class="about-page">
     <div class="about-page__title">{{ page.title or "关于" }}</div>
-    <div class="about-page__content">
-      {% for line in page.content %}
-        {% if not line %}
-          <br/>
-        {% else %}
-          <p>{{ line }}</p>
-        {% endif %}
-      {% endfor %}
+    {# Hexo 原生页面：内容来自 source/about/index.md，已由 markdown 渲染为 HTML #}
+    <div class="about-page__content post-content">
+      {{ page.content | safe }}
     </div>
     {% if theme.recent_updates and theme.recent_updates.enable and theme.recent_updates.rss_url %}
       <a class="about-page__rss" href="{{ theme.recent_updates.rss_url }}">订阅博客 RSS →</a>

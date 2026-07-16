@@ -96,11 +96,8 @@
                 <a class="nav-menu-item" href='{{ url_for("/blog/") }}'>博客</a>
               {% endif %}
             {% endif %}
-            {% if theme.about and theme.about.enable and theme.about.showInNav %}
-              <a class="nav-menu-item" href='{{ url_for("/about/") }}'>{{ theme.about.title or "关于" }}</a>
-            {% endif %}
-            {% if theme.cv.enable and theme.cv.showInNav %}
-              <a class="nav-menu-item" href='{{ url_for("/cv/") }}'>简历</a>
+            {% if theme.nav and theme.nav.about %}
+              <a class="nav-menu-item" href='{{ url_for("/about/") }}'>关于</a>
             {% endif %}
           </div>
         </div>

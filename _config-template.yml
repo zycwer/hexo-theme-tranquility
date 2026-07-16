@@ -51,16 +51,10 @@ index: # 配置首页个性化内容
       -
       - 绣口一吐就半个盛唐
 
-# 关于页（独立的 /about 路由，landing 模式下推荐开启）
-about:
-  enable: false
-  showInNav: false # 是否在导航栏显示入口
-  title: 关于
-  # 内容段落，每项一段；空字符串表示空行
-  content:
-    - 这里是关于我的介绍。
-    - 可以写多段文字介绍自己、技能、经历等。
-    - ''
+# 关于页使用 Hexo 原生页面功能实现：
+# 在博客 source 目录下新建 about/index.md，并在其 front-matter 中设置 `layout: about`，
+# 即可使用主题的 about 布局渲染。内容（markdown）写在页面文件中，无需在此配置。
+# 是否在导航栏显示“关于”入口，由下方 nav.about 控制。
 
 # 首页最近更新卡片（从外部博客 RSS 拉取，构建时抓取并服务端渲染）
 # 适合 landing 模式：本站不含文章，把外部博客的最新文章以卡片形式展示在首页
@@ -172,14 +166,6 @@ timeline:
       color: "#568dc4"
       icon: /images/icon/icon-event.svg
       checked: false
-  # 大事件：直接在配置中定义，不依赖文章。适合 landing 模式或无对应文章的事件
-  # type 需对应上方 items 中的 name；link 可选，留空则只展示标题
-  events:
-    - date: 2024-01-01
-      title: 开通个人主页
-      description: 使用 Tranquility 主题搭建个人主页
-      type: event
-      link:
 
 # 标签云
 tagcloud:
@@ -192,70 +178,6 @@ mermaid:
   version: 10.9.3 # 固定版本,避免 latest 因上游 breaking change 失效(11.x 为 ESM,需改用 type="module" 加载)
   options:
     startOnload: true
-
-cv:
-  enable: true
-  showInNav: true
-  iconPrefix: fas
-  keywords: 简历,李白
-  description: 李白的简历
-  title: 李白的简历
-  content:
-    title: 李白
-    baseInfo:
-      - 唐朝
-      - 诗人
-      - 太白
-      - 青莲居士
-    tel: 八八八八八
-    email: 李白@唐.中文
-    github: 暂无
-    blog: Tranquility
-    blogHref: https://theme.hozen.site/tranquility/
-    edu:
-      title: "教育背景"
-      content:
-        - 701 至 715，修习诗词剑术
-        - 718 至 724，蜀地隐居
-    chapters:
-      - title: "代表作品"
-        icon: person-digging
-        tips: 请点击项目名称查看项目详情
-        sections:
-          - title: 蜀道难
-            link: https://so.gushiwen.cn/shiwenv_d59ec5d6c91c.aspx
-            description: 乐府诗、浪漫主义
-            content:
-              - 天宝元年
-              - 这首诗是袭用乐府旧题，意在送友人入蜀。诗人以浪漫主义的手法，展开丰富的想象，艺术地再现了蜀道峥嵘，突兀，强悍、崎岖等奇丽惊险和不可凌越的磅礴气势，借以歌咏蜀地山川的壮秀，显示出祖国山河的雄伟壮丽。
-              - 至于本诗是否有更深的寓意，历代有各种不同看法。然而就诗论诗，不一定强析有寓意。但从诗中，“所守或匪亲，化为狼与豺”看，却是在写蜀地山川峻美的同时，告诫当局，蜀地险要，应好好用人防守。
-              - 诗采用律体与散文间杂，文句参差，笔意纵横，豪放洒脱。全诗感情强烈，一唱三叹，回环反复，读来令人心潮激荡。
-          - title: 将进酒
-            link: https://so.gushiwen.cn/shiwenv_ee16df5673bc.aspx
-            description: 乐府七言歌行
-            content:
-              - 开元二十二年
-              - 这首诗是诗人当时和友人岑勋在嵩山另一老友元丹丘的颍阳山居作客，作者正值仕途遇挫之际，所以借酒兴诗，来了一次酣畅淋漓的抒发。在这首诗里，李白“借题发挥”，借酒消愁，感叹人生易老，抒发了自己怀才不遇的心情。
-              - 这首诗十分形象的体现了李白桀骜不驯的性格：对自己充满自信、孤高自傲、热情豪放，“天生我材必有用”、“人生得意须尽欢”。全诗气势豪迈，感情豪放，言语流畅，具有极强的感染力。李白咏酒的诗歌非常能体现他的个性，思想内容深沉，艺术表现成熟。《将进酒》即为其代表作。
-      - title: 工作经验
-        icon: laptop-code
-        sections:
-          - title: 大唐翰林供奉
-            description: 743 - 744
-            content:
-              - 赐宫锦袍。暮春，兴庆池牡丹盛开，玄宗与杨玉环同赏，李白又奉诏作《清平调》。对御用文人生活日渐厌倦，始纵酒以自昏秽。
-              - 与贺知章等人结“酒中八仙”之游，玄宗呼之不朝。尝奉诏醉中起草诏书，引足令高力士脱靴，宫中人恨之，谗谤于玄宗，玄宗疏之，后玄宗赐金放还。
-      - title: 荣誉奖项
-        icon: trophy
-        list: true
-        content:
-          - 诗仙
-          - 酒中八仙
-      - title: 个人小结
-        icon: ranking-star
-        content:
-          - 为人爽朗大方，乐于交友，爱好饮酒作诗，名列“酒中八仙”  。曾经得到唐玄宗李隆基赏识，担任翰林供奉， 赐金放还，游历全国，先后迎娶宰相许圉师、宗楚客的孙女。唐肃宗即位后，卷入永王之乱，流放夜郎，辗转到达当涂县令李阳冰家。上元二年，去世，时年六十二。
-          - 著有《李太白集》，代表作有《望庐山瀑布》《行路难》《蜀道难》《将进酒》《早发白帝城》等。 李白所作词赋，就其开创意义及艺术成就而言，享有极为崇高的地位，后世誉为“诗仙”，与诗圣杜甫并称“李杜”。
 
 search:
   path: search.json
@@ -273,6 +195,7 @@ algolia:
 
 nav:
   sticky: false
+  about: false # 是否在导航栏显示“关于”入口（页面内容由 source/about/index.md 提供）
 
 google_ad:
   enable: false

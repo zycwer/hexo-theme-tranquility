@@ -63,8 +63,6 @@ function getSubText(hexo) {
     .concat(config.reward.text)
     .concat(config.foot.title);
 
-  if (config.cv) text = text.concat(getObjValues(config.cv));
-
   return Array.from(new Set(text.join("").split("")))
     .sort().join("");
   // must be sorted and .notdef at first position. see: https://github.com/opentypejs/opentype.js/issues/94
