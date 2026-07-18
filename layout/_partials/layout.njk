@@ -117,15 +117,24 @@
       </script>
     {% endif %}
     {% block link %}{% endblock link %}
-    {# JSON-LD 结构化数据：提升搜索引擎富摘要 #}
+    {# JSON-LD 结构化数据：提升搜索引擎富摘要。字符串字段做 JSON 转义避免破坏 JSON #}
     {% set jsonld_type = 'about' if (page.layout == 'about') else ('article' if is_post() else 'website') %}
     <script type="application/ld+json">
       {% if jsonld_type == 'website' %}
-        {"@context":"https://schema.org","@type":"WebSite","name":"{{ config.title }}","description":"{{ config.description }}","url":"{{ config.url }}"}
+        {"@context":"https://schema.org","@type":"WebSite","name":"{{ config.title | replace('\\', '\\\\') | replace('"', '\\"') }}","description":"{{ config.description | replace('\\', '\\\\') | replace('"', '\\"') }}","url":"{{ config.url }}"}
       {% elif jsonld_type == 'article' %}
-        {"@context":"https://schema.org","@type":"Article","headline":"{{ page.title }}","datePublished":"{{ page.date.format('YYYY-MM-DD') if page.date else '' }}","dateModified":"{{ page.updated.format('YYYY-MM-DD') if page.updated else '' }}","author":{"@type":"Person","name":"{{ config.author or config.title }}"}}
+        {% set _art_img = page.cover or theme.index.photo or theme.logo %}
+        {% set _art_img_abs = '' %}
+        {% if _art_img %}
+          {% if _art_img.indexOf('http') == 0 %}
+            {% set _art_img_abs = _art_img %}
+          {% else %}
+            {% set _art_img_abs = full_url_for(_art_img) %}
+          {% endif %}
+        {% endif %}
+        {"@context":"https://schema.org","@type":"Article","headline":"{{ page.title | replace('\\', '\\\\') | replace('"', '\\"') }}","datePublished":"{{ page.date.format('YYYY-MM-DD') if page.date else '' }}","dateModified":"{{ page.updated.format('YYYY-MM-DD') if page.updated else '' }}","author":{"@type":"Person","name":"{{ (config.author or config.title) | replace('\\', '\\\\') | replace('"', '\\"') }}"}{% if _art_img_abs %},"image":"{{ _art_img_abs }}"{% endif %}{% if page.tags and page.tags.length %},"keywords":"{% for _t in page.tags.toArray() %}{% if not loop.first %}, {% endif %}{{ _t.name | replace('\\', '\\\\') | replace('"', '\\"') }}{% endfor %}"{% endif %}}
       {% else %}
-        {"@context":"https://schema.org","@type":"Person","name":"{{ config.author or config.title }}","description":"{{ config.description }}"}
+        {"@context":"https://schema.org","@type":"Person","name":"{{ (config.author or config.title) | replace('\\', '\\\\') | replace('"', '\\"') }}","description":"{{ config.description | replace('\\', '\\\\') | replace('"', '\\"') }}"}
       {% endif %}
     </script>
   </head>

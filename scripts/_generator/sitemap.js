@@ -10,13 +10,15 @@ module.exports = hexo => {
     const urls = [];
     const seen = new Set();
     const add = (path, lastmod, changefreq, priority) => {
-      if (!path || seen.has(path)) return;
+      if (path === null || path === undefined || seen.has(path)) return;
       seen.add(path);
-      urls.push({ loc: fullUrlFor(path), lastmod, changefreq, priority });
+      // 空字符串代表首页，用根 URL（full_url_for('') 可能不带尾斜杠）
+      const loc = path === '' ? fullUrlFor('/') : fullUrlFor(path);
+      urls.push({ loc, lastmod, changefreq, priority });
     };
 
-    // 首页
-    add('index.html', Date.now(), 'daily', '1.0');
+    // 首页（用根路径，避免 /index.html 与 / 产生重复 URL）
+    add('', Date.now(), 'daily', '1.0');
 
     // 文章
     locals.posts.sort('-date').each(post => {

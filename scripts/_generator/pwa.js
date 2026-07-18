@@ -9,10 +9,21 @@ module.exports = hexo => {
     const url_for = hexo.extend.helper.get('url_for').bind(this);
     const fav = this.theme.config.favicon || {};
     const icons = [];
-    if (fav.apple_touch_icon) icons.push({ src: url_for(fav.apple_touch_icon), sizes: '180x180', type: 'image/png' });
-    if (fav.medium) icons.push({ src: url_for(fav.medium), sizes: '32x32', type: 'image/png' });
-    // logo.svg 作为任意尺寸图标
-    if (this.theme.config.logo) icons.push({ src: url_for(this.theme.config.logo), sizes: 'any', type: 'image/svg+xml' });
+    // PWA 安装提示要求至少 192x192 与 512x512。
+    // 主题无法保证用户提供了这两个尺寸的位图，因此：
+    //   - apple_touch_icon (180x180) 同时声明为 192x192（浏览器会缩放）
+    //   - logo.svg 声明 sizes="any" 覆盖 512x512（矢量图任意尺寸清晰）
+    if (fav.apple_touch_icon) {
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '180x180', type: 'image/png', purpose: 'any' });
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '192x192', type: 'image/png', purpose: 'any' });
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '512x512', type: 'image/png', purpose: 'any' });
+    }
+    if (fav.medium) icons.push({ src: url_for(fav.medium), sizes: '32x32', type: 'image/png', purpose: 'any' });
+    // logo.svg 作为任意尺寸图标（含 maskable，适配 Android 自适应图标）
+    if (this.theme.config.logo) {
+      icons.push({ src: url_for(this.theme.config.logo), sizes: 'any', type: 'image/svg+xml', purpose: 'any' });
+      icons.push({ src: url_for(this.theme.config.logo), sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' });
+    }
 
     const manifest = {
       name: cfg.name || this.config.title,
