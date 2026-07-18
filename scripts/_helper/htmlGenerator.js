@@ -6,7 +6,7 @@ module.exports = function (args) {
   const items = args.json.map(item => `
     <div class="${cls}-item">
       ${item.date ? `<div class="${cls}-date">${item.date}</div>` : ''}
-      ${item.img ? `<div class="${cls}-img"><img src="${item.img}" /></div>` : ''}
+      ${item.img ? `<div class="${cls}-img"><img src="${item.img}" loading="lazy" /></div>` : ''}
       <div class="${cls}-title"><a href="${item.path}" title="${item.title}" rel="bookmark">${item.title}</a></div>
       ${item.excerpt ? `<div class="${cls}-excerpt"><p>${item.excerpt}</p></div>` : ''}
     </div>`).join('');

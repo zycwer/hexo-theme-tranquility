@@ -21,6 +21,10 @@
     </title>
     <meta name="description" content="{{ config.description }}"/>
     <meta name="keywords" content="{{ config.keywords }}"/>
+    {% if theme.pwa and theme.pwa.enable %}
+      <link rel="manifest" href="{{ url_for('/manifest.json') }}"/>
+      <meta name="theme-color" content="{{ theme.pwa.theme_color or '#fcfcfb' }}"/>
+    {% endif %}
     {% if theme.favicon.apple_touch_icon %}
       <link rel="apple-touch-icon"
             sizes="180x180"
@@ -46,6 +50,53 @@
     {% if theme.favicon.android_manifest %}
       <link rel="manifest" href="{{ url_for(theme.favicon.android_manifest) }}"/>
     {% endif %}
+    {# Open Graph & Twitter Card：社交分享与 SEO #}
+    {% set og_title = page.title or config.title %}
+    {% set og_desc = page.excerpt or page.description or config.description %}
+    {% set og_url = full_url_for(page.path or '/') %}
+    {% set _og_img = page.cover or theme.index.photo or theme.logo %}
+    {% set og_image = '' %}
+    {% if _og_img %}
+      {% if _og_img.indexOf('http') == 0 %}
+        {% set og_image = _og_img %}
+      {% else %}
+        {% set og_image = full_url_for(_og_img) %}
+      {% endif %}
+    {% endif %}
+    <meta property="og:type" content="{% if is_post() %}article{% else %}website{% endif %}"/>
+    <meta property="og:title" content="{{ og_title }}"/>
+    <meta property="og:description" content="{{ og_desc }}"/>
+    <meta property="og:url" content="{{ og_url }}"/>
+    <meta property="og:site_name" content="{{ config.title }}"/>
+    {% if og_image %}<meta property="og:image" content="{{ og_image }}"/>{% endif %}
+    <meta name="twitter:card" content="{% if og_image %}summary_large_image{% else %}summary{% endif %}"/>
+    <meta name="twitter:title" content="{{ og_title }}"/>
+    <meta name="twitter:description" content="{{ og_desc }}"/>
+    {% if og_image %}<meta name="twitter:image" content="{{ og_image }}"/>{% endif %}
+    {# 深色模式：首屏同步解析，避免 FOUC。模式由 color_mode 配置（light/dark/auto/time） #}
+    <script>
+      window.__THEME_MODE__ = "{{ theme.color_mode or 'light' }}";
+      (function () {
+        var m = window.__THEME_MODE__;
+        var ts = {{ (theme.color_mode_time and theme.color_mode_time.start) or 18 }};
+        var te = {{ (theme.color_mode_time and theme.color_mode_time.end) or 6 }};
+        var o = localStorage.getItem('theme-override');
+        var t;
+        if (o === 'light' || o === 'dark') {
+          t = o;
+        } else if (m === 'dark') {
+          t = 'dark';
+        } else if (m === 'auto') {
+          t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        } else if (m === 'time') {
+          var h = new Date().getHours();
+          t = ts > te ? (h >= ts || h < te ? 'dark' : 'light') : (h >= ts && h < te ? 'dark' : 'light');
+        } else {
+          t = 'light';
+        }
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
     {% if theme.zh_font.enable %}
       {% include('./components/font.njk') %}
     {% endif %}
@@ -66,6 +117,17 @@
       </script>
     {% endif %}
     {% block link %}{% endblock link %}
+    {# JSON-LD 结构化数据：提升搜索引擎富摘要 #}
+    {% set jsonld_type = 'about' if (page.layout == 'about') else ('article' if is_post() else 'website') %}
+    <script type="application/ld+json">
+      {% if jsonld_type == 'website' %}
+        {"@context":"https://schema.org","@type":"WebSite","name":"{{ config.title }}","description":"{{ config.description }}","url":"{{ config.url }}"}
+      {% elif jsonld_type == 'article' %}
+        {"@context":"https://schema.org","@type":"Article","headline":"{{ page.title }}","datePublished":"{{ page.date.format('YYYY-MM-DD') if page.date else '' }}","dateModified":"{{ page.updated.format('YYYY-MM-DD') if page.updated else '' }}","author":{"@type":"Person","name":"{{ config.author or config.title }}"}}
+      {% else %}
+        {"@context":"https://schema.org","@type":"Person","name":"{{ config.author or config.title }}","description":"{{ config.description }}"}
+      {% endif %}
+    </script>
   </head>
   <body>
     {% if theme.algolia and theme.algolia.enable %}
@@ -86,6 +148,14 @@
           {% elif theme.search and theme.search.enable %}
             <div class="search-outer">{% include("./components/search-btn.njk") %}</div>
           {% endif %}
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换深色模式">
+            <span class="theme-toggle__icon theme-toggle__icon--sun">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/><line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/></g></svg>
+            </span>
+            <span class="theme-toggle__icon theme-toggle__icon--moon">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="currentColor"/></svg>
+            </span>
+          </button>
           <div class="nav-menu">
             {% if theme.homepage_mode != 'landing' %}
               {% if theme.subpage.enable %}
@@ -132,6 +202,16 @@
       </script>
     {% endif %}
     <script defer src="{{url_for('js/copy-code.js')}}"></script>
+    <script defer src="{{url_for('js/theme.js')}}"></script>
+    {% if theme.pwa and theme.pwa.enable %}
+      <script>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('{{ url_for("/sw.js") }}').catch(function(){});
+          });
+        }
+      </script>
+    {% endif %}
     {% block script %}{% endblock script %}
   </body>
 </html>

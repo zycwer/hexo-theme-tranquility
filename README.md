@@ -40,6 +40,8 @@
 - [最近更新](#最近更新rss-聚合)卡片，构建时聚合外部博客 RSS，国内加载稳定
 - [关于页](#关于页)（Hexo 原生页面）、[时间线](#时间线)（文章驱动，点击进入详情）
 - [一言（Hitokoto）](#一言slogan)Slogan，刷新随机切换
+- [深色模式](#深色模式)（浅色/深色/定时/跟随浏览器，导航栏一键切换）
+- [Open Graph](#open-graph--twitter-card) 社交分享卡片、[JSON-LD](#json-ld-结构化数据) 结构化数据、[站点地图](#站点地图)、[PWA](#pwa-可安装应用)
 - 三端自适应，舒适阅读
 - 自定义字体及提取压缩，兼具美观和性能
 - [相关文章](#相关文章)、[数学公式](#数学公式)、[Gitalk 评论](#其他)、[赞赏](#文章赞赏)、[SEO](#其他)
@@ -57,11 +59,16 @@
   - [改变](#改变)
 - [配置](#配置)
   - [一言（Slogan）](#一言slogan)
+  - [深色模式](#深色模式)
   - [站点模式](#站点模式)
   - [子页](#子页)
   - [时间线](#时间线)
   - [关于页](#关于页)
   - [最近更新（RSS 聚合）](#最近更新rss-聚合)
+  - [Open Graph & Twitter Card](#open-graph--twitter-card)
+  - [JSON-LD 结构化数据](#json-ld-结构化数据)
+  - [站点地图](#站点地图)
+  - [PWA（可安装应用）](#pwa可安装应用)
   - [代码高亮](#代码高亮)
   - [数学公式](#数学公式)
   - [首页自定义](#首页自定义)
@@ -174,6 +181,32 @@ slogan_hitokoto: false   # 开启后首页 slogan 处展示随机一言
 - 一言内容由客户端请求 `https://v1.hitokoto.cn/`，构建时仍把静态 `slogan` 渲染进 HTML，因此 **SEO 友好、无 JS 或请求失败时仍可见**（自动回退到静态 slogan）。
 - 接口 5 秒超时，失败静默回退，不会影响页面其他部分。
 - 开启后该位置字体自动切换为系统宋体（不使用提取子字体），避免随机字符不在子字体中导致的字体交错问题。
+
+### 深色模式
+
+主题内置运行时深色模式（基于 CSS 变量，**切换无需重建**），支持四种策略，由 `color_mode` 控制：
+
+```yml
+color_mode: light  # light | dark | auto | time
+color_mode_time:   # 仅 color_mode: time 时生效
+  start: 18        # 深色开始（24h 制，含）
+  end: 6           # 深色结束（24h 制，不含，支持跨午夜，如 18→6）
+```
+
+| 模式 | 行为 |
+| --- | --- |
+| `light` | 始终浅色（默认） |
+| `dark` | 始终深色 |
+| `auto` | 跟随浏览器 `prefers-color-scheme`，系统切换时实时响应 |
+| `time` | 在 `color_mode_time.start` ~ `end` 时段使用深色，其余浅色 |
+
+导航栏右侧有一个 ☾/☀ 切换按钮：点击会立即切换主题，并把选择写入 `localStorage`（`theme-override`），**手动覆盖优先于配置策略**。清除浏览器存储后会回到配置的策略。
+
+实现要点：
+
+- 首屏内联同步脚本在 CSS 加载前设置 `data-theme`，避免 FOUC（切换瞬间的样式闪烁）。
+- `auto` 模式下监听 `matchMedia('(prefers-color-scheme: dark)')` 的 `change` 事件，系统切换时自动跟随（除非已有手动覆盖）。
+- 所有颜色通过 `source/css/_theme.styl` 的 CSS 变量定义，`_variables.styl` 中把 Stylus 变量映射到 `var(--c-*)`，因此已有的样式无需逐处修改即可响应深色模式。
 
 ### 站点模式
 
@@ -357,6 +390,83 @@ recent_updates:
 ```
 
 > 推荐使用 Hexo 博客安装 [`hexo-generator-feed`](https://github.com/hexojs/hexo-generator-feed) 生成 RSS：在博客根目录 `_config.yml` 中配置 `feed: { type: atom, path: feed.xml, limit: 20 }`，然后将 `recent_updates.rss_url` 指向该 feed 地址即可。
+
+### Open Graph & Twitter Card
+
+主题自动为每个页面注入 Open Graph 与 Twitter Card meta 标签，用于社交平台分享时展示标题、描述和封面图（微信、Telegram、Twitter/X、Slack、Discord 等均会读取）。
+
+无需额外配置，标签会自动生成：
+
+- `og:type` —— 文章页为 `article`，其余页面为 `website`
+- `og:title` / `og:description` —— 取自页面标题与描述（文章页取摘要）
+- `og:url` —— 页面绝对 URL（通过 `full_url_for` 生成）
+- `og:site_name` —— 取自博客根目录 `_config.yml` 的 `title`
+- `og:image` —— 优先级：文章 `cover` → 首页 `index.photo` → `logo`
+- `twitter:card` —— 默认 `summary_large_image`（有封面时）或 `summary`
+
+如需自定义分享图，在文章 front-matter 中设置 `cover` 字段（既用于文章列表封面，也用于分享卡片）：
+
+```yml
+---
+title: 我的一篇文章
+cover: /assets/images/my-cover.jpg
+---
+```
+
+> `og:image` 会自动转换为绝对 URL。若 `cover` 已经是 `http(s)://` 开头的完整 URL，则原样使用。
+
+### JSON-LD 结构化数据
+
+主题根据页面类型自动注入 [schema.org](https://schema.org/) JSON-LD 结构化数据，帮助搜索引擎理解站点内容（Google 富媒体搜索结果会读取）：
+
+| 页面类型 | Schema 类型 | 主要字段 |
+| --- | --- | --- |
+| 关于页（`layout: about`） | `Person` | name、url、email、logo |
+| 文章页 | `Article` | headline、datePublished、dateModified、author、image、keywords |
+| 其他页面（首页、子页等） | `WebSite` | name、url、description |
+
+无需配置，自动从主题配置与文章 front-matter 中读取数据。
+
+### 站点地图
+
+主题内置 `sitemap.xml` 生成器，构建时自动产出站点地图，提交给 Google Search Console / Bing Webmaster / 百度站长等平台。
+
+```yml
+sitemap:
+  enable: true  # 默认开启，设为 false 可关闭
+```
+
+生成的 `sitemap.xml` 包含：
+
+- 首页（`priority=1.0`，`changefreq=daily`）
+- 所有文章（按发布时间倒序，`priority=0.8`，`changefreq=weekly`，含 `lastmod`）
+- 所有页面（`priority=0.6`，`changefreq=monthly`）
+- 所有分类与标签归档页（`priority=0.4`，`changefreq=weekly`）
+
+URL 均为绝对路径（基于博客根目录 `_config.yml` 的 `url` 配置）。
+
+### PWA（可安装应用）
+
+主题可生成 Progressive Web App 所需的 `manifest.json` 与 Service Worker（`sw.js`），让站点支持「添加到主屏幕」、离线访问与静态资源缓存。
+
+```yml
+pwa:
+  enable: false       # 默认关闭，开启后生成 manifest.json 与 sw.js
+  name:               # 应用全名（留空则取站点 title）
+  short_name:         # 主屏幕图标下的短名（留空则取 name 前 12 字符）
+  description:        # 应用描述
+  display: standalone # standalone | fullscreen | minimal-ui | browser
+  theme_color: "#fcfcfb"        # 应用主题色（与深色模式浅色色板一致）
+  background_color: "#fcfcfb"   # 启动画面背景色
+```
+
+开启后：
+
+- `manifest.json` 自动从 `favicon` 配置生成 `icons` 数组（apple-touch-icon 180×180、favicon-32×32、svg）。
+- `sw.js` 采用「静态资源缓存优先、HTML 网络优先回退缓存」策略：JS/CSS/图片/字体优先从缓存读取，HTML 页面优先请求网络，网络失败时回退到缓存（保证用户能离线访问已浏览过的页面）。
+- 页面会自动注册 Service Worker（仅在生产环境、HTTPS 或 `localhost` 下生效），并设置 `<meta name="theme-color">`。
+
+> **注意**：PWA 必须在 **HTTPS** 环境下才能注册 Service Worker（`localhost` 除外）。GitHub Pages、Vercel、Netlify、Cloudflare Pages 等托管平台默认提供 HTTPS，可直接使用。
 
 ### 代码高亮
 

@@ -1,0 +1,45 @@
+// 主题色板：通过 CSS 变量实现深色模式，运行时切换无需重建
+// 模式由 _config.color_mode 控制（light | dark | auto | time），详见 README
+:root {
+  --c-bg: #fcfcfb;            // 页面/墙覆盖底色
+  --c-bg-soft: #eff2f3;       // 次级背景
+  --c-bg-muted: #f5f5f5;      // 静音背景（卡片底/分页等）
+  --c-bg-card: #ffffff;       // 卡片背景
+  --c-bg-overlay: rgba(255, 255, 255, 0.25);  // 导航毛玻璃底
+  --c-bg-overlay-strong: rgba(255, 255, 255, 0.9);  // 移动端导航底
+  --c-wall-overlay: rgba(255, 255, 255, 0.95);
+  --c-wall-overlay-hover: rgba(255, 255, 255, 0.8);
+  --c-text: #555;             // 正文
+  --c-text-heading: #222;     // 标题
+  --c-text-soft: #666;
+  --c-text-muted: #888;
+  --c-border: #eee;
+  --c-border-strong: #ddd;
+  --c-link: #555;
+  --c-link-hover: #222;
+  --c-shadow: rgba(0, 0, 0, 0.04);
+  --c-paginator: #333;
+  --c-nav-btn: #333;
+}
+
+[data-theme="dark"] {
+  --c-bg: #1a1a1a;
+  --c-bg-soft: #242424;
+  --c-bg-muted: #2a2a2a;
+  --c-bg-card: #2a2a2a;
+  --c-bg-overlay: rgba(26, 26, 26, 0.35);
+  --c-bg-overlay-strong: rgba(20, 20, 20, 0.92);
+  --c-wall-overlay: rgba(26, 26, 26, 0.92);
+  --c-wall-overlay-hover: rgba(26, 26, 26, 0.75);
+  --c-text: #c4c4c4;
+  --c-text-heading: #e8e8e8;
+  --c-text-soft: #aeaeae;
+  --c-text-muted: #888;
+  --c-border: #3a3a3a;
+  --c-border-strong: #4a4a4a;
+  --c-link: #c4c4c4;
+  --c-link-hover: #ffffff;
+  --c-shadow: rgba(0, 0, 0, 0.4);
+  --c-paginator: #c4c4c4;
+  --c-nav-btn: #ddd;
+}

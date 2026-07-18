@@ -5,6 +5,16 @@ slogan_hitokoto: false
 email: example@email.com
 logo: "/images/logo.svg"
 
+# 深色模式：
+#   light = 始终浅色
+#   dark  = 始终深色
+#   auto  = 跟随浏览器 prefers-color-scheme
+#   time  = 按时间段切换（见下方 color_mode_time）
+color_mode: light
+color_mode_time:
+  start: 18  # 深色模式开始小时（24 小时制，下同）
+  end: 6     # 深色模式结束小时（支持跨午夜，如 18→6）
+
 # 第三方库(MathJax / Mermaid / Gitalk / DocSearch)的 CDN 源
 # 默认 jsDelivr;unpkg 国内访问不稳定。国内可改为 https://npm.elemecdn.com
 cdn: https://cdn.jsdelivr.net/npm
@@ -200,3 +210,19 @@ nav:
 google_ad:
   enable: false
   meta_tag: "G-XXXXXXXXXX" # Google Analytics meta tag
+
+# 站点地图：自动生成 sitemap.xml（覆盖文章/页面/分类/标签）
+# 若已安装 hexo-generator-sitemap，可在此关闭以避免冲突
+sitemap:
+  enable: true
+
+# PWA：生成 manifest.json + Service Worker，移动端可"添加到主屏幕"，离线可访问已缓存页面
+# 首次开启后需 https 访问（localhost 除外）Service Worker 才会注册
+pwa:
+  enable: false
+  name: # PWA 应用名，留空则使用 config.title
+  short_name: # 短名，留空则使用 config.title
+  description: # 描述，留空则使用 config.description
+  display: standalone # standalone | fullscreen | minimal-ui | browser
+  theme_color: "#fcfcfb" # 状态栏/标题栏颜色
+  background_color: "#fcfcfb"

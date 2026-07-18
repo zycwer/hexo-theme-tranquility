@@ -29,12 +29,12 @@ for item in hexo-config('timeline.items') {
   @extend .wall-bg;
   z-index: 2;
   content: ' ';
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: var(--c-wall-overlay);
   transition: background-color 200ms ease-in;
 }
 
 .wall-main:hover+.wall-bg::before {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--c-wall-overlay-hover);
 }
 
 .wall-main:hover+.wall-bg .cursor {
@@ -578,10 +578,10 @@ for v, k in timeline_colors {
   max-width: 600px;
   margin: 0 auto;
   padding: 24px 28px;
-  background: #fff;
-  border: 1px solid $whitesmoke;
+  background: var(--c-bg-card);
+  border: 1px solid var(--c-border);
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 12px var(--c-shadow);
   text-align: center;
 
   &.is-active {
@@ -604,7 +604,7 @@ for v, k in timeline_colors {
     // 种系统宋体，导致同一标题内两种宋体字面交错。故直接使用单一系统宋体字面，
     // 保证整段标题字形统一。
     font-family: "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", serif;
-    color: $text-color;
+    color: var(--c-text-heading);
     text-decoration: none;
     margin-bottom: 12px;
     transition: color 200ms ease;
@@ -676,9 +676,9 @@ for v, k in timeline_colors {
     }
 
     .line-title {
-      background: white;
+      background: var(--c-bg-card);
       border-radius: 4px;
-      border: 2px solid $whitesmoke;
+      border: 2px solid var(--c-border);
       padding: 4px;
     }
   }

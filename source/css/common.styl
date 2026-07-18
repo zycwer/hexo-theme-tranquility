@@ -63,7 +63,7 @@ mjx-container {
   width: 0;
   left: 0;
   bottom: -2px;
-  background-color: #000;
+  background-color: var(--c-link-hover);
 }
 
 .hover-line:hover::after {
@@ -77,13 +77,13 @@ mjx-container {
 }
 
 .page-number.current {
-  background-color: $black-dim;
+  background-color: var(--c-paginator);
   color: #fff;
 }
 
 .page-number {
   text-decoration: none;
-  color: $black-dim;
+  color: var(--c-paginator);
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -92,13 +92,13 @@ mjx-container {
   width: 26px;
   overflow: hidden;
   border-radius: 50%;
-  border: 1px solid $black-dim;
+  border: 1px solid var(--c-paginator);
   margin: 0 8px;
   transition: all 200ms ease-out;
 }
 
 .page-number:hover {
-  background-color: $black-light;
+  background-color: var(--c-text);
   color: #fff;
 }
 

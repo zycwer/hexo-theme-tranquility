@@ -22,7 +22,7 @@ if (hexo-config('algolia.enable')) {
   position: fixed;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--c-bg-overlay);
   backdrop-filter: blur(15px) saturate(0.3);
   top: 0;
   z-index: 1;
@@ -51,6 +51,41 @@ if (hexo-config('algolia.enable')) {
   align-items: center;
 }
 
+// 深色模式切换按钮：显示当前主题对应的图标
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0 12px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--c-text);
+  border-radius: 50%;
+  transition: background 200ms ease, color 200ms ease;
+
+  &:hover {
+    background: var(--c-bg-muted);
+  }
+
+  &__icon {
+    display: none;
+    line-height: 0;
+  }
+}
+
+// 当前为深色时显示太阳（点击切回浅色），浅色时显示月亮
+[data-theme="dark"] .theme-toggle__icon--sun {
+  display: inline-flex;
+}
+
+[data-theme="light"] .theme-toggle__icon--moon {
+  display: inline-flex;
+}
+
 .nav-menu-item {
   letter-spacing: 0.1em;
   text-decoration: none;
@@ -68,7 +103,7 @@ if (hexo-config('algolia.enable')) {
     left: 0;
     right: 0;
     height: 60px;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--c-bg-overlay-strong);
     z-index: 99;
     justify-content: center;
   }
@@ -88,7 +123,7 @@ if (hexo-config('algolia.enable')) {
     left: 0;
     right: 0;
     z-index: 4;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--c-bg-overlay-strong);
     overflow: hidden;
     flex-direction: column;
     align-items: flex-start;
@@ -120,7 +155,7 @@ if (hexo-config('algolia.enable')) {
     &::before, &::after {
       transition: transform 200ms ease-out;
       content: '';
-      background: $black-dim;
+      background: var(--c-nav-btn);
       width: 30px;
       height: 2px;
       border-radius: 1px;

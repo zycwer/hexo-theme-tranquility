@@ -40,6 +40,8 @@
 - [Recent Updates](#recent-updates-rss-aggregation) cards aggregating external blog RSS at build time — stable loading in mainland China
 - [About page](#about-page) (Hexo native page) and [Timeline](#timeline) (article-driven, click to view details)
 - [Hitokoto](#hitokoto-slogan) slogan that refreshes on every page load
+- [Dark mode](#dark-mode) (light/dark/scheduled/follow-browser, one-click toggle in the navbar)
+- [Open Graph](#open-graph--twitter-card) social cards, [JSON-LD](#json-ld-structured-data) structured data, [sitemap](#sitemap), and [PWA](#pwa-installable-app) support
 - Responsive across desktop, tablet, and mobile for comfortable reading
 - Custom font extraction and subsetting, balancing aesthetics and performance
 - [Related posts](#related-posts), [math formulas](#math-formulas), [Gitalk comments](#others), [reward](#post-reward), [SEO](#others)
@@ -57,11 +59,16 @@
   - [The Change](#the-change)
 - [Configuration](#configuration)
   - [Hitokoto (Slogan)](#hitokoto-slogan)
+  - [Dark Mode](#dark-mode)
   - [Site Mode](#site-mode)
   - [Subpage](#subpage)
   - [Timeline](#timeline)
   - [About Page](#about-page)
   - [Recent Updates (RSS Aggregation)](#recent-updates-rss-aggregation)
+  - [Open Graph & Twitter Card](#open-graph--twitter-card)
+  - [JSON-LD Structured Data](#json-ld-structured-data)
+  - [Sitemap](#sitemap)
+  - [PWA (Installable App)](#pwa-installable-app)
   - [Code Highlighting](#code-highlighting)
   - [Math Formulas](#math-formulas)
   - [Homepage Customization](#homepage-customization)
@@ -174,6 +181,32 @@ Notes:
 - The hitokoto content is fetched client-side from `https://v1.hitokoto.cn/`. At build time, the static `slogan` is still rendered into the HTML, so it's **SEO-friendly and visible even without JS or on fetch failure** (automatic fallback to the static slogan).
 - 5-second timeout; failures fall back silently without affecting the rest of the page.
 - When enabled, this position automatically switches to system Song serif fonts (not the extracted subset font) to avoid font interleaving caused by random characters not present in the subset.
+
+### Dark Mode
+
+The theme ships with runtime dark mode (built on CSS variables — **no rebuild needed to switch**). Four strategies are supported, controlled by `color_mode`:
+
+```yml
+color_mode: light  # light | dark | auto | time
+color_mode_time:   # only effective when color_mode: time
+  start: 18        # dark starts (24h, inclusive)
+  end: 6           # dark ends (24h, exclusive; cross-midnight supported, e.g. 18→6)
+```
+
+| Mode | Behavior |
+| --- | --- |
+| `light` | Always light (default) |
+| `dark` | Always dark |
+| `auto` | Follows the browser's `prefers-color-scheme`; reacts in real time when the system theme changes |
+| `time` | Dark during the `color_mode_time.start` ~ `end` window; light otherwise |
+
+A ☾/☀ toggle button sits on the right side of the navbar: clicking it instantly switches the theme and persists the choice to `localStorage` (`theme-override`). **Manual override takes precedence over the configured strategy.** Clearing browser storage reverts to the configured strategy.
+
+Implementation notes:
+
+- An inline synchronous script in the head sets `data-theme` before CSS loads, preventing FOUC (flash of unstyled content on switch).
+- In `auto` mode, the script listens to `matchMedia('(prefers-color-scheme: dark)')` `change` events, so the theme follows system changes automatically (unless a manual override exists).
+- All colors are defined as CSS variables in `source/css/_theme.styl`. `_variables.styl` maps Stylus variables to `var(--c-*)`, so existing styles respond to dark mode without per-rule changes.
 
 ### Site Mode
 
@@ -355,6 +388,83 @@ Example (RSS 2.0):
 ```
 
 > Recommended: install [`hexo-generator-feed`](https://github.com/hexojs/hexo-generator-feed) on your Hexo blog to generate RSS. Configure `feed: { type: atom, path: feed.xml, limit: 20 }` in your blog's root `_config.yml`, then point `recent_updates.rss_url` to that feed URL.
+
+### Open Graph & Twitter Card
+
+The theme automatically injects Open Graph and Twitter Card meta tags into every page, used by social platforms to render the title, description, and cover image when sharing (read by WeChat, Telegram, Twitter/X, Slack, Discord, etc.).
+
+No extra configuration needed — tags are generated automatically:
+
+- `og:type` — `article` on post pages, `website` elsewhere
+- `og:title` / `og:description` — from the page title and description (posts use their excerpt)
+- `og:url` — absolute URL of the page (generated via `full_url_for`)
+- `og:site_name` — taken from `title` in your blog's root `_config.yml`
+- `og:image` — priority: post `cover` → homepage `index.photo` → `logo`
+- `twitter:card` — `summary_large_image` by default (when a cover exists) or `summary`
+
+To customize the share image, set the `cover` field in a post's front-matter (used both as the post list cover and the share card image):
+
+```yml
+---
+title: One of My Posts
+cover: /assets/images/my-cover.jpg
+---
+```
+
+> `og:image` is automatically converted to an absolute URL. If `cover` is already a full URL starting with `http(s)://`, it is used as-is.
+
+### JSON-LD Structured Data
+
+The theme automatically injects [schema.org](https://schema.org/) JSON-LD structured data based on the page type, helping search engines understand the site content (read by Google rich results):
+
+| Page type | Schema type | Main fields |
+| --- | --- | --- |
+| About page (`layout: about`) | `Person` | name, url, email, logo |
+| Post page | `Article` | headline, datePublished, dateModified, author, image, keywords |
+| Other pages (homepage, subpages, etc.) | `WebSite` | name, url, description |
+
+No configuration needed — data is read automatically from the theme config and post front-matter.
+
+### Sitemap
+
+The theme ships with a built-in `sitemap.xml` generator that produces a sitemap at build time, ready to submit to Google Search Console / Bing Webmaster / Baidu Zhanzhang.
+
+```yml
+sitemap:
+  enable: true  # enabled by default; set to false to disable
+```
+
+The generated `sitemap.xml` includes:
+
+- Homepage (`priority=1.0`, `changefreq=daily`)
+- All posts (sorted by publish date descending, `priority=0.8`, `changefreq=weekly`, with `lastmod`)
+- All pages (`priority=0.6`, `changefreq=monthly`)
+- All category and tag archive pages (`priority=0.4`, `changefreq=weekly`)
+
+All URLs are absolute (based on the `url` config in your blog's root `_config.yml`).
+
+### PWA (Installable App)
+
+The theme can generate the `manifest.json` and Service Worker (`sw.js`) required by Progressive Web Apps, enabling "Add to Home Screen", offline access, and static asset caching.
+
+```yml
+pwa:
+  enable: false       # disabled by default; enable to generate manifest.json and sw.js
+  name:               # full app name (defaults to site title if empty)
+  short_name:         # short name under the home-screen icon (defaults to first 12 chars of name)
+  description:        # app description
+  display: standalone # standalone | fullscreen | minimal-ui | browser
+  theme_color: "#fcfcfb"        # app theme color (matches the dark-mode light palette)
+  background_color: "#fcfcfb"   # splash screen background color
+```
+
+When enabled:
+
+- `manifest.json` generates its `icons` array from the `favicon` config (apple-touch-icon 180×180, favicon-32×32, svg).
+- `sw.js` uses a "cache-first for static assets, network-first with cache fallback for HTML" strategy: JS/CSS/images/fonts are read from cache first; HTML pages prefer the network and fall back to cache on failure (so users can revisit pages they've already seen, even offline).
+- The page automatically registers the Service Worker (only in production, HTTPS, or `localhost`) and sets `<meta name="theme-color">`.
+
+> **Note**: PWA Service Workers can only be registered under **HTTPS** (except `localhost`). GitHub Pages, Vercel, Netlify, Cloudflare Pages, and most modern hosting platforms provide HTTPS by default, so they work out of the box.
 
 ### Code Highlighting
 
