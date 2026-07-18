@@ -257,7 +257,7 @@ for item in hexo-config('timeline.items') {
   height: 100%;
   width: 2px;
   border-radius: 1px;
-  background: #ccc;
+  background: var(--c-radio-track);
   transition: all 0.4s ease;
 
   &::after {
@@ -266,7 +266,7 @@ for item in hexo-config('timeline.items') {
     height: 20px;
     width: 20px;
     border-radius: 50%;
-    background-color: #fafafa;
+    background-color: var(--c-radio-thumb);
     border: 2px solid transparent;
     box-sizing: border-box;
     content: '';
@@ -437,7 +437,7 @@ for v, k in timeline_colors {
 .line-date-tag {
   display: inline-block;
   font-size: 14px;
-  color: #fff;
+  color: var(--c-on-accent);
   padding: 0 4px;
   border-radius: 3px;
 }
@@ -483,7 +483,7 @@ for v, k in timeline_colors {
     transition: color 200ms ease;
 
     &:hover {
-      color: #568dc4;
+      color: var(--c-accent-soft);
     }
   }
 }
@@ -509,7 +509,7 @@ for v, k in timeline_colors {
   &__rss {
     margin-left: 14px;
     font-size: 14px;
-    color: #fff;
+    color: var(--c-on-accent);
     background: $gainsboro;
     border-radius: 3px;
     padding: 2px 8px;
@@ -517,7 +517,7 @@ for v, k in timeline_colors {
     transition: background 200ms ease;
 
     &:hover {
-      background: #568dc4;
+      background: var(--c-accent-soft);
     }
   }
 
@@ -610,14 +610,14 @@ for v, k in timeline_colors {
     transition: color 200ms ease;
 
     &:hover {
-      color: #568dc4;
+      color: var(--c-accent-soft);
     }
   }
 
   &__excerpt {
     font-size: 15px;
     line-height: 1.8em;
-    color: #666;
+    color: var(--c-text-soft);
     margin: 0;
   }
 }
