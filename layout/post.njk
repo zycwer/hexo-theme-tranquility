@@ -17,13 +17,13 @@
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
           {{ toc(page.content, {list_number: false, max_depth: 4, class: 'post-toc'}) }}
-          <a href="{{ page.link }}#" class="toc-top">回到顶部</a>
+          <a href="#" class="toc-top">回到顶部</a>
         </aside>
       {% endif %}
       <div class="post-content__body">
         {% if page.photos %}
           <div class="post-gallery">
-            {% for photo in page.photos %}<img width="auto" height="auto" alt="cover" src="{{ url_for(photo) }}"/>{% endfor %}
+            {% for photo in page.photos %}<img alt="cover" loading="lazy" decoding="async" src="{{ url_for(photo) }}"/>{% endfor %}
           </div>
         {% endif %}
         {{ page.content }}
@@ -52,6 +52,7 @@
   </div>
 {% endblock body %}
 {% block script %}
+  {% if page.toc %}<script defer src="{{ url_for('js/toc.js') }}"></script>{% endif %}
   {% if theme.gitalk.enable %}{{ partial("_third_party/gitalk.njk") }}
   {% endif %}
 {% endblock script %}

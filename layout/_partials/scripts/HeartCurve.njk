@@ -47,7 +47,7 @@
       a
     } = this;
     ctx.beginPath();
-    let x, y, deg = 0;
+    let x, y, r, deg = 0;
     ctx.moveTo(0, 0);
     ctx.strokeStyle = "#ff0000";
     while (deg <= 360) {
@@ -107,11 +107,14 @@
   (function () {
     const heartCurve = new HeartCurve(400, 400);
     heartCurve.spin();
-    mobileAdjust(window.matchMedia("(hover:none"));
-    window.matchMedia("(hover:none)").addListener(mobileAdjust);
+    var mq = window.matchMedia("(hover:none)");
+    mobileAdjust(mq);
+    if (mq.addEventListener) mq.addEventListener('change', mobileAdjust);
+    else if (mq.addListener) mq.addListener(mobileAdjust);
 
     function mobileAdjust(media) {
-      const wallEl = document.querySelector('#wall-main')
+      const wallEl = document.querySelector('#wall-main');
+      if (!wallEl) return;
       if (!media.matches) {
         heartCurve.pause();
         wallEl.addEventListener('mouseenter', () => {

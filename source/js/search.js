@@ -17,8 +17,8 @@ function showSearchDialog() {
 
 function closeSearchDialog() {
   if (!searchStatus) return
-  searchMask.style.display = 'None'
-  document.body.style.overflow = 'inherit'
+  searchMask.style.display = 'none'
+  document.body.style.overflow = ''
   searchIpt.value = ""
   searchStatus = 0
 }
@@ -141,20 +141,20 @@ function trimeContent(keyIndexs, content, keywords, wordLen = 20) {
     splitIndex.push(arr.indices[0])
 
   return keyIndexs.map(key => {
-    let pos = binaryFind(splitIndex, key)
+    const pos = binaryFind(splitIndex, key)
     const wordStart = Math.max(0, pos - 10)
     const wordEnd = Math.min(wordLen + wordStart, splitIndex.length - 1)
     const start = splitIndex[wordStart][0]
     const end = splitIndex[wordEnd][1]
-
+    // 取原始子串，再高亮所有关键词（不破坏其他匹配）
+    let snippet = content.slice(start, end)
     keywords.forEach(keyword => {
-      content = content
-        .slice(start, end)
-        .replace(new RegExp(keyword, 'ig'),
-          `<span class="search-keyword">${keyword}</span>`)
+      // 转义正则元字符，避免用户输入 ( ) [ ] * 等导致报错
+      const safe = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      snippet = snippet.replace(new RegExp(safe, 'ig'),
+        function (m) { return '<span class="search-keyword">' + m + '</span>' })
     })
-
-    return content
+    return snippet
   })
 }
 
