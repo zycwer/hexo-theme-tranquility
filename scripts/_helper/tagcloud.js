@@ -1,9 +1,11 @@
 module.exports = function (tags, config) {
-  if (!config.fancy) {
-    config.min_font = 1;
-    config.max_font = 1;
-    config.unit = 'em';
+  // 使用副本，避免污染原始配置对象
+  var cfg = Object.assign({}, config);
+  if (!cfg.fancy) {
+    cfg.min_font = 1;
+    cfg.max_font = 1;
+    cfg.unit = 'em';
   }
-  const html = tags ? this.tagcloud(tags, config) : this.list_tags();
-  return config.fancy ? `<canvas width="500" height="500" id="tagCanvas">${html}</canvas>` : html;
+  const html = tags ? this.tagcloud(tags, cfg) : this.list_tags();
+  return cfg.fancy ? `<canvas width="500" height="500" id="tagCanvas">${html}</canvas>` : html;
 };

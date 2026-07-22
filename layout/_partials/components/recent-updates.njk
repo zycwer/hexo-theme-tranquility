@@ -10,9 +10,9 @@
       <div class="recent-updates__track">
         {% for item in updates %}
           <article class="recent-card{% if loop.first %} is-active{% endif %}" data-index="{{ loop.index0 }}">
-            <div class="recent-card__date">{{ item.date }}</div>
-            <a class="recent-card__title" href="{{ item.link }}" target="_blank" rel="noopener">{{ item.title }}</a>
-            {% if item.excerpt %}<p class="recent-card__excerpt">{{ item.excerpt }}</p>{% endif %}
+            <div class="recent-card__date">{{ item.date | escape }}</div>
+            <a class="recent-card__title" href="{{ item.link | escape }}" target="_blank" rel="noopener noreferrer">{{ item.title | escape }}</a>
+            {% if item.excerpt %}<p class="recent-card__excerpt">{{ item.excerpt | escape }}</p>{% endif %}
           </article>
         {% endfor %}
       </div>

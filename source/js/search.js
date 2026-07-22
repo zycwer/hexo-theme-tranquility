@@ -24,35 +24,43 @@ function closeSearchDialog() {
 }
 
 function searchInitialize(url) {
-  fetch(url).then(res => res.json()).then(res => {
-    const inputHandler = debounce(doSearch)
-
-    searchBtn.style.display = "flex"
-
-    document.addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && e.key == "k") {
-        if (searchStatus) closeSearchDialog()
-        else showSearchDialog()
-      }
-      if (e.key == 'Escape') closeSearchDialog()
+  fetch(url)
+    .then(res => {
+      if (!res.ok) throw new Error('HTTP ' + res.status)
+      return res.json()
     })
+    .then(res => {
+      const inputHandler = debounce(doSearch)
 
-    searchClearBtn.addEventListener('click', () => {
-      searchIpt.value = ""
-      clearResult()
+      searchBtn.style.display = "flex"
+
+      document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key == "k") {
+          if (searchStatus) closeSearchDialog()
+          else showSearchDialog()
+        }
+        if (e.key == 'Escape') closeSearchDialog()
+      })
+
+      searchClearBtn.addEventListener('click', () => {
+        searchIpt.value = ""
+        clearResult()
+      })
+
+      searchBtn.addEventListener('click', () => {
+        showSearchDialog()
+      })
+
+      searchMask.addEventListener('click', e => {
+        if (e.target !== searchMask) return
+        closeSearchDialog()
+      })
+
+      searchIpt.addEventListener('input', inputHandler.bind(searchIpt, res))
     })
-
-    searchBtn.addEventListener('click', () => {
-      showSearchDialog()
+    .catch(err => {
+      console.error('搜索索引加载失败', err)
     })
-
-    searchMask.addEventListener('click', e => {
-      if (e.target !== searchMask) return
-      closeSearchDialog()
-    }, true)
-
-    searchIpt.addEventListener('input', inputHandler.bind(searchIpt, res))
-  })
 }
 
 function clearResult() {
@@ -62,7 +70,7 @@ function clearResult() {
 function doSearch(data) {
   if (this.value.trim().length <= 0) return clearResult()
 
-  var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+  const keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
 
   const result = search(data, keywords)
 
@@ -114,14 +122,14 @@ function renderSearchResult(result, el) {
     item.className = 'search-result-item'
     item.href = res.url
 
-    const title = document.createElement('DIV')
+    const title = document.createElement('div')
     title.className = 'search-result__head'
     title.innerText = res.title
 
-    const content = document.createElement('DIV')
+    const content = document.createElement('div')
     content.className = 'search-result__body'
     res.content.forEach(contentText => {
-      const contentItem = document.createElement('DIV')
+      const contentItem = document.createElement('div')
       contentItem.innerHTML = contentText
       content.appendChild(contentItem)
     })
@@ -134,11 +142,12 @@ function renderSearchResult(result, el) {
 }
 
 function trimeContent(keyIndexs, content, keywords, wordLen = 20) {
-  const reg = /[\u4e00-\u9fa5]|\w+/gd
+  // 不使用 d 标志（hasIndices），兼容更多浏览器；手动计算区间
+  const reg = /[\u4e00-\u9fa5]|\w+/g
   const splitIndex = []
   let arr
   while ((arr = reg.exec(content)) !== null)
-    splitIndex.push(arr.indices[0])
+    splitIndex.push([arr.index, arr.index + arr[0].length])
 
   return keyIndexs.map(key => {
     const pos = binaryFind(splitIndex, key)
@@ -146,8 +155,9 @@ function trimeContent(keyIndexs, content, keywords, wordLen = 20) {
     const wordEnd = Math.min(wordLen + wordStart, splitIndex.length - 1)
     const start = splitIndex[wordStart][0]
     const end = splitIndex[wordEnd][1]
-    // 取原始子串，再高亮所有关键词（不破坏其他匹配）
     let snippet = content.slice(start, end)
+    // 先转义 HTML，避免摘要中的 < > & 被当作标签解析（XSS 防护）
+    snippet = snippet.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     keywords.forEach(keyword => {
       // 转义正则元字符，避免用户输入 ( ) [ ] * 等导致报错
       const safe = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

@@ -35,13 +35,15 @@ module.exports = hexo => {
   hexo.locals.set('recentUpdates', () => cachedRecent || []);
 };
 
-function fetchText(url, timeout) {
+function fetchText(url, timeout, maxRedirects) {
+  maxRedirects = maxRedirects == null ? 5 : maxRedirects;
   return new Promise((resolve, reject) => {
     const lib = url.startsWith('https') ? https : http;
     const req = lib.get(url, { headers: { 'User-Agent': 'hexo-theme-tranquility' } }, res => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         res.resume();
-        return resolve(fetchText(new URL(res.headers.location, url).href, timeout));
+        if (maxRedirects <= 0) return reject(new Error('too many redirects'));
+        return resolve(fetchText(new URL(res.headers.location, url).href, timeout, maxRedirects - 1));
       }
       if (res.statusCode !== 200) {
         res.resume();
@@ -51,6 +53,7 @@ function fetchText(url, timeout) {
       res.setEncoding('utf8');
       res.on('data', chunk => { data += chunk; });
       res.on('end', () => resolve(data));
+      res.on('error', reject);
     });
     req.on('error', reject);
     req.setTimeout(timeout, () => req.destroy(new Error('timeout')));

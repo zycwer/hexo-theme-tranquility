@@ -105,24 +105,29 @@
   };
 
   (function () {
-    const heartCurve = new HeartCurve(400, 400);
-    heartCurve.spin();
+    var heartCurve;
+    try {
+      heartCurve = new HeartCurve(400, 400);
+      heartCurve.spin();
+    } catch (e) {
+      return;
+    }
     var mq = window.matchMedia("(hover:none)");
+    var hoverBound = false;
     mobileAdjust(mq);
     if (mq.addEventListener) mq.addEventListener('change', mobileAdjust);
     else if (mq.addListener) mq.addListener(mobileAdjust);
 
     function mobileAdjust(media) {
-      const wallEl = document.querySelector('#wall-main');
+      var wallEl = document.querySelector('#wall-main');
       if (!wallEl) return;
-      if (!media.matches) {
+      if (!media.matches && !hoverBound) {
+        hoverBound = true;
         heartCurve.pause();
-        wallEl.addEventListener('mouseenter', () => {
-          console.log('resume');
+        wallEl.addEventListener('mouseenter', function () {
           heartCurve.resume();
         });
-        wallEl.addEventListener('mouseleave', () => {
-          console.log('pause');
+        wallEl.addEventListener('mouseleave', function () {
           heartCurve.pause();
         });
       }

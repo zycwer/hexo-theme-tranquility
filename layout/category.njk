@@ -1,10 +1,9 @@
-{% set fancy = theme.tagcloud.fancy %}
 {% extends "_partials/layout.njk" %}
 {% block link %}
   <link rel="stylesheet" type="text/css" href="{{ url_for("/css/category.css") }}" />
 {% endblock link %}
 {% block body %}
-  <div class="wall wall-category{{ '--plain' if not fancy else '' }}">
+  <div class="wall wall-category{{ '--plain' if not theme.tagcloud.fancy else '' }}">
     <div class="wall-main">
       <div class="wall-category-title">
         <div class="title-icon"
@@ -19,7 +18,7 @@
   </div>
   <div class="post-list">
     {% if not page.posts %}
-      DEBUG: 该子页分类下没有文章！在指定文章头部中添加 category: {{ page.name }} 字段，即可将该文章添加至此页。
+      <p class="post-list-empty">该分类下暂无文章。在文章 front-matter 中添加 <code>category: {{ page.name }}</code> 字段，即可将文章添加至此页。</p>
     {% else %}
       {{ partial("_partials/macros/post-list.njk", {posts: page.posts}) }}
     {% endif %}
@@ -27,34 +26,28 @@
   </div>
 {% endblock body %}
 {% block script %}
-  {% if fancy %}
+  {% if theme.tagcloud.fancy %}
     <script type="text/javascript"
             charset="utf-8"
             src="{{ url_for('/js/tagcanvas.min.js') }}"></script>
-    <script type = "text/javascript">
-        window.onload = function() {
-            try {
-                TagCanvas.Start('tagCanvas', '', {
-                    outlineThickness: 1,
-                    maxSpeed: 0.03,
-                    // freezeActive: true,
-                    // freezeDecel: true,
-                    textColour: null,
-                    textColour: null,
-                    outlineColour: "#aaa",
-                    weight: true,
-                    padding: 4,
-                    // clickToFront: 200,
-                    fadIn: 200,
-                    // pinchZoom: true,
-                    wheelZoom: false,
-                    initial: [0.1, -0.03]
-                });
-            } catch (e) {
-                // something went wrong, hide the canvas container
-                document.getElementById('tags-outer').style.display = 'none';
-            }
-        };
+    <script type="text/javascript">
+      window.addEventListener('load', function () {
+        try {
+          TagCanvas.Start('tagCanvas', '', {
+            outlineThickness: 1,
+            maxSpeed: 0.03,
+            textColour: null,
+            outlineColour: "#aaa",
+            weight: true,
+            padding: 4,
+            fadeIn: 200,
+            wheelZoom: false,
+            initial: [0.1, -0.03]
+          });
+        } catch (e) {
+          document.getElementById('tags-outer').style.display = 'none';
+        }
+      });
     </script>
   {% endif %}
 {% endblock script %}

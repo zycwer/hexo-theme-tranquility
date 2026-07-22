@@ -14,15 +14,15 @@ module.exports = ctx => {
   ctx.extend.generator.register('blog', blog);
 };
 
-// 按置顶排序（sticky 越大越靠前），不改变原数组
+// 按置顶排序（sticky 越大越靠前），返回新数组，不修改原 Query
 function sortBySticky(posts) {
-  posts.data.sort((a, b) => (b.sticky || 0) - (a.sticky || 0));
+  return posts.toArray().sort((a, b) => (b.sticky || 0) - (a.sticky || 0));
 }
 
 function blog(locals) {
   const config = this.config;
-  const posts = locals.posts.sort(config.index_generator.order_by);
-  sortBySticky(posts);
+  const sorted = locals.posts.sort(config.index_generator.order_by);
+  const posts = sortBySticky(sorted);
   return pagination('blog', posts, {
     perPage: config.index_generator.per_page,
     layout: ['category'],
@@ -46,16 +46,17 @@ function subpageGenerator(locals) {
     p = p.endsWith('/') ? p : p + '/';
 
     if (!category || !category.length) {
-      console.warn(`Warn: There is no post in subpage '${page.title}'`);
+      ctx.log.warn(`There is no post in subpage '${page.title}'`);
       return result.concat([{ path: p, layout: ['category', 'archive', 'index'], data: { ...page } }]);
     }
 
-    const posts = category.posts.sort(orderBy);
-    sortBySticky(posts);
+    const posts = sortBySticky(category.posts.sort(orderBy));
 
     // 收集该分类下所有文章的标签
     const tagIds = new Set();
-    posts.forEach(post => post.tags.toArray().forEach(tag => tagIds.add(tag._id)));
+    posts.forEach(post => {
+      if (post.tags) post.tags.toArray().forEach(tag => tagIds.add(tag._id));
+    });
     const tags = ctx.model('Tag').find({ _id: { $in: Array.from(tagIds) } });
 
     return result.concat(pagination(p, posts, {

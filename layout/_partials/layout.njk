@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="{{ config.language or 'zh-cn' }}">
   <head>
     <meta charset="utf-8"/>
     {% if theme.google_ad.enable %}
@@ -27,6 +27,7 @@
     </title>
     <meta name="description" content="{{ page.excerpt or page.description or config.description }}"/>
     <meta name="keywords" content="{% if page.tags and page.tags.length %}{% for _t in page.tags.toArray() %}{% if not loop.first %}, {% endif %}{{ _t.name }}{% endfor %}{% else %}{{ config.keywords }}{% endif %}"/>
+    <link rel="canonical" href="{{ full_url_for(page.path or '/') }}"/>
     {% if theme.pwa and theme.pwa.enable %}
       <link rel="manifest" href="{{ url_for('/manifest.json') }}"/>
       <meta name="theme-color" content="{{ theme.pwa.theme_color or '#fcfcfb' }}"/>
@@ -51,7 +52,7 @@
     {% if theme.favicon.safari_pinned_tab %}
       <link rel="mask-icon"
             href="{{ url_for(theme.favicon.safari_pinned_tab) }}"
-            color="{{ theme.android_chrome_color }}"/>
+            color="{{ theme.android_chrome_color or theme.pwa.theme_color or '' }}"/>
     {% endif %}
     {% if theme.favicon.android_manifest %}
       <link rel="manifest" href="{{ url_for(theme.favicon.android_manifest) }}"/>

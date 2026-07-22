@@ -1,56 +1,83 @@
 {% macro timeline(data) %}
   <script type="text/javascript">
-    const timelineData = {{ data | dump }}
-    const {types, posts} = timelineData
-    listEl = document.querySelector("#timeline-list");
+    (function () {
+      var timelineData = {{ data | dump | replace('</', '<\\/') }};
+      var types = timelineData.types;
+      var posts = timelineData.posts;
+      var listEl = document.querySelector("#timeline-list");
 
-    elRefs = getElRefs(types)
-    bindListener(types, elRefs)
-
-    setTimeout(init.bind(this, types, elRefs))
-
-    function getElRefs(types) {
-      return types.map(type => document.querySelector(`#radio-${type}`))
-    }
-
-    function bindListener(names, els) {
-      names.map((name, i) => els[i].addEventListener('change', e => updateList(name, e.target.checked)))
-    }
-
-    function updateList(type, value) {
-      listDom
-        .filter(line => line.type === type)
-        .forEach(line => {
-          line.el.className = line
-            .el
-            .className
-            .replace(
-              /(--hidden)?$/, value
-              ? ""
-              : "--hidden");
+      function getElRefs(typeList) {
+        return typeList.map(function (type) {
+          return document.querySelector("#radio-" + type);
         });
-    }
+      }
 
-    const listDom = posts.map(t => getLine(t));
-    listEl.append(...listDom.map(i => i.el));
+      function updateList(type, value) {
+        listDom.forEach(function (line) {
+          if (line.type === type) {
+            line.el.classList.toggle('timeline-item--hidden', !value);
+          }
+        });
+      }
 
-    function getLine(data) {
-      const item = document.createElement("DIV");
-      item.className = `timeline-item-${data.type} timeline-item--hidden`;
-      item.innerHTML = `
-                          <div class="line-date">
-                          <div class="line-date-tag">${data.date}</div></div>
-                          <div class="line-anchor"></div>
-                          <div class="line-title">
-                              <img class="text-icon" width="20" height="20" src="${data.icon}" />
-                              <a class="timeline-post" href="${data.path}">${data.title}</a>
-                          </div>
-                          `;
-      return {el: item, type: data.type};
-    };
+      function bindListener(names, els) {
+        names.forEach(function (name, i) {
+          if (els[i]) {
+            els[i].addEventListener('change', function (e) {
+              updateList(name, e.target.checked);
+            });
+          }
+        });
+      }
 
-    function init(names, els) {
-      names.map((name, i) => updateList(name, els[i].checked))
-    }
+      function getLine(d) {
+        var item = document.createElement('div');
+        item.className = 'timeline-item-' + d.type + ' timeline-item--hidden';
+
+        var dateWrap = document.createElement('div');
+        dateWrap.className = 'line-date';
+        var dateTag = document.createElement('div');
+        dateTag.className = 'line-date-tag';
+        dateTag.textContent = d.date;
+        dateWrap.appendChild(dateTag);
+
+        var anchor = document.createElement('div');
+        anchor.className = 'line-anchor';
+
+        var titleWrap = document.createElement('div');
+        titleWrap.className = 'line-title';
+        var icon = document.createElement('img');
+        icon.className = 'text-icon';
+        icon.width = 20;
+        icon.height = 20;
+        icon.src = d.icon;
+        icon.alt = '';
+        var link = document.createElement('a');
+        link.className = 'timeline-post';
+        link.href = d.path;
+        link.textContent = d.title;
+        titleWrap.appendChild(icon);
+        titleWrap.appendChild(link);
+
+        item.appendChild(dateWrap);
+        item.appendChild(anchor);
+        item.appendChild(titleWrap);
+
+        return { el: item, type: d.type };
+      }
+
+      var listDom = posts.map(function (t) { return getLine(t); });
+      if (listEl) {
+        listEl.append.apply(listEl, listDom.map(function (i) { return i.el; }));
+      }
+
+      var elRefs = getElRefs(types);
+      bindListener(types, elRefs);
+      setTimeout(function () {
+        types.forEach(function (name, i) {
+          if (elRefs[i]) updateList(name, elRefs[i].checked);
+        });
+      });
+    })();
   </script>
 {% endmacro %}
