@@ -1,4 +1,4 @@
-slogan: “宁静致远”
+slogan: "宁静致远"
 # 一言（Hitokoto）：开启后首页 slogan 处将客户端请求 https://v1.hitokoto.cn
 # 展示随机一言，请求失败或 JS 未执行时回退到上方静态 slogan
 slogan_hitokoto: false
@@ -108,7 +108,7 @@ reward: # 赞赏
   enable: true
   face: /assets/author-face.jpg # 头像图片
   paycode: /assets/pay-code.jpg # 支付码图片
-  text: “给作者倒杯卡布奇诺”
+  text: "给作者倒杯卡布奇诺"
   btnText: 喜欢作者
 
 # see https://github.com/gitalk/gitalk

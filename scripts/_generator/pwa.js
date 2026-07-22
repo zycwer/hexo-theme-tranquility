@@ -48,9 +48,11 @@ module.exports = hexo => {
 };
 
 // 简洁 Service Worker：静态资源缓存优先，HTML 网络优先失败回退缓存
+// CACHE 版本号每次构建变化，确保主题更新后旧缓存被清理
 function buildSW(root) {
+  const cacheVersion = 'tranquility-' + Date.now();
   return `// 由 hexo-theme-tranquility 自动生成，请勿手动编辑
-const CACHE = 'tranquility-v1';
+const CACHE = ${JSON.stringify(cacheVersion)};
 const ROOT = ${JSON.stringify(root)};
 const PRECACHE = [ROOT + '/', ROOT + '/css/layout.css'];
 
@@ -72,16 +74,21 @@ self.addEventListener('fetch', e => {
   const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
   if (isHTML) {
     e.respondWith(fetch(req).then(res => {
-      const copy = res.clone();
-      caches.open(CACHE).then(c => c.put(req, copy));
+      if (res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy));
+      }
       return res;
     }).catch(() => caches.match(req).then(r => r || caches.match(ROOT + '/')));
     return;
   }
   // 静态资源：缓存优先
   e.respondWith(caches.match(req).then(cached => cached || fetch(req).then(res => {
-    const copy = res.clone();
-    caches.open(CACHE).then(c => c.put(req, copy));
+    // 仅缓存成功响应，避免 404/500 等被缓存
+    if (res.ok) {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(req, copy));
+    }
     return res;
   })));
 });

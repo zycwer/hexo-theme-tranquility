@@ -25,8 +25,8 @@
         {{ page.title }} | {{ config.title }}
       {% endif %}
     </title>
-    <meta name="description" content="{{ config.description }}"/>
-    <meta name="keywords" content="{{ config.keywords }}"/>
+    <meta name="description" content="{{ page.excerpt or page.description or config.description }}"/>
+    <meta name="keywords" content="{% if page.tags and page.tags.length %}{% for _t in page.tags.toArray() %}{% if not loop.first %}, {% endif %}{{ _t.name }}{% endfor %}{% else %}{{ config.keywords }}{% endif %}"/>
     {% if theme.pwa and theme.pwa.enable %}
       <link rel="manifest" href="{{ url_for('/manifest.json') }}"/>
       <meta name="theme-color" content="{{ theme.pwa.theme_color or '#fcfcfb' }}"/>
@@ -150,8 +150,8 @@
     {% elif theme.search and theme.search.enable %}
       {% include("./components/search-main.njk") %}
     {% endif %}
-    {% set headClass = 'head--sticky'if theme.nav and theme.nav.sticky else 'head' %}
-    <div class={{ headClass }}>
+    {% set headClass = 'head--sticky' if theme.nav and theme.nav.sticky else 'head' %}
+    <div class="{{ headClass }}">
       <div class="nav">
         <a href='{{ url_for("/") }}' class="nav-logo">
           <img alt="logo" height="60" width="60" src="{{ url_for(theme.logo) }}"/>
@@ -205,9 +205,9 @@
           appId: '{{theme.algolia.appId}}',
           apiKey: '{{theme.algolia.apiKey}}',
           indexName: '{{theme.algolia.indexName}}',
-          insights: '{{theme.algolia.insights}}',
+          insights: {{ 'true' if theme.algolia.insights else 'false' }},
           container: 'div#algolia-search',
-          debug: '{{theme.algolia.debug}}'
+          debug: {{ 'true' if theme.algolia.debug else 'false' }}
         });
       </script>
     {% elif theme.search and theme.search.enable %}
