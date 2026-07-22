@@ -5,6 +5,10 @@
   var MODE = window.__THEME_MODE__ || 'light';
   var overrideKey = 'theme-override';
 
+  // localStorage 在隐私模式/禁用 cookie 下可能抛异常，统一兜底
+  function safeGetItem(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function safeSetItem(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
   function current() {
     return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
   }
@@ -18,13 +22,14 @@
     var btn = document.getElementById('theme-toggle');
     if (!btn) return;
     btn.setAttribute('aria-label', t === 'dark' ? '切换到浅色' : '切换到深色');
+    btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
     btn.dataset.active = t;
   }
 
   function toggle() {
     var next = current() === 'dark' ? 'light' : 'dark';
     // 仅在用户主动切换时写入覆盖；auto/time 模式变化时不写
-    localStorage.setItem(overrideKey, next);
+    safeSetItem(overrideKey, next);
     apply(next);
   }
 
@@ -37,7 +42,7 @@
     if (MODE === 'auto' && window.matchMedia) {
       var mq = window.matchMedia('(prefers-color-scheme: dark)');
       var onChange = function (e) {
-        if (localStorage.getItem(overrideKey)) return;
+        if (safeGetItem(overrideKey)) return;
         apply(e.matches ? 'dark' : 'light');
       };
       if (mq.addEventListener) mq.addEventListener('change', onChange);

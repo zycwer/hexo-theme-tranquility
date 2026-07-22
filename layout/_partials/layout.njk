@@ -28,6 +28,11 @@
     <meta name="description" content="{{ page.excerpt or page.description or config.description }}"/>
     <meta name="keywords" content="{% if page.tags and page.tags.length %}{% for _t in page.tags.toArray() %}{% if not loop.first %}, {% endif %}{{ _t.name }}{% endfor %}{% else %}{{ config.keywords }}{% endif %}"/>
     <link rel="canonical" href="{{ full_url_for(page.path or '/') }}"/>
+    {% if theme.feed %}
+      <link rel="alternate" type="application/rss+xml" title="{{ config.title }}" href="{{ url_for(theme.feed.path or '/atom.xml') }}"/>
+    {% elif theme.recent_updates and theme.recent_updates.enable and theme.recent_updates.rss_url %}
+      <link rel="alternate" type="application/rss+xml" title="{{ config.title }}" href="{{ theme.recent_updates.rss_url }}"/>
+    {% endif %}
     {% if theme.pwa and theme.pwa.enable %}
       <link rel="manifest" href="{{ url_for('/manifest.json') }}"/>
       <meta name="theme-color" content="{{ theme.pwa.theme_color or '#fcfcfb' }}"/>
@@ -64,7 +69,7 @@
     {% set _og_img = page.cover or theme.index.photo or theme.logo %}
     {% set og_image = '' %}
     {% if _og_img %}
-      {% if _og_img.indexOf('http') == 0 %}
+      {% if _og_img.indexOf('http') == 0 or _og_img.indexOf('//') == 0 %}
         {% set og_image = _og_img %}
       {% else %}
         {% set og_image = full_url_for(_og_img) %}
@@ -75,7 +80,12 @@
     <meta property="og:description" content="{{ og_desc }}"/>
     <meta property="og:url" content="{{ og_url }}"/>
     <meta property="og:site_name" content="{{ config.title }}"/>
+    {% set _og_lang = (config.language or 'zh_CN') | replace('-', '_') %}
+    <meta property="og:locale" content="{{ _og_lang }}"/>
     {% if og_image %}<meta property="og:image" content="{{ og_image }}"/>{% endif %}
+    {% if is_post() and page.tags and page.tags.length %}
+      {% for _t in page.tags.toArray() %}<meta property="article:tag" content="{{ _t.name }}"/>{% endfor %}
+    {% endif %}
     <meta name="twitter:card" content="{% if og_image %}summary_large_image{% else %}summary{% endif %}"/>
     <meta name="twitter:title" content="{{ og_title }}"/>
     <meta name="twitter:description" content="{{ og_desc }}"/>
@@ -87,14 +97,15 @@
         var m = window.__THEME_MODE__;
         var ts = {{ (theme.color_mode_time and theme.color_mode_time.start) or 18 }};
         var te = {{ (theme.color_mode_time and theme.color_mode_time.end) or 6 }};
-        var o = localStorage.getItem('theme-override');
+        var o = null;
+        try { o = localStorage.getItem('theme-override'); } catch (e) {}
         var t;
         if (o === 'light' || o === 'dark') {
           t = o;
         } else if (m === 'dark') {
           t = 'dark';
         } else if (m === 'auto') {
-          t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
         } else if (m === 'time') {
           var h = new Date().getHours();
           t = ts > te ? (h >= ts || h < te ? 'dark' : 'light') : (h >= ts && h < te ? 'dark' : 'light');
@@ -194,6 +205,9 @@
       {% block body %}{% endblock body %}
     </div>
     {% include "./components/foot.njk" %}
+    <button id="back-to-top" class="back-to-top" type="button" aria-label="回到顶部">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 4l-8 8h5v8h6v-8h5z" fill="currentColor"/></svg>
+    </button>
     {% if theme.mathjax %}
       <script id="MathJax-script"
               async
@@ -219,6 +233,7 @@
     {% endif %}
     <script defer src="{{url_for('js/copy-code.js')}}"></script>
     <script defer src="{{url_for('js/theme.js')}}"></script>
+    <script defer src="{{url_for('js/back-to-top.js')}}"></script>
     {% if theme.pwa and theme.pwa.enable %}
       <script>
         if ('serviceWorker' in navigator) {

@@ -1,7 +1,0 @@
-<script src="{{ theme.cdn or 'https://cdn.jsdelivr.net/npm' }}/gitalk/dist/gitalk.min.js"></script>
-<script type="text/javascript">
-  var param = {{ theme.gitalk | dump }};
-  param.id = location.pathname.substring(0, 50);
-  var gitalk = new Gitalk(param);
-  gitalk.render('gitalk-container');
-</script>

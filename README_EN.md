@@ -16,16 +16,25 @@
 
 > **💡 Fork Notice**
 >
-> This repository is a fork of [hooozen/hexo-theme-tranquility](https://github.com/hooozen/hexo-theme-tranquility). The original repository was archived in June 2026 and is no longer maintained. This fork continues maintenance and adds the following features on top of the original:
+> This repository is a fork of [hooozen/hexo-theme-tranquility](https://github.com/hooozen/hexo-theme-tranquility). The original repository was archived in June 2026 and is no longer maintained. This fork continues maintenance, adding features and fixing bugs on top of the original.
+>
+> Major changes compared to the original repo:
 >
 > - Hitokoto Slogan toggle
 > - Article-driven timeline (replaces config-defined events)
 > - Hexo native about page (replaces config-defined content)
 > - Build-time RSS-aggregated "Recent Updates" cards
-> - Code simplification (scripts directory -23%)
-> - Removed the CV feature (duplicated by the about page)
+> - Runtime dark mode (CSS variables — no rebuild needed to switch)
+> - Open Graph / Twitter Card / JSON-LD structured data
+> - Sitemap (sitemap.xml), robots.txt, RSS auto-discovery
+> - PWA (manifest.json + Service Worker), lazy image loading
+> - Back-to-top button, `prefers-reduced-motion` accessibility degradation
+> - Font loading optimization (`font-display: swap` + preload)
+> - Code simplification (scripts directory -23%); removed the CV feature (duplicated by the about page)
+> - Security hardening (fixed XSS / `</script>` injection / localStorage fallback, etc.)
+> - Removed the deprecated Gitalk comments feature
 >
-> See the [v1.4.0 Release](https://github.com/zycwer/hexo-theme-tranquility/releases/tag/v1.4.0) for details.
+> See [Releases](https://github.com/zycwer/hexo-theme-tranquility/releases) for details.
 
 ## Demo Sites
 
@@ -41,10 +50,11 @@
 - [About page](#about-page) (Hexo native page) and [Timeline](#timeline) (article-driven, click to view details)
 - [Hitokoto](#hitokoto-slogan) slogan that refreshes on every page load
 - [Dark mode](#dark-mode) (light/dark/scheduled/follow-browser, one-click toggle in the navbar)
-- [Open Graph](#open-graph--twitter-card) social cards, [JSON-LD](#json-ld-structured-data) structured data, [sitemap](#sitemap), and [PWA](#pwa-installable-app) support
+- [Open Graph](#open-graph--twitter-card) social cards, [JSON-LD](#json-ld-structured-data) structured data, [sitemap](#sitemap), [robots.txt](#robotstxt), [RSS auto-discovery](#rss-auto-discovery), and [PWA](#pwa-installable-app) support
+- [Back-to-top button](#back-to-top-button), [accessibility motion degradation](#accessibility-prefers-reduced-motion), [font loading optimization](#font-loading-optimization)
 - Responsive across desktop, tablet, and mobile for comfortable reading
 - Custom font extraction and subsetting, balancing aesthetics and performance
-- [Related posts](#related-posts), [math formulas](#math-formulas), [Gitalk comments](#others), [reward](#post-reward), [SEO](#others)
+- [Related posts](#related-posts), [math formulas](#math-formulas), [reward](#post-reward), [SEO](#others)
 - and more
 
 -----
@@ -68,6 +78,8 @@
   - [Open Graph & Twitter Card](#open-graph--twitter-card)
   - [JSON-LD Structured Data](#json-ld-structured-data)
   - [Sitemap](#sitemap)
+  - [robots.txt](#robotstxt)
+  - [RSS Auto-Discovery](#rss-auto-discovery)
   - [PWA (Installable App)](#pwa-installable-app)
   - [Code Highlighting](#code-highlighting)
   - [Math Formulas](#math-formulas)
@@ -84,6 +96,9 @@
   - [Mermaid Enhancement](#mermaid-enhancement)
   - [Search](#search)
   - [Post Excerpt](#post-excerpt)
+  - [Back-to-Top Button](#back-to-top-button)
+  - [Accessibility (prefers-reduced-motion)](#accessibility-prefers-reduced-motion)
+  - [Font Loading Optimization](#font-loading-optimization)
   - [Others](#others)
 
 ## Installation
@@ -443,6 +458,36 @@ The generated `sitemap.xml` includes:
 
 All URLs are absolute (based on the `url` config in your blog's root `_config.yml`).
 
+### robots.txt
+
+The theme ships with a built-in `robots.txt` generator that produces a crawl-control file at build time, allowing search engines to crawl pages, blocking resource directories (CSS/JS/fonts), and declaring the sitemap URL.
+
+```yml
+robots:
+  enable: true
+  # disallow:  # custom paths to disallow indexing (defaults to /css/ /js/ /font/ if unset)
+  #   - /css/
+  #   - /js/
+```
+
+The generated `robots.txt` includes:
+
+- `User-agent: *` / `Allow: /` — allow all crawlers to access the whole site
+- `Disallow: /css/`, `/js/`, `/font/` — block pure-resource directories from being indexed as standalone resources
+- `Sitemap: <absolute-url>/sitemap.xml` — auto-references the sitemap (unless sitemap is disabled)
+
+### RSS Auto-Discovery
+
+The theme injects an RSS auto-discovery tag into the `<head>` of every page:
+
+```html
+<link rel="alternate" type="application/rss+xml" title="..." href="https://example.com/feed.xml">
+```
+
+Browsers and RSS readers use this to auto-discover the site's feed, so readers can subscribe without manually entering the feed URL. The URL is taken from `recent_updates.rss_url` in the [Recent Updates](#recent-updates-rss-aggregation) config; if `recent_updates` is not configured, this tag is not injected (no side effects).
+
+> Recommended: generate RSS on your Hexo blog via [`hexo-generator-feed`](https://github.com/hexojs/hexo-generator-feed), and point `recent_updates.rss_url` to the same URL — that way "Recent Updates cards" and "RSS auto-discovery" share one feed.
+
 ### PWA (Installable App)
 
 The theme can generate the `manifest.json` and Service Worker (`sw.js`) required by Progressive Web Apps, enabling "Add to Home Screen", offline access, and static asset caching.
@@ -632,10 +677,41 @@ abstract: "This post tests the hidden excerpt feature. This text only appears in
 ---
 ```
 
+### Back-to-Top Button
+
+The theme provides a "back to top" button in the bottom-right corner of every page: it fades in after scrolling past one viewport height, and smoothly scrolls back to the top on click.
+
+- No configuration needed — enabled automatically.
+- Scroll listening is throttled with `requestAnimationFrame` to avoid high-frequency callbacks affecting scroll performance.
+- Click scrolling respects the [Accessibility](#accessibility-prefers-reduced-motion) setting: when "reduce motion" is on, it uses instant positioning (`behavior: auto`) instead of smooth scrolling.
+
+### Accessibility (prefers-reduced-motion)
+
+The theme respects the OS "reduce motion" preference (`prefers-reduced-motion: reduce`), making it friendlier for users with vestibular sensitivity or motion sickness:
+
+- Global degradation: all CSS animation and transition durations are compressed to `0.01ms`, and `scroll-behavior` is set to `auto`.
+- Heart curve (HeartCurve): when this preference is detected, the `requestAnimationFrame` animation loop is skipped and only a single static frame is drawn.
+- Back-to-top button: smooth scrolling degrades to instant positioning.
+
+This behavior is automatic — no configuration needed. Enable "reduce motion" in your system settings to activate it.
+
+### Font Loading Optimization
+
+The theme optimizes loading of custom subset fonts (see [Custom Fonts](#custom-fonts)) to reduce FOUT (flash of unstyled text) and speed up text rendering:
+
+- `font-display: swap`: system fonts render text first while the custom font loads, then seamlessly swap in — avoiding long blank periods.
+- `<link rel="preload">`: the first font file is preloaded at high priority, fetched in parallel with CSS to shorten the critical rendering path.
+- Font subsetting: only the glyphs actually used are packaged (see [Custom Fonts](#custom-fonts)), dramatically reducing font size.
+
+No configuration needed — applied automatically when `zh_font.enable: true` is set.
+
 ### Others
 
 For other config options, see the comments in the config file:
 
-- Gitalk comments
-- Baidu SEO
+- Baidu SEO (`baidu_site_verification`, `baidu_analytics`)
+- Google Analytics (`google_ad`)
+- Algolia search (`algolia` — enable after replacing with real credentials)
 - etc.
+
+> Comments: the Gitalk comments feature built into the original theme has been removed in this fork (the original repo is archived, Gitalk is unmaintained and depends on GitHub OAuth). For comments, we recommend [giscus](https://giscus.app/) (based on GitHub Discussions) or [Waline](https://waline.js.org/) — embed the corresponding component via a custom `layout` or directly in a page file under `source`.

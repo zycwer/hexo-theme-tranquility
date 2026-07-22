@@ -16,8 +16,8 @@ module.exports = hexo => {
     const env = nunjucks.configure(layoutDir, {
       autoescape: false,
       throwOnUndefined: false,
-      // 启用模板缓存：单次构建内 layout 文件不变，避免每次 env.render(path) 重新编译
-      noCache: false,
+      // server 模式禁用缓存便于热更新；generate 模式启用缓存提升性能
+      noCache: hexo.env && hexo.env.cmd === 'server',
       trimBlocks: false,
       lstripBlocks: false
     });

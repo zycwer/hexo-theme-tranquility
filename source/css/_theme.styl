@@ -77,3 +77,15 @@
   --c-highlight-bg: rgba(255, 217, 0, 0.35);  // 高亮背景降低亮度避免刺眼
   --c-highlight-text: #e8e8e8;      // 高亮文字改浅
 }
+
+/* prefers-reduced-motion：为偏好减少动画的用户全局禁用动画 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

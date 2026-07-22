@@ -108,10 +108,19 @@
     var heartCurve;
     try {
       heartCurve = new HeartCurve(400, 400);
-      heartCurve.spin();
     } catch (e) {
       return;
     }
+
+    // 偏好减少动画的用户仅静态绘制一帧，不启动 rAF 循环
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      heartCurve.isPause = true;
+      heartCurve.spin();
+      return;
+    }
+
+    heartCurve.spin();
     var mq = window.matchMedia("(hover:none)");
     var hoverBound = false;
     mobileAdjust(mq);

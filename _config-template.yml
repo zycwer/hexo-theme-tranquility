@@ -15,7 +15,7 @@ color_mode_time:
   start: 18  # 深色模式开始小时（24 小时制，下同）
   end: 6     # 深色模式结束小时（支持跨午夜，如 18→6）
 
-# 第三方库(MathJax / Mermaid / Gitalk / DocSearch)的 CDN 源
+# 第三方库(MathJax / Mermaid / DocSearch)的 CDN 源
 # 默认 jsDelivr;unpkg 国内访问不稳定。国内可改为 https://npm.elemecdn.com
 cdn: https://cdn.jsdelivr.net/npm
 
@@ -111,23 +111,6 @@ reward: # 赞赏
   text: "给作者倒杯卡布奇诺"
   btnText: 喜欢作者
 
-# see https://github.com/gitalk/gitalk
-gitalk: # gitalk 评论
-  enable: false
-  owner: # MUST HAVE, Your Github Username
-  admin:
-  repo: # MUST HAVE, The name of the repo you use to store Gitment comments
-  clientID: # MUST HAVE, Github client id for the Gitment
-  clientSecret: # EITHER this or proxy_gateway, Github access secret token for the Gitment
-
-  distractionFreeMode: false # Facebook-like distraction free mode
-  # OAuth 代理,默认公共代理国内不稳定且有限流,建议自行部署 Cloudflare Worker 代理后替换
-  proxy: https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token
-  # Gitalk's display language depends on user's browser or system environment
-  # If you want everyone visiting your site to see a uniform language, you can set a force language value
-  # Available values: en | es-ES | fr | ru | zh-CN | zh-TW
-  language: zh-CN
-
 # see https://github.com/tea3/hexo-related-popular-posts
 related_post:
   enable: true
@@ -196,7 +179,7 @@ search:
   content: true
 
 algolia:
-  enable: true
+  enable: false # 需替换为真实 Algolia 凭据后再开启
   appId: appId
   apiKey: apiKey
   indexName: indexName
@@ -215,6 +198,14 @@ google_ad:
 # 若已安装 hexo-generator-sitemap，可在此关闭以避免冲突
 sitemap:
   enable: true
+
+# robots.txt：自动生成 robots.txt 并引用 sitemap.xml
+# disallow 可自定义禁止索引的路径
+robots:
+  enable: true
+  # disallow:
+  #   - /css/
+  #   - /js/
 
 # PWA：生成 manifest.json + Service Worker，移动端可"添加到主屏幕"，离线可访问已缓存页面
 # 首次开启后需 https 访问（localhost 除外）Service Worker 才会注册

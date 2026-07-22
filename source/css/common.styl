@@ -264,3 +264,44 @@ mjx-container {
     transform: scale(0.8);
   }
 }
+
+/* 回到顶部按钮 */
+.back-to-top {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  background: var(--c-bg-card);
+  box-shadow: 0 2px 8px var(--c-shadow);
+  color: var(--c-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+  z-index: 90;
+}
+
+.back-to-top--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  border-color: var(--c-link-hover);
+  color: var(--c-link-hover);
+}
+
+@media (max-width: 760px) {
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+  }
+}

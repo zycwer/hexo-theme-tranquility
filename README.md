@@ -16,16 +16,25 @@
 
 > **💡 Fork 说明**
 >
-> 本仓库是 [hooozen/hexo-theme-tranquility](https://github.com/hooozen/hexo-theme-tranquility) 的 fork。原仓库已于 2026 年 6 月归档、停止维护，本 fork 在其基础上持续维护并新增了以下特性：
+> 本仓库是 [hooozen/hexo-theme-tranquility](https://github.com/hooozen/hexo-theme-tranquility) 的 fork。原仓库已于 2026 年 6 月归档、停止维护，本 fork 在其基础上持续维护并持续新增特性、修复缺陷。
+>
+> 相较原仓库的主要演进：
 >
 > - 一言（Hitokoto）Slogan 开关
 > - 文章驱动的时间线（取代配置文件事件）
 > - Hexo 原生关于页（取代配置文件内容）
 > - 构建时 RSS 聚合的「最近更新」卡片
-> - 代码精简优化（scripts 目录 -23%）
-> - 删除与关于页重复的简历（CV）功能
+> - 运行时深色模式（CSS 变量切换，无需重建）
+> - Open Graph / Twitter Card / JSON-LD 结构化数据
+> - 站点地图（sitemap.xml）、robots.txt、RSS 自动发现
+> - PWA（manifest.json + Service Worker）、图片懒加载
+> - 回到顶部按钮、`prefers-reduced-motion` 无障碍降级
+> - 字体加载优化（`font-display: swap` + preload）
+> - 代码精简（scripts 目录 -23%）、删除与关于页重复的简历（CV）功能
+> - 安全加固（修复 XSS / `</script>` 注入 / localStorage 兜底等）
+> - 移除已废弃的 Gitalk 评论功能
 >
-> 详见 [v1.4.0 Release](https://github.com/zycwer/hexo-theme-tranquility/releases/tag/v1.4.0)。
+> 详见 [Releases](https://github.com/zycwer/hexo-theme-tranquility/releases)。
 
 ## 演示站
 
@@ -41,10 +50,11 @@
 - [关于页](#关于页)（Hexo 原生页面）、[时间线](#时间线)（文章驱动，点击进入详情）
 - [一言（Hitokoto）](#一言slogan)Slogan，刷新随机切换
 - [深色模式](#深色模式)（浅色/深色/定时/跟随浏览器，导航栏一键切换）
-- [Open Graph](#open-graph--twitter-card) 社交分享卡片、[JSON-LD](#json-ld-结构化数据) 结构化数据、[站点地图](#站点地图)、[PWA](#pwa-可安装应用)
+- [Open Graph](#open-graph--twitter-card) 社交分享卡片、[JSON-LD](#json-ld-结构化数据) 结构化数据、[站点地图](#站点地图)、[robots.txt](#robotstxt)、[RSS 自动发现](#rss-自动发现)、[PWA](#pwa-可安装应用)
+- [回到顶部按钮](#回到顶部按钮)、[无障碍动效降级](#无障碍prefers-reduced-motion)、[字体加载优化](#字体加载优化)
 - 三端自适应，舒适阅读
 - 自定义字体及提取压缩，兼具美观和性能
-- [相关文章](#相关文章)、[数学公式](#数学公式)、[Gitalk 评论](#其他)、[赞赏](#文章赞赏)、[SEO](#其他)
+- [相关文章](#相关文章)、[数学公式](#数学公式)、[赞赏](#文章赞赏)、[SEO](#其他)
 - 等
 
  -----
@@ -68,6 +78,8 @@
   - [Open Graph & Twitter Card](#open-graph--twitter-card)
   - [JSON-LD 结构化数据](#json-ld-结构化数据)
   - [站点地图](#站点地图)
+  - [robots.txt](#robotstxt)
+  - [RSS 自动发现](#rss-自动发现)
   - [PWA（可安装应用）](#pwa可安装应用)
   - [代码高亮](#代码高亮)
   - [数学公式](#数学公式)
@@ -84,6 +96,9 @@
   - [Mermaid 增强](#mermaid-增强)
   - [文章搜索](#文章搜索)
   - [文章摘要](#文章摘要)
+  - [回到顶部按钮](#回到顶部按钮)
+  - [无障碍（prefers-reduced-motion）](#无障碍prefers-reduced-motion)
+  - [字体加载优化](#字体加载优化)
   - [其他](#其他)
 
 ## 安装
@@ -445,6 +460,36 @@ sitemap:
 
 URL 均为绝对路径（基于博客根目录 `_config.yml` 的 `url` 配置）。
 
+### robots.txt
+
+主题内置 `robots.txt` 生成器，构建时自动产出爬虫协议文件，允许搜索引擎抓取页面、屏蔽资源目录（CSS/JS/字体），并声明站点地图地址。
+
+```yml
+robots:
+  enable: true
+  # disallow:  # 自定义禁止索引的路径（不设置则默认屏蔽 /css/ /js/ /font/）
+  #   - /css/
+  #   - /js/
+```
+
+生成的 `robots.txt` 包含：
+
+- `User-agent: *` / `Allow: /` —— 允许所有爬虫抓取全站
+- `Disallow: /css/`、`/js/`、`/font/` —— 屏蔽纯资源目录，避免被索引为独立资源
+- `Sitemap: <绝对地址>/sitemap.xml` —— 自动引用站点地图（若未关闭 sitemap）
+
+### RSS 自动发现
+
+主题会在所有页面 `<head>` 中注入 RSS 自动发现标签：
+
+```html
+<link rel="alternate" type="application/rss+xml" title="..." href="https://example.com/feed.xml">
+```
+
+浏览器与 RSS 阅读器据此自动发现站点的订阅源，读者无需手动输入 feed 地址即可订阅。该地址取自[最近更新](#最近更新rss-聚合)配置中的 `recent_updates.rss_url`；若未配置 `recent_updates`，则不注入此标签（无副作用）。
+
+> 建议在博客根目录 `_config.yml` 中通过 [`hexo-generator-feed`](https://github.com/hexojs/hexo-generator-feed) 生成 RSS，并把 `recent_updates.rss_url` 指向同一地址，这样「最近更新卡片」与「RSS 自动发现」共用一个订阅源。
+
 ### PWA（可安装应用）
 
 主题可生成 Progressive Web App 所需的 `manifest.json` 与 Service Worker（`sw.js`），让站点支持「添加到主屏幕」、离线访问与静态资源缓存。
@@ -635,13 +680,44 @@ abstract: "该文章测试隐藏式摘要功能，此文本只会在文章列表
 ---
 ```
 
+### 回到顶部按钮
+
+主题在所有页面右下角提供「回到顶部」按钮：滚动超过一屏后按钮淡入浮现，点击平滑滚动回顶部。
+
+- 无需配置，自动启用。
+- 滚动监听使用 `requestAnimationFrame` 节流，避免高频触发影响滚动性能。
+- 点击滚动遵循 [无障碍](#无障碍prefers-reduced-motion) 设置：当用户开启「减少动态效果」时改用瞬时定位（`behavior: auto`），不再播放平滑滚动动画。
+
+### 无障碍（prefers-reduced-motion）
+
+主题尊重操作系统的「减少动态效果」（`prefers-reduced-motion: reduce`）偏好，对前庭功能敏感、易晕动症的用户更友好：
+
+- 全局降级：所有 CSS 动画与过渡的时长压缩为 `0.01ms`，`scroll-behavior` 设为 `auto`。
+- 心形曲线（HeartCurve）：检测到该偏好时跳过 `requestAnimationFrame` 动画循环，仅静态绘制一帧。
+- 回到顶部按钮：平滑滚动退化为瞬时定位。
+
+该行为自动生效，无需配置。用户在系统设置中开启「减少动态效果」即可。
+
+### 字体加载优化
+
+主题对自定义子字体（见[自定义字体](#自定义字体)）做了加载优化，减少字体闪烁（FOUT）并加快文字渲染：
+
+- `font-display: swap`：字体加载完成前先用系统字体渲染文字，加载完成后无缝替换，避免长时间空白。
+- `<link rel="preload">`：首个字体文件高优先级预加载，与 CSS 并行请求，缩短关键渲染路径。
+- 字体子集化：仅打包页面用到的字形（见[自定义字体](#自定义字体)），大幅减小字体体积。
+
+无需配置，开启 `zh_font.enable: true` 后自动应用。
+
 ### 其他
 
-请他配置请查看配置文件注释
+其他配置请查看配置文件注释：
 
-- gitalk 文章评论
-- 百度 SEO
+- 百度 SEO（`baidu_site_verification`、`baidu_analytics`）
+- Google Analytics（`google_ad`）
+- Algolia 搜索（`algolia`，需替换为真实凭据后开启）
 - 等
+
+> 评论功能：原主题内置的 Gitalk 已在本 fork 中移除（原仓库归档、Gitalk 不再维护且依赖 GitHub OAuth）。如需评论，推荐接入 [giscus](https://giscus.app/)（基于 GitHub Discussions）或 [Waline](https://waline.js.org/)，通过自定义 `layout` 或在 `source` 下页面文件中嵌入对应组件即可。
 
 -----
 

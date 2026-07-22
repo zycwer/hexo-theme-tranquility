@@ -4,6 +4,16 @@
         font-family:{{ theme.zh_font.fontName }};
         src: url({{ url_for('/font/') + subfont + '.' + theme.zh_font.type }});
         font-weight: {{ subfont }};
+        font-display: swap;
     }
   </style>
 {% endfor %}
+{% if theme.zh_font.style and theme.zh_font.style.length %}
+  {% set _ftype = theme.zh_font.type or 'ttf' %}
+  {% set _mime = 'font/woff2' if _ftype == 'woff2' else ('font/woff' if _ftype == 'woff' else 'font/ttf') %}
+  <link rel="preload"
+        as="font"
+        type="{{ _mime }}"
+        crossorigin
+        href="{{ url_for('/font/' + theme.zh_font.style[0] + '.' + _ftype) }}"/>
+{% endif %}
