@@ -8,6 +8,10 @@
   var dots = Array.prototype.slice.call(root.querySelectorAll('.recent-updates__dot'));
   if (cards.length <= 1) return; // 单张或无图无需切换
 
+  var prevBtn = root.querySelector('.recent-updates__arrow--prev');
+  var nextBtn = root.querySelector('.recent-updates__arrow--next');
+  if (!prevBtn || !nextBtn) return;
+
   var current = 0;
 
   function show(index) {
@@ -20,10 +24,10 @@
     });
   }
 
-  root.querySelector('.recent-updates__arrow--prev').addEventListener('click', function () {
+  prevBtn.addEventListener('click', function () {
     show(current - 1);
   });
-  root.querySelector('.recent-updates__arrow--next').addEventListener('click', function () {
+  nextBtn.addEventListener('click', function () {
     show(current + 1);
   });
   dots.forEach(function (dot) {

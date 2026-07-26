@@ -28,8 +28,8 @@
     <meta name="description" content="{{ page.excerpt or page.description or config.description }}"/>
     <meta name="keywords" content="{% if page.tags and page.tags.length %}{% for _t in page.tags.toArray() %}{% if not loop.first %}, {% endif %}{{ _t.name }}{% endfor %}{% else %}{{ config.keywords }}{% endif %}"/>
     <link rel="canonical" href="{{ full_url_for(page.path or '/') }}"/>
-    {% if theme.feed %}
-      <link rel="alternate" type="application/rss+xml" title="{{ config.title }}" href="{{ url_for(theme.feed.path or '/atom.xml') }}"/>
+    {% if config.feed %}
+      <link rel="alternate" type="application/rss+xml" title="{{ config.title }}" href="{{ url_for(config.feed.path or '/atom.xml') }}"/>
     {% elif theme.recent_updates and theme.recent_updates.enable and theme.recent_updates.rss_url %}
       <link rel="alternate" type="application/rss+xml" title="{{ config.title }}" href="{{ theme.recent_updates.rss_url }}"/>
     {% endif %}
@@ -144,7 +144,7 @@
         {% set _art_img = page.cover or theme.index.photo or theme.logo %}
         {% set _art_img_abs = '' %}
         {% if _art_img %}
-          {% if _art_img.indexOf('http') == 0 %}
+          {% if _art_img.indexOf('http') == 0 or _art_img.indexOf('//') == 0 %}
             {% set _art_img_abs = _art_img %}
           {% else %}
             {% set _art_img_abs = full_url_for(_art_img) %}

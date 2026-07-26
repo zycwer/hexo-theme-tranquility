@@ -114,6 +114,7 @@ function renderSearchResult(result, el) {
 
   if (!result || result.length <= 0) {
     el.innerHTML = '<div class="search-result-empty">无结果</div>'
+    return
   }
 
   const list = document.createDocumentFragment()
