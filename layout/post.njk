@@ -51,6 +51,9 @@
     {% if theme.related_post.enable %}
       {% include "_partials/components/related-post.njk" %}
     {% endif %}
+    {% if theme.comments and theme.comments.enable %}
+      {% include "_partials/components/comments.njk" %}
+    {% endif %}
   </div>
 {% endblock body %}
 {% block script %}

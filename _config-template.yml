@@ -111,6 +111,35 @@ reward: # 赞赏
   text: "给作者倒杯卡布奇诺"
   btnText: 喜欢作者
 
+# 评论系统：内置 giscus / waline / disqus 三种方案，填写对应字段后自动在文章页底部渲染
+# 三选一开启，enable 为 true 的第一个生效；同时开启多个时按 giscus > waline > disqus 优先级
+comments:
+  enable: false
+  # giscus —— 基于 GitHub Discussions，无需服务器，数据存储在仓库 Discussions
+  # 配置参数从 https://giscus.app 获取
+  giscus:
+    repo: # 你的仓库，格式 owner/repo，如 zycwer/blog
+    repo_id: # 从 giscus.app 获取
+    category: # Discussions 分类名，如 Announcements
+    category_id: # 从 giscus.app 获取
+    mapping: pathname # 文章与 Discussion 的映射方式：pathname | url | title | og:title
+    reactions_enabled: 1 # 是否开启表情反应：0 关闭 / 1 开启
+    input_position: bottom # 评论框位置：top / bottom
+    lang: zh-CN # 语言
+    # 主题：light / dark / preferred_color_scheme（自动跟随系统）
+    # 设为 auto 时会跟随本主题的深色模式切换
+    theme: preferred_color_scheme
+  # waline —— 自托管评论系统，支持匿名评论，后端可选 LeanCloud / MySQL / PostgreSQL / SQLite
+  # 部署文档：https://waline.js.org/guide/get-started/
+  waline:
+    serverURL: # 你的 Waline 服务地址，如 https://your-waline.vercel.app
+    lang: zh-CN # 语言
+    emoji: # 表情包 CDN，留空使用默认
+    # 深色模式自动跟随本主题（html[data-theme="dark"]）
+  # disqus —— 老牌评论系统，国内访问需科学上网
+  disqus:
+    shortname: # 你的 Disqus shortname
+
 # see https://github.com/tea3/hexo-related-popular-posts
 related_post:
   enable: true

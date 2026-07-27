@@ -197,3 +197,16 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+// 评论容器（giscus / waline / disqus 通用）
+.comments {
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid var(--c-border, #eee);
+
+  .giscus,
+  #waline,
+  #disqus_thread {
+    min-height: 200px;
+  }
+}

@@ -1,0 +1,82 @@
+{# 评论系统组件：根据 theme.comments 配置渲染 giscus / waline / disqus 三选一 #}
+{# 优先级：giscus > waline > disqus（取首个 enable 且配置完整的） #}
+{% set c = theme.comments or {} %}
+
+{% if c.enable %}
+  <div class="comments" id="comments">
+
+    {# ========== giscus ========== #}
+    {% set g = c.giscus or {} %}
+    {% if g.repo and g.repo_id and g.category and g.category_id %}
+      <div class="giscus"></div>
+      <script src="https://giscus.app/client.js"
+        data-repo="{{ g.repo }}"
+        data-repo-id="{{ g.repo_id }}"
+        data-category="{{ g.category }}"
+        data-category-id="{{ g.category_id }}"
+        data-mapping="{{ g.mapping or 'pathname' }}"
+        data-strict="0"
+        data-reactions-enabled="{{ g.reactions_enabled | default(1) }}"
+        data-emit-metadata="0"
+        data-input-position="{{ g.input_position or 'bottom' }}"
+        data-theme="{{ g.theme if g.theme != 'auto' else 'light' }}"
+        data-lang="{{ g.lang or 'zh-CN' }}"
+        crossorigin="anonymous"
+        async>
+      </script>
+      {# 当 giscus.theme = auto 时，监听本主题深色模式切换并同步 giscus 主题 #}
+      {% if g.theme == 'auto' %}
+        <script>
+          (function () {
+            var sync = function () {
+              var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+              var iframe = document.querySelector('iframe.giscus-frame');
+              if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage(
+                  { giscus: { setConfig: { theme: dark ? 'dark' : 'light' } } },
+                  'https://giscus.app'
+                );
+              }
+            };
+            new MutationObserver(sync).observe(document.documentElement, {
+              attributes: true,
+              attributeFilter: ['data-theme']
+            });
+          })();
+        </script>
+      {% endif %}
+
+    {# ========== waline ========== #}
+    {% elseif (c.waline or {}).serverURL %}
+      {% set w = c.waline %}
+      <div id="waline"></div>
+      <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+      <script type="module">
+        import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+        init({
+          el: '#waline',
+          serverURL: {{ w.serverURL | dump | safe }},
+          lang: {{ (w.lang or 'zh-CN') | dump | safe }},
+          {% if w.emoji %}emoji: {{ w.emoji | dump | safe }},{% endif %}
+          dark: 'html[data-theme="dark"]'
+        });
+      </script>
+
+    {# ========== disqus ========== #}
+    {% elseif (c.disqus or {}).shortname %}
+      {% set d = c.disqus %}
+      <div id="disqus_thread"></div>
+      <script>
+        (function () {
+          var d = document, s = d.createElement('script');
+          s.src = 'https://{{ d.shortname }}.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>请启用 JavaScript 以查看 <a href="https://disqus.com/?ref_noscript">Disqus 评论</a>。</noscript>
+
+    {% endif %}
+
+  </div>
+{% endif %}
