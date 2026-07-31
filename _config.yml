@@ -1,0 +1,248 @@
+slogan: "宁静致远"
+# 一言（Hitokoto）：开启后首页 slogan 处将客户端请求 https://v1.hitokoto.cn
+# 展示随机一言，请求失败或 JS 未执行时回退到上方静态 slogan
+slogan_hitokoto: false
+email: example@email.com
+logo: "/images/logo.svg"
+
+# 深色模式：
+#   light = 始终浅色
+#   dark  = 始终深色
+#   auto  = 跟随浏览器 prefers-color-scheme
+#   time  = 按时间段切换（见下方 color_mode_time）
+color_mode: light
+color_mode_time:
+  start: 18  # 深色模式开始小时（24 小时制，下同）
+  end: 6     # 深色模式结束小时（支持跨午夜，如 18→6）
+
+# 第三方库(MathJax / Mermaid / DocSearch)的 CDN 源
+# 默认 jsDelivr;unpkg 国内访问不稳定。国内可改为 https://npm.elemecdn.com
+cdn: https://cdn.jsdelivr.net/npm
+
+# 站点模式：
+#   blog    = 默认博客主题（展示子页/博客入口）
+#   landing = 纯个人主页模式（隐藏博客/子页入口，聚焦关于页、大事件与最近更新）
+homepage_mode: blog
+
+mathjax: false # 加载 LateX 数学公式库
+
+favicon: # 配置网页图标
+  small: /images/favicon-16x16.png
+  medium: /images/favicon-32x32.png
+  apple_touch_icon: /images/apple-touch-icon.png
+  safari_pinned_tab: /images/logo.svg
+
+subpage: # 开启“子页”功能，详见 README
+  enable: true
+  pages:
+    - name: featTest # 文章的分类（category）名，如 developer
+      path: feat # 若不设置则默认使用 name
+      title: 特性测试 # 菜单名，如 开发者
+      icon: /images/icon/icon-code.svg # 图标的路径
+      description: 主题的功能测试 # 描述
+    - name: baseTest # 文章的分类（category）名，如 developer
+      path: base # 若不设置则默认使用 name
+      title: 基础测试 # 菜单名，如 开发者
+      icon: /images/icon/icon-pi.svg # 图标的路径
+      description: 基于 hexo 官方的基础测试 # 描述
+
+index: # 配置首页个性化内容
+  motto: "长风破浪会有时！"
+  poem:
+    - 君不见高堂明镜悲白发
+    - 朝如青丝暮成雪
+  photo: /images/about.jpg
+  about:
+    title: 关于
+    text:
+      - 酒入豪肠,七分酿成了月光
+      -
+      - 余下的三分啸成剑气
+      -
+      - 绣口一吐就半个盛唐
+
+# 关于页使用 Hexo 原生页面功能实现：
+# 在博客 source 目录下新建 about/index.md，并在其 front-matter 中设置 `layout: about`，
+# 即可使用主题的 about 布局渲染。内容（markdown）写在页面文件中，无需在此配置。
+# 是否在导航栏显示“关于”入口，由下方 nav.about 控制。
+
+# 首页最近更新卡片（从外部博客 RSS 拉取，构建时抓取并服务端渲染）
+# 适合 landing 模式：本站不含文章，把外部博客的最新文章以卡片形式展示在首页
+recent_updates:
+  enable: false
+  rss_url: # 博客 RSS 源地址，例如 https://example.com/feed.xml（结构要求见 README）
+  max_count: 3 # 最多展示的卡片数量（建议 <= 3）
+  title: 最近更新
+  show_excerpt: true # 是否展示摘要
+  excerpt_length: 80 # 摘要最大字符数
+
+foot:
+  title:
+    - "海内存知己"
+    - "天涯若比邻"
+  linksRows: 4
+
+links: # 朋友
+  - name: "Theme Tranquility"
+    url: https://github.com/hooozen/hexo-theme-tranquility
+  - name: "浩然的主页"
+    url: https://hozen.site
+
+social:
+  - name: "hooozen"
+    icon: "/images/logo-github.svg"
+    url: https://github.com/hooozen
+  - name: "谁在胡言乱语"
+    icon: "/images/logo-wx.svg"
+    url: https://mp.weixin.qq.com/s?__biz=MzI3NzQ4NDkzNg==&mid=2247484469&idx=1&sn=8a442bb67397f52cce5c38c3f9b41e36&chksm=eb64c0d2dc1349c40d2e1bb55615ae28b3f2951be22f00717b9ade98c851082e42dc666ab45d#rd
+  - name: "Mundooo"
+    icon: "/images/logo-zh.svg"
+    url: https://www.zhihu.com/people/hozen
+
+contacts:
+  - name: "name@example.com"
+    icon: "/images/icon/icon-email.svg"
+    url: "mailto:name@example.com"
+
+reward: # 赞赏
+  enable: true
+  face: /assets/author-face.jpg # 头像图片
+  paycode: /assets/pay-code.jpg # 支付码图片
+  text: "给作者倒杯卡布奇诺"
+  btnText: 喜欢作者
+
+# 评论系统：内置 giscus / waline / disqus 三种方案，填写对应字段后自动在文章页底部渲染
+# 三选一开启，enable 为 true 的第一个生效；同时开启多个时按 giscus > waline > disqus 优先级
+comments:
+  enable: false
+  # giscus —— 基于 GitHub Discussions，无需服务器，数据存储在仓库 Discussions
+  # 配置参数从 https://giscus.app 获取
+  giscus:
+    repo: # 你的仓库，格式 owner/repo，如 zycwer/blog
+    repo_id: # 从 giscus.app 获取
+    category: # Discussions 分类名，如 Announcements
+    category_id: # 从 giscus.app 获取
+    mapping: pathname # 文章与 Discussion 的映射方式：pathname | url | title | og:title
+    reactions_enabled: 1 # 是否开启表情反应：0 关闭 / 1 开启
+    input_position: bottom # 评论框位置：top / bottom
+    lang: zh-CN # 语言
+    # 主题：light / dark / preferred_color_scheme（自动跟随系统）
+    # 设为 auto 时会跟随本主题的深色模式切换
+    theme: preferred_color_scheme
+  # waline —— 自托管评论系统，支持匿名评论，后端可选 LeanCloud / MySQL / PostgreSQL / SQLite
+  # 部署文档：https://waline.js.org/guide/get-started/
+  waline:
+    serverURL: # 你的 Waline 服务地址，如 https://your-waline.vercel.app
+    lang: zh-CN # 语言
+    emoji: # 表情包 CDN，留空使用默认
+    # 深色模式自动跟随本主题（html[data-theme="dark"]）
+  # disqus —— 老牌评论系统，国内访问需科学上网
+  disqus:
+    shortname: # 你的 Disqus shortname
+
+# see https://github.com/tea3/hexo-related-popular-posts
+related_post:
+  enable: true
+  config:
+    maxCount: 5 # Maximum count of a list. default 5
+    ulClass: # Class name of element. deafult 'popular-posts'
+    PPMixingRate: 0.4 # Mixing ratio of popular posts and related posts. default 0.0(=Related posts only)
+    isDate: # visible the date. false
+    isImage: # visible the image. false
+    isExcerpt: # visible the excerpt. false
+    PPCategoryFilter: # Option to fix category on Popular Posts. undefined
+    PPTagFilter: # Option to fix tag on Popular Posts. undefined
+
+# Baidu Webmaster tools verification.
+# See: https://ziyuan.baidu.com/site
+baidu_site_verification:
+
+# Baidu Analytics
+# See: https://tongji.baidu.com
+baidu_analytics: # <app_id>
+
+# 自定义字体，用于美化部分汉字的显示效果.
+# 可以通过替换 _font/ 目录下的字体文件替换自己喜欢的字体
+zh_font:
+  enable: true
+  fontName: sourceHanSerif
+  type: ttf
+  style:
+    - normal
+    - bold
+
+# 配置时间线 参考 README.md
+timeline:
+  enable: true
+  order: false # 是否按时间正序展示，false 为倒序
+  items:
+    - name: article
+      color: "#ee936c"
+      icon: /images/icon/icon-article.svg
+      checked: false
+    - name: app
+      color: "#60a465"
+      icon: /images/icon/icon-app.svg
+      checked: true
+    - name: event
+      color: "#568dc4"
+      icon: /images/icon/icon-event.svg
+      checked: false
+
+# 标签云
+tagcloud:
+  fancy: false
+  min_font: 14
+  max_font: 30
+
+mermaid:
+  enable: true # 启用 Mermaid 增强
+  version: 10.9.3 # 固定版本,避免 latest 因上游 breaking change 失效(11.x 为 ESM,需改用 type="module" 加载)
+  options:
+    startOnload: true
+
+search:
+  path: search.json
+  enable: true
+  field: post
+  content: true
+
+algolia:
+  enable: false # 需替换为真实 Algolia 凭据后再开启
+  appId: appId
+  apiKey: apiKey
+  indexName: indexName
+  insights: true
+  debug: false
+
+nav:
+  sticky: false
+  about: false # 是否在导航栏显示“关于”入口（页面内容由 source/about/index.md 提供）
+
+google_ad:
+  enable: false
+  meta_tag: "G-XXXXXXXXXX" # Google Analytics meta tag
+
+# 站点地图：自动生成 sitemap.xml（覆盖文章/页面/分类/标签）
+# 若已安装 hexo-generator-sitemap，可在此关闭以避免冲突
+sitemap:
+  enable: true
+
+# robots.txt：自动生成 robots.txt 并引用 sitemap.xml
+# disallow 可自定义禁止索引的路径
+robots:
+  enable: true
+  # disallow:
+  #   - /css/
+  #   - /js/
+
+# PWA：生成 manifest.json + Service Worker，移动端可"添加到主屏幕"，离线可访问已缓存页面
+# 首次开启后需 https 访问（localhost 除外）Service Worker 才会注册
+pwa:
+  enable: false
+  name: # PWA 应用名，留空则使用 config.title
+  short_name: # 短名，留空则使用 config.title
+  description: # 描述，留空则使用 config.description
+  display: standalone # standalone | fullscreen | minimal-ui | browser
+  theme_color: "#fcfcfb" # 状态栏/标题栏颜色
+  background_color: "#fcfcfb"

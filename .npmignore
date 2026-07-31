@@ -1,0 +1,30 @@
+# 开发与文档资源，不打包进 npm
+doc/
+.github/
+.vscode/
+.git
+.gitignore
+.gitattributes
+.gitkeep
+.gitmodules
+
+# 模板配置（npm 用户使用包内的 _config.yml 作默认值，无需此文件）
+_config-template.yml
+
+# 英文 README（npm 包主页只保留中文 README.md）
+README_EN.md
+
+# 字体调试文件（仅本地开发用，不打包）
+_font/debug.html
+_font/debug.js
+
+# 调试与日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+
+# 临时发布产物
+*.tgz
+.release-notes-*.md

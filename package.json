@@ -1,0 +1,39 @@
+{
+  "name": "hexo-theme-tranquility",
+  "version": "1.6.2",
+  "description": "一款为个人主页及多学科领域博主设计的 Hexo 主题（致远 / Tranquility）",
+  "main": "package.json",
+  "files": [
+    "layout",
+    "scripts",
+    "source",
+    "languages",
+    "_font",
+    "_config.yml"
+  ],
+  "keywords": [
+    "hexo",
+    "theme",
+    "hexo-theme",
+    "tranquility",
+    "blog",
+    "personal-homepage"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zycwer/hexo-theme-tranquility.git"
+  },
+  "homepage": "https://docs.qwrcb.top",
+  "bugs": {
+    "url": "https://github.com/zycwer/hexo-theme-tranquility/issues"
+  },
+  "author": "zycwer",
+  "license": "MIT",
+  "dependencies": {
+    "hexo-pagination": "^2.0.0",
+    "hexo-renderer-nunjucks": "^3.0.0",
+    "hexo-renderer-stylus": "^3.0.1",
+    "moment": "^2.30.1",
+    "opentype.js": "^1.3.4"
+  }
+}
