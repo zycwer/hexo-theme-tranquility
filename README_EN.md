@@ -8,6 +8,7 @@
 
 <p align="center">
 <a href="https://github.com/zycwer/hexo-theme-tranquility/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/zycwer/hexo-theme-tranquility?label=release&color=orange"></a>
+<a href="https://www.npmjs.com/package/hexo-theme-tranquility"><img alt="npm" src="https://img.shields.io/npm/v/hexo-theme-tranquility?logo=npm&label=npm"></a>
 <a href="https://hexo.io/"><img src="https://img.shields.io/badge/Hexo-%3E%3D8.0.0-blue?logo=hexo"></a>
 <a href="https://github.com/zycwer/hexo-theme-tranquility/blob/main/LICENSE"><img src="https://img.shields.io/github/license/zycwer/hexo-theme-tranquility"></a>
 <a href="https://docs.qwrcb.top"><img src="https://img.shields.io/badge/docs-docs.qwrcb.top-green"></a>
@@ -56,6 +57,27 @@ Full installation, configuration, and advanced customization tutorials are avail
 ## Installation
 
 0. Prerequisites: [Node.js (>=16)](https://nodejs.org/), [Git](https://git-scm.com/), [Hexo](https://hexo.io/), and a working Hexo blog. If you're new to these, start with the [Hexo docs](https://hexo.io/docs/).
+
+### Option A: Install via npm (Recommended)
+
+1. Install the theme (runtime dependencies like `hexo-pagination` are installed automatically):
+
+    ```sh
+    cd hexo
+    npm install hexo-theme-tranquility
+    ```
+
+2. Set the `theme` field to `tranquility` in your blog's root `_config.yml` (see [Themes | Hexo](https://hexo.io/docs/themes)).
+
+3. Remove conflicting dependencies (they conflict with this theme's "Subpage" design; npm cannot uninstall them automatically):
+
+    ```bash
+    npm uninstall hexo-generator-category hexo-generator-archive
+    ```
+
+4. Theme configuration: Create `_config.tranquility.yml` in your blog's root directory with **only the options you want to override** — the rest fall back to the in-package defaults (deep-merged). See the [docs site](https://docs.qwrcb.top) or read the comments in [\_config-template.yml](./_config-template.yml) for configuration options.
+
+### Option B: Install via Git Clone
 
 1. Clone this repository into your Hexo blog's `themes/tranquility` folder:
 

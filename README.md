@@ -8,6 +8,7 @@
 
 <p align="center">
 <a href="https://github.com/zycwer/hexo-theme-tranquility/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/zycwer/hexo-theme-tranquility?label=release&color=orange"></a>
+<a href="https://www.npmjs.com/package/hexo-theme-tranquility"><img alt="npm" src="https://img.shields.io/npm/v/hexo-theme-tranquility?logo=npm&label=npm"></a>
 <a href="https://hexo.io/"><img src="https://img.shields.io/badge/Hexo-%3E%3D8.0.0-blue?logo=hexo"></a>
 <a href="https://github.com/zycwer/hexo-theme-tranquility/blob/main/LICENSE"><img src="https://img.shields.io/github/license/zycwer/hexo-theme-tranquility"></a>
 <a href="https://docs.qwrcb.top"><img src="https://img.shields.io/badge/docs-docs.qwrcb.top-green"></a>
@@ -56,6 +57,27 @@
 ## 安装
 
 0. 前置条件：[node(>=16)](https://nodejs.org/en)、[Git](https://git-scm.com/)、[Hexo](https://hexo.io/) 以及使用 Hexo 博客文件。如果你还不了解以上内容，请从[这里](https://hexo.io/zh-cn/docs/)获取相关帮助。
+
+### 方式一：通过 npm 安装（推荐）
+
+1. 安装主题（运行时依赖会自动装齐，无需手动安装 `hexo-pagination` 等）：
+
+    ```sh
+    cd hexo
+    npm install hexo-theme-tranquility
+    ```
+
+2. 配置根目录下 `_config.yml` 中的 `theme` 字段为 `tranquility`（参考 [主题 | Hexo](https://hexo.io/zh-cn/docs/themes))。
+
+3. 移除冲突的依赖（与本主题「子页」设计冲突，npm 无法自动卸载）：
+
+    ```bash
+    npm uninstall hexo-generator-category hexo-generator-archive
+    ```
+
+4. 主题配置：在博客根目录新建 `_config.tranquility.yml`，**只需写需要修改的项**，其余走包内默认值（深合并覆盖）。具体配置项请查看[文档站](https://docs.qwrcb.top)或阅读 [\_config-template.yml](./_config-template.yml) 的注释。
+
+### 方式二：通过 Git 克隆安装
 
 1. 下载本仓库的文件到你的 Hexo 目录的 `themes\tranquility` 文件夹下:
 
