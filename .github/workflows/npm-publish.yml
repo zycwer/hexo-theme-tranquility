@@ -21,11 +21,6 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-          # 开启缓存，加速 install
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci || npm install
 
       - name: Verify package contents
         run: npm pack --dry-run
