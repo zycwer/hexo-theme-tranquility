@@ -38,7 +38,7 @@ module.exports = hexo => {
     };
 
     const root = (this.config.root || '/').replace(/\/$/, '');
-    const sw = buildSW(root);
+    const sw = buildSW(root, hexo);
 
     return [
       { path: 'manifest.json', data: JSON.stringify(manifest, null, 2) },
@@ -49,8 +49,11 @@ module.exports = hexo => {
 
 // 简洁 Service Worker：静态资源缓存优先，HTML 网络优先失败回退缓存
 // CACHE 版本号每次构建变化，确保主题更新后旧缓存被清理
-function buildSW(root) {
-  const cacheVersion = 'tranquility-' + Date.now();
+function buildSW(root, hexo) {
+  // generate 模式用时间戳确保主题更新后旧缓存被清理；
+  // server 模式热重载频繁，用固定版本避免反复清空缓存丧失离线能力
+  const isServer = hexo.env && hexo.env.cmd === 'server';
+  const cacheVersion = 'tranquility-' + (isServer ? 'dev' : Date.now());
   return `// 由 hexo-theme-tranquility 自动生成，请勿手动编辑
 const CACHE = ${JSON.stringify(cacheVersion)};
 const ROOT = ${JSON.stringify(root)};

@@ -1,6 +1,6 @@
 'use strict';
 
-// 适配 hexo 8.x + hexo-renderer-nunjucks 2.x：
+// 适配 hexo 8.x + hexo-renderer-nunjucks 3.x：
 // 该渲染器的 compile 用 nunjucks.compile(text) 不传 env，会创建无 loader 的空 env，
 // 导致模板中的 {% extends %} / {% include %} 无法解析相对路径（报 "template not found"）。
 // 这里重新注册 njk/j2 渲染器，使用配置了 FileSystemLoader（指向主题 layout 目录）的 env，

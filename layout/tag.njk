@@ -7,7 +7,11 @@
 {% block body %}
   <div class="tag-page-title">#{{ page.tag }}</div>
   <div class="post-list">
-    {{ partial("_partials/macros/post-list.njk", {posts: page.posts}) }}
+    {% if not page.posts %}
+      <p class="post-list-empty">该标签下暂无文章。</p>
+    {% else %}
+      {{ partial("_partials/macros/post-list.njk", {posts: page.posts}) }}
+    {% endif %}
     {% if page.prev or page.next %}<div class="paginator">{{ paginator({"prev_next": false}) }}</div>{% endif %}
   </div>
 {% endblock body %}

@@ -1,4 +1,5 @@
-{% for p in posts.toArray() %}
+{% set postArr = posts.toArray() if posts.toArray else posts %}
+{% for p in postArr %}
   {% set sticky = p.sticky %}
   <div class="post-card{{ '--sticky' if sticky else '' }}">
     <div class="post__head">

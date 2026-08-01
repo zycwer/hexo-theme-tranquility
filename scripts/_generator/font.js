@@ -16,7 +16,7 @@ module.exports = function (hexo) {
     const { enable, fontName, type, style } = zhFont;
     if (!enable) return;
     if (!fontName || !type || !Array.isArray(style)) {
-      hexo.log.warn('zh_font config incomplete: fontName/type/style required');
+      hexo.log.warn('zh_font 配置不完整：需指定 fontName/type/style');
       return;
     }
 
@@ -38,7 +38,7 @@ module.exports = function (hexo) {
 
 function compress(text, { source, name, style }) {
   try {
-    let data = new Uint8Array(fs.readFileSync(source)).buffer;
+    const data = new Uint8Array(fs.readFileSync(source)).buffer;
     const font = opentype.parse(data);
     const glyphs = [notdefGlyph].concat(font.stringToGlyphs(text));
     const subFont = new opentype.Font({
