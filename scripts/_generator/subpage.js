@@ -33,16 +33,21 @@ function blog(locals) {
 
 function subpageGenerator(locals) {
   const ctx = this;
-  if (!ctx.theme.config.subpage.enable) return;
+  const subpageCfg = ctx.theme.config.subpage;
+  if (!subpageCfg || !subpageCfg.enable) return;
 
   const config = ctx.config;
   const perPage = config.subpage_generator.per_page;
   const orderBy = config.subpage_generator.order_by || '-date';
   const paginationDir = config.pagination_dir || 'page';
 
-  return ctx.theme.config.subpage.pages.reduce((result, page) => {
+  const pages = subpageCfg.pages;
+  if (!pages || !pages.length) return [];
+
+  return pages.reduce((result, page) => {
     const category = locals.categories.findOne({ name: page.name });
     let p = page.path || page.name;
+    if (!p) return result;
     p = p.endsWith('/') ? p : p + '/';
 
     if (!category || !category.length) {

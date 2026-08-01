@@ -2,12 +2,10 @@
   "name": "hexo-theme-tranquility",
   "version": "1.6.2",
   "description": "一款为个人主页及多学科领域博主设计的 Hexo 主题（致远 / Tranquility）",
-  "main": "package.json",
   "files": [
     "layout",
     "scripts",
     "source",
-    "languages",
     "_font",
     "_config.yml"
   ],

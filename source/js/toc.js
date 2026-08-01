@@ -35,15 +35,15 @@
   }
 
   function adjustToc() {
-    var y = window.scrollY;
+    var y = window.scrollY || window.pageYOffset;
+    tocEl.classList.remove('post-toc--attached', 'post-toc--bottom');
     if (y < breakPoint1) {
-      tocEl.className = 'post-toc';
       tocEl.style.top = '0';
     } else if (y < breakPoint2) {
-      tocEl.className = 'post-toc--attached';
+      tocEl.classList.add('post-toc--attached');
       tocEl.style.top = '0';
     } else {
-      tocEl.className = 'post-toc--bottom';
+      tocEl.classList.add('post-toc--bottom');
       tocEl.style.top = (articleHeight - tocHeight) + 'px';
     }
     ticking = false;

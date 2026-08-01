@@ -83,21 +83,13 @@ foot:
   linksRows: 4
 
 links: # 朋友
-  - name: "Theme Tranquility"
-    url: https://github.com/hooozen/hexo-theme-tranquility
-  - name: "浩然的主页"
-    url: https://hozen.site
+  # - name: "朋友的主页"
+  #   url: https://example.com
 
 social:
-  - name: "hooozen"
-    icon: "/images/logo-github.svg"
-    url: https://github.com/hooozen
-  - name: "谁在胡言乱语"
-    icon: "/images/logo-wx.svg"
-    url: https://mp.weixin.qq.com/s?__biz=MzI3NzQ4NDkzNg==&mid=2247484469&idx=1&sn=8a442bb67397f52cce5c38c3f9b41e36&chksm=eb64c0d2dc1349c40d2e1bb55615ae28b3f2951be22f00717b9ade98c851082e42dc666ab45d#rd
-  - name: "Mundooo"
-    icon: "/images/logo-zh.svg"
-    url: https://www.zhihu.com/people/hozen
+  # - name: "GitHub"
+  #   icon: "/images/logo-github.svg"
+  #   url: https://github.com/your-username
 
 contacts:
   - name: "name@example.com"
@@ -105,7 +97,7 @@ contacts:
     url: "mailto:name@example.com"
 
 reward: # 赞赏
-  enable: true
+  enable: false
   face: /assets/author-face.jpg # 头像图片
   paycode: /assets/pay-code.jpg # 支付码图片
   text: "给作者倒杯卡布奇诺"

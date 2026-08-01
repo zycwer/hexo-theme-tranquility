@@ -8,9 +8,10 @@ module.exports = hexo => {
     if (!cfg || !cfg.enable) return {};
 
     const items = cfg.items;
+    if (!items || !Array.isArray(items)) return {};
     const types = items.map(item => item.name);
     const order = cfg.order ? 'date' : '-date';
-    const iconOf = type => url_for((items.find(item => item.name == type) || {}).icon || '');
+    const iconOf = type => url_for((items.find(item => item.name === type) || {}).icon || '');
 
     const posts = hexo.locals.get('posts').sort(order)
       .filter(post => types.includes(post.timeline))
