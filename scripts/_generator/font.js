@@ -40,18 +40,31 @@ function compress(text, { source, name, style }, hexo) {
     const data = new Uint8Array(fs.readFileSync(source)).buffer;
     const font = opentype.parse(data);
     // 检测源字体中缺失的字符（如生僻字/繁体字超出 GB2312 子集范围）
-    // 缺失字符将回退为 .notdef，浏览器会以系统字体兜底显示
-    const missing = [];
+    // 缺失字符从子集文本中剔除，避免 opentype.js 产生 "Undefined CHARARRAY" 警告；
+    // 浏览器遇到这些字符时会以系统字体兜底显示
+    const missing = new Set();
+    const available = [];
     for (const ch of text) {
       const g = font.charToGlyph(ch);
       if (!g || g.name === '.notdef' || (g.unicode === undefined && g.name !== '.null')) {
-        missing.push(ch);
+        missing.add(ch);
+      } else {
+        available.push(ch);
       }
     }
-    if (missing.length) {
-      hexo.log.warn('subfont: 源字体缺失字符（将以系统字体兜底）：%s', Array.from(new Set(missing)).join(' '));
+    if (missing.size) {
+      hexo.log.warn('subfont: 源字体缺失字符（将以系统字体兜底）：%s', Array.from(missing).join(' '));
     }
-    const glyphs = [notdefGlyph].concat(font.stringToGlyphs(text));
+    const subGlyphs = font.stringToGlyphs(available.join(''));
+    // 源字体经 pyftsubset 子集化后 post 表为 version 3（不含 glyph name），
+    // opentype.js 解析时 glyph.name 为 undefined，构建新字体时会输出
+    // "Undefined CHARARRAY" 警告。这里按 unicode 为每个 glyph 补一个合法 name。
+    subGlyphs.forEach((g, i) => {
+      if (!g.name || g.name === 'undefined') {
+        g.name = g.unicode != null ? 'uni' + g.unicode.toString(16).toUpperCase() : 'glyph' + i;
+      }
+    });
+    const glyphs = [notdefGlyph].concat(subGlyphs);
     const subFont = new opentype.Font({
       unitsPerEm: font.unitsPerEm,
       ascender: font.ascender,
