@@ -7,7 +7,7 @@ const http = require('http');
 const https = require('https');
 
 // 防御 SSRF：仅允许 http/https，禁止内网/回环/链路本地地址
-const BLOCKED_HOSTS = /^(127\.|10\.|192\.168\.|169\.254\.|::1$|fe80:|fc00:|fd)/i;
+const BLOCKED_HOSTS = /^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2[0-9]|3[01])\.|0\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|198\.(1[89]|2[0-5])\.|::1$|fe80:|fc00:|fd)/i;
 const MAX_BYTES = 5 * 1024 * 1024; // 单次响应上限 5MB，防止超大 RSS 撑爆内存
 
 let cachedRecent = null;
@@ -47,7 +47,7 @@ function assertSafeUrl(urlStr) {
     throw new Error('unsupported protocol: ' + u.protocol);
   }
   const host = u.hostname;
-  if (BLOCKED_HOSTS.test(host) || host === 'localhost') {
+  if (BLOCKED_HOSTS.test(host) || host === 'localhost' || host === '0.0.0.0') {
     throw new Error('blocked host: ' + host);
   }
   return u;

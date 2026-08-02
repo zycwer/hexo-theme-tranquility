@@ -101,6 +101,7 @@
     }
   };
   HeartCurve.prototype.resume = function () {
+    if (!this.isPause) return;
     this.isPause = false;
     this.spin();
   };

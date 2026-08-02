@@ -3,7 +3,7 @@
     @font-face {
         font-family:'{{ theme.zh_font.fontName | escape }}';
         src: url('{{ (url_for('/font/') + subfont + '.' + theme.zh_font.type) | escape }}');
-        font-weight: {{ subfont }};
+        font-weight: {{ subfont | escape }};
         font-display: swap;
     }
   </style>
@@ -15,5 +15,5 @@
         as="font"
         type="{{ _mime }}"
         crossorigin
-        href="{{ url_for('/font/' + theme.zh_font.style[0] + '.' + _ftype) }}"/>
+        href="{{ url_for('/font/' + theme.zh_font.style[0] + '.' + _ftype) | escape }}"/>
 {% endif %}

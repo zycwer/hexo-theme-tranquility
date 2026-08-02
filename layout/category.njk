@@ -8,9 +8,9 @@
       <div class="wall-category-title">
         <div class="title-icon"
              style="background-image: url('{{ url_for(page.icon) | escape }}')"></div>
-        {{ page.title or page.name }}
+        {{ (page.title or page.name) | escape }}
       </div>
-      <div class="wall-category-description">{{ page.description }}</div>
+      <div class="wall-category-description">{{ page.description | escape }}</div>
       <div class="wall-category-tags">
         <div id="tags-outer">{{ trqlt_tagcloud(page.tags, theme.tagcloud) }}</div>
       </div>

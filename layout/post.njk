@@ -6,7 +6,7 @@
   <article class="post-content">
     <div class="post-inner{{ '--toc' if page.toc else '' }}">
       <div class="post-content__head">
-        <div class="post-title">{{ page.title or "未命名" }}</div>
+        <div class="post-title">{{ (page.title or "未命名") | escape }}</div>
         <div class="post-info">
           {{ partial("_partials/macros/tags.njk", {tags: page.tags}) }}
           <span class="post-date">{{ date(page.date) }}</span>
@@ -22,7 +22,7 @@
       <div class="post-content__body">
         {% if page.photos %}
           <div class="post-gallery">
-            {% for photo in page.photos %}<img alt="cover" loading="lazy" decoding="async" src="{{ url_for(photo) }}"/>{% endfor %}
+            {% for photo in page.photos %}<img alt="cover" loading="lazy" decoding="async" src="{{ url_for(photo) | escape }}"/>{% endfor %}
           </div>
         {% endif %}
         {{ page.content }}
@@ -32,7 +32,7 @@
       <script src='{{ theme.cdn or 'https://cdn.jsdelivr.net/npm' }}/mermaid@{{ theme.mermaid.version }}/dist/mermaid.min.js'></script>
       <script>
         if (window.mermaid) {
-          mermaid.initialize({{ theme.mermaid.options | dump }});
+          mermaid.initialize({{ theme.mermaid.options | dump | replace('</', '<\/') }});
           // 10.x+ 用 mermaid.run()，9.x 用 mermaid.init()，做兼容 fallback
           if (typeof mermaid.run === 'function') {
             mermaid.run();

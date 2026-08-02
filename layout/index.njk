@@ -2,7 +2,7 @@
 {% block link %}
   {% if theme.baidu_site_verification %}
     <meta name="baidu-site-verification"
-          content="{{ theme.baidu_site_verification }}"/>
+          content="{{ theme.baidu_site_verification | escape }}"/>
   {% endif %}
   <link rel="stylesheet"
         type="text/css"
@@ -11,9 +11,9 @@
 {% block body %}
   <div class="wall wall-index">
     <div class="wall-main" id="wall-main">
-      <div class="wall-title">{{ config.title | upper }}</div>
-      <div class="wall-subtitle">{{ config.subtitle }}</div>
-      <div class="wall-description{% if theme.slogan_hitokoto %} wall-description--hitokoto{% endif %}"{% if theme.slogan_hitokoto %} id="hitokoto-slogan" data-fallback="{{ theme.slogan }}"{% endif %}>{{ theme.slogan }}</div>
+      <div class="wall-title">{{ config.title | upper | escape }}</div>
+      <div class="wall-subtitle">{{ config.subtitle | escape }}</div>
+      <div class="wall-description{% if theme.slogan_hitokoto %} wall-description--hitokoto{% endif %}"{% if theme.slogan_hitokoto %} id="hitokoto-slogan" data-fallback="{{ theme.slogan | escape }}"{% endif %}>{{ theme.slogan | escape }}</div>
     </div>
     <div class="wall-bg">
       <div class="wall-bg-index">
@@ -25,10 +25,10 @@
           <img alt="normal" width="300" height="94" loading="lazy" src="{{ url_for("/images/normal.svg") }}"/>
         </div>
         <canvas width="400" height="400" id="heart-curve"></canvas>
-        <div class="motto">{{ theme.index.motto }}</div>
+        <div class="motto">{{ theme.index.motto | escape }}</div>
         <div class="poem">
           {% for line in theme.index.poem %}
-            {{ line }}
+            {{ line | escape }}
             <br/>
           {% endfor %}
         </div>
@@ -37,11 +37,11 @@
   </div>
   <div class="about">
     <div class="about-photo"
-         style="background-image: url({{ url_for(theme.index.photo) }})"></div>
+         style="background-image: url('{{ url_for(theme.index.photo) | escape }}')"></div>
     <div class="about-text">
       <div class="about-title">
         {% for word in theme.index.about.title %}
-          <div class="matts">{{ word }}</div>
+          <div class="matts">{{ word | escape }}</div>
         {% endfor %}
       </div>
       <div class="about-detail">
@@ -50,7 +50,7 @@
             {% if not line %}
               <br/>
             {% else %}
-              {{ line }}
+              {{ line | escape }}
               <br/>
             {% endif %}
           {% endfor %}
@@ -68,10 +68,10 @@
         <div class="radio-wrapper">
           {% for item in theme.timeline.items %}
             <div class="radio">
-              <input id="radio-{{ item.name }}"
+              <input id="radio-{{ item.name | escape }}"
                      type="checkbox"
                      {% if item.checked %}checked{% endif %}/>
-              <label class="radio-skin--{{ item.name }}" for="radio-{{ item.name }}"></label>
+              <label class="radio-skin--{{ item.name | escape }}" for="radio-{{ item.name | escape }}"></label>
             </div>
           {% endfor %}
         </div>

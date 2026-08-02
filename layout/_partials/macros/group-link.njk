@@ -7,7 +7,7 @@
         <img alt="link"
              height="20"
              width="20"
-             src="{{ url_for(link.icon or defaultLinkIcon) }}" />
+             src="{{ url_for(link.icon or defaultLinkIcon) | escape }}" />
         <a class="foot-link" href="{{ link.url | escape }}" rel="noopener noreferrer">{{ link.name | escape }}</a>
       </div>
     {% endfor %}
@@ -23,7 +23,7 @@
             <img alt="link"
                  height="20"
                  width="20"
-                 src="{{ url_for(link.icon or defaultLinkIcon) }}" />
+                 src="{{ url_for(link.icon or defaultLinkIcon) | escape }}" />
             <a class="foot-link" href="{{ link.url | escape }}" rel="noopener noreferrer">{{ link.name | escape }}</a>
           </div>
         {% endif %}

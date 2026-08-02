@@ -1,6 +1,14 @@
 // PWA 支持：生成 manifest.json 与 sw.js（Service Worker）
 // 配置 theme.pwa.enable 开启。manifest 引用 favicon 作为图标，sw 采用
 // 静态资源缓存优先 + HTML 网络优先策略，离线可访问已缓存页面
+
+// 按扩展名推断图标 MIME，避免 svg 被误判为 image/svg（无效）
+function mimeFromPath(p) {
+  const ext = (p || '').split('.').pop().toLowerCase();
+  const map = { svg: 'image/svg+xml', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', ico: 'image/x-icon' };
+  return map[ext] || 'image/png';
+}
+
 module.exports = hexo => {
   hexo.extend.generator.register('pwa', function () {
     const cfg = this.theme.config.pwa;
@@ -14,11 +22,11 @@ module.exports = hexo => {
     //   - apple_touch_icon (180x180) 同时声明为 192x192（浏览器会缩放）
     //   - logo.svg 声明 sizes="any" 覆盖 512x512（矢量图任意尺寸清晰）
     if (fav.apple_touch_icon) {
-      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '180x180', type: 'image/' + (fav.apple_touch_icon.split('.').pop() || 'png'), purpose: 'any' });
-      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '192x192', type: 'image/' + (fav.apple_touch_icon.split('.').pop() || 'png'), purpose: 'any' });
-      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '512x512', type: 'image/' + (fav.apple_touch_icon.split('.').pop() || 'png'), purpose: 'any' });
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '180x180', type: mimeFromPath(fav.apple_touch_icon), purpose: 'any' });
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '192x192', type: mimeFromPath(fav.apple_touch_icon), purpose: 'any' });
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '512x512', type: mimeFromPath(fav.apple_touch_icon), purpose: 'any' });
     }
-    if (fav.medium) icons.push({ src: url_for(fav.medium), sizes: '32x32', type: 'image/' + (fav.medium.split('.').pop() || 'png'), purpose: 'any' });
+    if (fav.medium) icons.push({ src: url_for(fav.medium), sizes: '32x32', type: mimeFromPath(fav.medium), purpose: 'any' });
     // logo.svg 作为任意尺寸图标（含 maskable，适配 Android 自适应图标）
     if (this.theme.config.logo) {
       icons.push({ src: url_for(this.theme.config.logo), sizes: 'any', type: 'image/svg+xml', purpose: 'any' });

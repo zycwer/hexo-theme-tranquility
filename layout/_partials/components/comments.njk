@@ -55,9 +55,9 @@
         import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
         init({
           el: '#waline',
-          serverURL: {{ w.serverURL | dump | safe }},
-          lang: {{ (w.lang or 'zh-CN') | dump | safe }},
-          {% if w.emoji %}emoji: {{ w.emoji | dump | safe }},{% endif %}
+          serverURL: {{ w.serverURL | dump | replace('</', '<\\/') | safe }},
+          lang: {{ (w.lang or 'zh-CN') | dump | replace('</', '<\\/') | safe }},
+          {% if w.emoji %}emoji: {{ w.emoji | dump | replace('</', '<\\/') | safe }},{% endif %}
           dark: 'html[data-theme="dark"]'
         });
       </script>

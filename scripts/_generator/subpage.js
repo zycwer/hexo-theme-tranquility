@@ -63,13 +63,12 @@ function subpageGenerator(locals) {
       if (post.tags) post.tags.toArray().forEach(tag => tagIds.add(tag._id));
     });
     const tags = ctx.model('Tag').find({ _id: { $in: Array.from(tagIds) } });
-    const tagsArr = tags.toArray ? tags.toArray() : (tags || []);
 
     return result.concat(pagination(p, posts, {
       perPage,
       layout: ['category', 'archive', 'index'],
       format: paginationDir + '/%d/',
-      data: { ...page, tags: tagsArr }
+      data: { ...page, tags }
     }));
   }, []);
 };
