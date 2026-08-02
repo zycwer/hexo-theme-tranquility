@@ -75,7 +75,7 @@
     npm uninstall hexo-generator-category hexo-generator-archive
     ```
 
-4. 主题配置：在博客根目录新建 `_config.tranquility.yml`，**只需写需要修改的项**，其余走包内默认值（深合并覆盖）。具体配置项请查看[文档站](https://docs.qwrcb.top)或阅读 [\_config-template.yml](./_config-template.yml) 的注释。
+4. 主题配置：在博客根目录新建 `_config.tranquility.yml`，**只需写需要修改的项**，其余走包内默认值（深合并覆盖）。具体配置项请查看[文档站](https://docs.qwrcb.top)或阅读包内 `node_modules/hexo-theme-tranquility/_config.yml` 的注释。
 
 ### 方式二：通过 Git 克隆安装
 
@@ -92,7 +92,7 @@
 
     ```bash
     npm uninstall hexo-generator-category hexo-generator-archive
-    npm install hexo-pagination moment opentype.js
+    npm install hexo-pagination moment opentype.js nunjucks hexo-renderer-nunjucks hexo-renderer-stylus
     ```
 
 4. 主题配置：将主题目录下的 `themes/tranquility/_config-template.yml` 复制到博客文件根目录下，并重命名为 `_config.tranquility.yml`。在 `_config.tranquility.yml` 个性化主题配置，具体配置项请查看[文档站](https://docs.qwrcb.top)或阅读配置文件的注释。

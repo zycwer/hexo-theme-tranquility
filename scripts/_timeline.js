@@ -9,7 +9,7 @@ module.exports = hexo => {
 
     const items = cfg.items;
     if (!items || !Array.isArray(items)) return {};
-    const types = items.map(item => item.name);
+    const types = items.map(item => item && item.name).filter(Boolean);
     const order = cfg.order ? 'date' : '-date';
     const iconOf = type => url_for((items.find(item => item.name === type) || {}).icon || '');
 
@@ -20,7 +20,7 @@ module.exports = hexo => {
         path: url_for(p.path),
         icon: iconOf(p.timeline),
         type: p.timeline,
-        date: moment(p.date).format('YYYY-MM-DD')
+        date: (p.date && p.date.format ? p.date : moment(p.date)).format('YYYY-MM-DD')
       }));
 
     return { types, posts };

@@ -4,12 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const { Buffer } = require('node:buffer');
 
-const notdefGlyph = new opentype.Glyph({
-  name: '.notdef',
-  advanceWidth: 650,
-  path: new opentype.Path()
-});
-
 module.exports = function (hexo) {
   hexo.extend.generator.register('subfont', locals => {
     const zhFont = hexo.theme.config.zh_font || {};
@@ -25,8 +19,12 @@ module.exports = function (hexo) {
     hexo.log.info('Extract subfont:', text);
 
     return style.map(subfont => {
+      if (/[\/\\]|\.\./.test(subfont)) {
+        hexo.log.warn('zh_font.style 含非法字符：%s', subfont);
+        return null;
+      }
       const source = path.resolve(sourceFolder, `${subfont}.${type}`);
-      const data = compress(text, { source, name: fontName, style: subfont });
+      const data = compress(text, { source, name: fontName, style: subfont }, hexo);
       if (!data) return null;
       return {
         path: path.join('/font', `${subfont}.${type}`),
@@ -36,8 +34,9 @@ module.exports = function (hexo) {
   });
 };
 
-function compress(text, { source, name, style }) {
+function compress(text, { source, name, style }, hexo) {
   try {
+    const notdefGlyph = new opentype.Glyph({ name: '.notdef', advanceWidth: 650, path: new opentype.Path() });
     const data = new Uint8Array(fs.readFileSync(source)).buffer;
     const font = opentype.parse(data);
     // 检测源字体中缺失的字符（如生僻字/繁体字超出 GB2312 子集范围）
@@ -50,7 +49,7 @@ function compress(text, { source, name, style }) {
       }
     }
     if (missing.length) {
-      console.warn('subfont: 源字体缺失字符（将以系统字体兜底）：%s', Array.from(new Set(missing)).join(' '));
+      hexo.log.warn('subfont: 源字体缺失字符（将以系统字体兜底）：%s', Array.from(new Set(missing)).join(' '));
     }
     const glyphs = [notdefGlyph].concat(font.stringToGlyphs(text));
     const subFont = new opentype.Font({
@@ -63,7 +62,7 @@ function compress(text, { source, name, style }) {
     });
     return Buffer.from(subFont.toArrayBuffer());
   } catch (err) {
-    console.warn('subfont compress failed for %s: %s', source, err && err.message);
+    hexo.log.warn('subfont compress failed for %s: %s', source, err && err.message);
     return null;
   }
 }

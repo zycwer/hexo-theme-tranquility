@@ -16,8 +16,8 @@ module.exports = hexo => {
     ];
 
     // 禁止索引的路径（如 CSS、JS、字体等）
-    if (cfg.disallow && cfg.disallow.length) {
-      cfg.disallow.forEach(function (p) { lines.push('Disallow: ' + p); });
+    if (Array.isArray(cfg.disallow) && cfg.disallow.length) {
+      cfg.disallow.forEach(function (p) { p = String(p).replace(/[\r\n]/g, ''); lines.push('Disallow: ' + p); });
     } else {
       lines.push('Disallow: /css/');
       lines.push('Disallow: /js/');

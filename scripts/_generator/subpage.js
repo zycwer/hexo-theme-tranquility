@@ -21,10 +21,10 @@ function sortBySticky(posts) {
 
 function blog(locals) {
   const config = this.config;
-  const sorted = locals.posts.sort(config.index_generator.order_by);
+  const sorted = locals.posts.sort((config.index_generator || {}).order_by || '-date');
   const posts = sortBySticky(sorted);
   return pagination('blog', posts, {
-    perPage: config.index_generator.per_page,
+    perPage: (config.index_generator || {}).per_page || 10,
     layout: ['category'],
     format: (config.pagination_dir || 'page') + '/%d/',
     data: { name: '博客', icon: 'blog' }
@@ -63,12 +63,13 @@ function subpageGenerator(locals) {
       if (post.tags) post.tags.toArray().forEach(tag => tagIds.add(tag._id));
     });
     const tags = ctx.model('Tag').find({ _id: { $in: Array.from(tagIds) } });
+    const tagsArr = tags.toArray ? tags.toArray() : (tags || []);
 
     return result.concat(pagination(p, posts, {
       perPage,
       layout: ['category', 'archive', 'index'],
       format: paginationDir + '/%d/',
-      data: { ...page, tags }
+      data: { ...page, tags: tagsArr }
     }));
   }, []);
 };

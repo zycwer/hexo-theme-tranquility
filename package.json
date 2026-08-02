@@ -27,11 +27,15 @@
   },
   "author": "zycwer",
   "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  },
   "dependencies": {
     "hexo-pagination": "^2.0.0",
     "hexo-renderer-nunjucks": "^2.0.0",
     "hexo-renderer-stylus": "^3.0.1",
     "moment": "^2.30.1",
+    "nunjucks": "^3.2.4",
     "opentype.js": "^1.3.4"
   }
 }

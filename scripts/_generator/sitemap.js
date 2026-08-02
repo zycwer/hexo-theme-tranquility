@@ -20,7 +20,7 @@ module.exports = hexo => {
     // 首页 lastmod 用最新文章日期，而非构建时间戳（避免每次构建都变化影响 SEO 判断）
     const sortedPosts = locals.posts.sort('-date');
     const latestPost = sortedPosts.first();
-    add('', latestPost ? (latestPost.updated || latestPost.date) : Date.now(), 'daily', '1.0');
+    add('', latestPost ? (latestPost.updated || latestPost.date) : null, 'daily', '1.0');
 
     // 文章
     sortedPosts.each(post => {

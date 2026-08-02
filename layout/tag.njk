@@ -5,7 +5,7 @@
         href="{{ url_for("/css/category.css") }}" />
 {% endblock link %}
 {% block body %}
-  <div class="tag-page-title">#{{ page.tag }}</div>
+  <div class="tag-page-title">#{{ page.tag | escape }}</div>
   <div class="post-list">
     {% if not page.posts %}
       <p class="post-list-empty">该标签下暂无文章。</p>

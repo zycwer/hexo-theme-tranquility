@@ -11,10 +11,14 @@ function escapeHtml(s) {
 module.exports = function (args) {
   if (!args || !args.json || !args.json.length) return '';
 
-  const cls = args.class || 'related';
+  const cls = escapeHtml(args.class || 'related');
   const items = args.json.map(item => {
     const title = escapeHtml(item.title);
-    const path = escapeHtml(item.path);
+    let path = item.path;
+    if (path && !/^(https?:)?\/\//.test(path) && !path.startsWith('/') && !path.startsWith('#')) {
+      path = '#';
+    }
+    path = escapeHtml(path);
     const date = item.date ? `<div class="${cls}-date">${escapeHtml(item.date)}</div>` : '';
     const img = item.img ? `<div class="${cls}-img"><img src="${escapeHtml(item.img)}" loading="lazy" /></div>` : '';
     const excerpt = item.excerpt ? `<div class="${cls}-excerpt"><p>${escapeHtml(item.excerpt)}</p></div>` : '';

@@ -37,6 +37,18 @@
       show(idx);
     });
   });
+  dots.forEach(function (dot) {
+    dot.setAttribute('tabindex', '0');
+    dot.setAttribute('role', 'button');
+    dot.setAttribute('aria-label', '切换到第 ' + (parseInt(dot.getAttribute('data-index'), 10) + 1) + ' 张卡片');
+    dot.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      var idx = parseInt(dot.getAttribute('data-index'), 10);
+      if (isNaN(idx)) return;
+      show(idx);
+    });
+  });
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     var tag = (e.target && e.target.tagName) || '';

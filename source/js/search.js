@@ -26,23 +26,32 @@
   }
 
   function searchInitialize(url) {
-    fetch(url)
+    // 入口判空：缺少任一关键元素直接退出，避免后续抛错
+    if (!searchBtn || !searchMask || !searchIpt || !searchResult || !searchClearBtn) return
+
+    // 快捷键绑在 fetch 之前，索引加载失败也能用 Ctrl+K / Esc 打开/关闭弹窗
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        if (searchStatus) closeSearchDialog()
+        else showSearchDialog()
+      }
+      if (e.key === 'Escape') closeSearchDialog()
+    })
+
+    // fetch 增加 8s 超时（AbortController），失败时降级提示
+    const controller = new AbortController()
+    const timer = setTimeout(() => { controller.abort() }, 8000)
+    fetch(url, { signal: controller.signal })
       .then(res => {
         if (!res.ok) throw new Error('HTTP ' + res.status)
         return res.json()
       })
       .then(res => {
+        clearTimeout(timer)
+
         const inputHandler = debounce(doSearch)
 
         searchBtn.style.display = 'flex'
-
-        document.addEventListener('keydown', e => {
-          if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            if (searchStatus) closeSearchDialog()
-            else showSearchDialog()
-          }
-          if (e.key === 'Escape') closeSearchDialog()
-        })
 
         searchClearBtn.addEventListener('click', () => {
           searchIpt.value = ''
@@ -61,7 +70,9 @@
         searchIpt.addEventListener('input', inputHandler.bind(searchIpt, res))
       })
       .catch(err => {
-        console.error('搜索索引加载失败', err)
+        clearTimeout(timer)
+        console.error('search index load failed:', err)
+        if (searchResult) searchResult.innerHTML = '<div class="search-error">搜索索引加载失败</div>'
       })
   }
 

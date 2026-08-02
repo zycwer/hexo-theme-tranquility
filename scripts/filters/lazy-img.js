@@ -4,10 +4,12 @@
 module.exports = hexo => {
   hexo.extend.filter.register('after_post_render', function (data) {
     if (!data || !data.content) return data;
-    data.content = data.content.replace(/<img\b(?![^>]*\bloading=)([^>]*)>/gi, (m, attrs) => {
-      // 不为 already async 的图片重复添加 decoding
-      const decoding = /\bdecoding=/i.test(attrs) ? '' : ' decoding="async"';
-      return `<img${attrs} loading="lazy"${decoding}>`;
+    data.content = data.content.replace(/<img\b([^>]*?)(\s*\/?)>/gi, function (match, attrs, closing) {
+      if (/\bloading\s*=/i.test(attrs) && /\bdecoding\s*=/i.test(attrs)) return match;
+      var inject = '';
+      if (!/\bloading\s*=/i.test(attrs)) inject += ' loading="lazy"';
+      if (!/\bdecoding\s*=/i.test(attrs)) inject += ' decoding="async"';
+      return '<img' + attrs + inject + closing + '>';
     });
     return data;
   });

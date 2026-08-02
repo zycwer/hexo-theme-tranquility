@@ -58,8 +58,14 @@
 
   window.addEventListener('scroll', requestAdjust, { passive: true });
   window.addEventListener('resize', function () {
-    updateData();
-    requestAdjust();
+    if (!ticking) {
+      window.requestAnimationFrame(function () {
+        updateData();
+        adjustToc();
+        ticking = false;
+      });
+      ticking = true;
+    }
   }, { passive: true });
   window.addEventListener('load', updateData);
   // DOMContentLoaded 后内容已渲染，立即初始化一次

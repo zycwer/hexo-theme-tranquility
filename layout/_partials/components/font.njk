@@ -1,8 +1,8 @@
 {% for subfont in theme.zh_font.style %}
   <style>
     @font-face {
-        font-family:{{ theme.zh_font.fontName }};
-        src: url({{ url_for('/font/') + subfont + '.' + theme.zh_font.type }});
+        font-family:'{{ theme.zh_font.fontName | escape }}';
+        src: url('{{ (url_for('/font/') + subfont + '.' + theme.zh_font.type) | escape }}');
         font-weight: {{ subfont }};
         font-display: swap;
     }

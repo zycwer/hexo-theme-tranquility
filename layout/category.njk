@@ -7,7 +7,7 @@
     <div class="wall-main">
       <div class="wall-category-title">
         <div class="title-icon"
-             style="background-image: url({{ url_for(page.icon) }})"></div>
+             style="background-image: url('{{ url_for(page.icon) | escape }}')"></div>
         {{ page.title or page.name }}
       </div>
       <div class="wall-category-description">{{ page.description }}</div>
@@ -18,7 +18,7 @@
   </div>
   <div class="post-list">
     {% if not page.posts %}
-      <p class="post-list-empty">该分类下暂无文章。在文章 front-matter 中添加 <code>category: {{ page.name }}</code> 字段，即可将文章添加至此页。</p>
+      <p class="post-list-empty">该分类下暂无文章。在文章 front-matter 中添加 <code>category: {{ page.name | escape }}</code> 字段，即可将文章添加至此页。</p>
     {% else %}
       {{ partial("_partials/macros/post-list.njk", {posts: page.posts}) }}
     {% endif %}
@@ -45,7 +45,7 @@
             initial: [0.1, -0.03]
           });
         } catch (e) {
-          document.getElementById('tags-outer').style.display = 'none';
+          var _to = document.getElementById('tags-outer'); if (_to) _to.style.display = 'none';
         }
       });
     </script>

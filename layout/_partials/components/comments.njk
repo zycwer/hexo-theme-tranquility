@@ -10,17 +10,17 @@
     {% if g.repo and g.repo_id and g.category and g.category_id %}
       <div class="giscus"></div>
       <script src="https://giscus.app/client.js"
-        data-repo="{{ g.repo }}"
-        data-repo-id="{{ g.repo_id }}"
-        data-category="{{ g.category }}"
-        data-category-id="{{ g.category_id }}"
-        data-mapping="{{ g.mapping or 'pathname' }}"
+        data-repo="{{ g.repo | escape }}"
+        data-repo-id="{{ g.repo_id | escape }}"
+        data-category="{{ g.category | escape }}"
+        data-category-id="{{ g.category_id | escape }}"
+        data-mapping="{{ (g.mapping or 'pathname') | escape }}"
         data-strict="0"
-        data-reactions-enabled="{{ g.reactions_enabled | default(1) }}"
+        data-reactions-enabled="{{ g.reactions_enabled | default(1) | escape }}"
         data-emit-metadata="0"
-        data-input-position="{{ g.input_position or 'bottom' }}"
-        data-theme="{{ g.theme if g.theme != 'auto' else 'light' }}"
-        data-lang="{{ g.lang or 'zh-CN' }}"
+        data-input-position="{{ (g.input_position or 'bottom') | escape }}"
+        data-theme="{{ (g.theme if g.theme != 'auto' else 'light') | escape }}"
+        data-lang="{{ (g.lang or 'zh-CN') | escape }}"
         crossorigin="anonymous"
         async>
       </script>
@@ -69,7 +69,7 @@
       <script>
         (function () {
           var d = document, s = d.createElement('script');
-          s.src = 'https://{{ d.shortname }}.disqus.com/embed.js';
+          s.src = {{ ('https://' + d.shortname + '.disqus.com/embed.js') | dump | replace('</', '<\\/') }};
           s.setAttribute('data-timestamp', +new Date());
           (d.head || d.body).appendChild(s);
         })();

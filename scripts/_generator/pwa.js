@@ -14,11 +14,11 @@ module.exports = hexo => {
     //   - apple_touch_icon (180x180) 同时声明为 192x192（浏览器会缩放）
     //   - logo.svg 声明 sizes="any" 覆盖 512x512（矢量图任意尺寸清晰）
     if (fav.apple_touch_icon) {
-      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '180x180', type: 'image/png', purpose: 'any' });
-      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '192x192', type: 'image/png', purpose: 'any' });
-      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '512x512', type: 'image/png', purpose: 'any' });
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '180x180', type: 'image/' + (fav.apple_touch_icon.split('.').pop() || 'png'), purpose: 'any' });
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '192x192', type: 'image/' + (fav.apple_touch_icon.split('.').pop() || 'png'), purpose: 'any' });
+      icons.push({ src: url_for(fav.apple_touch_icon), sizes: '512x512', type: 'image/' + (fav.apple_touch_icon.split('.').pop() || 'png'), purpose: 'any' });
     }
-    if (fav.medium) icons.push({ src: url_for(fav.medium), sizes: '32x32', type: 'image/png', purpose: 'any' });
+    if (fav.medium) icons.push({ src: url_for(fav.medium), sizes: '32x32', type: 'image/' + (fav.medium.split('.').pop() || 'png'), purpose: 'any' });
     // logo.svg 作为任意尺寸图标（含 maskable，适配 Android 自适应图标）
     if (this.theme.config.logo) {
       icons.push({ src: url_for(this.theme.config.logo), sizes: 'any', type: 'image/svg+xml', purpose: 'any' });
@@ -53,7 +53,7 @@ function buildSW(root, hexo) {
   // generate 模式用时间戳确保主题更新后旧缓存被清理；
   // server 模式热重载频繁，用固定版本避免反复清空缓存丧失离线能力
   const isServer = hexo.env && hexo.env.cmd === 'server';
-  const cacheVersion = 'tranquility-' + (isServer ? 'dev' : Date.now());
+  const cacheVersion = 'tranquility-' + (isServer ? 'dev' : ((hexo.theme.config.pwa || {}).cache_version || Date.now()));
   return `// 由 hexo-theme-tranquility 自动生成，请勿手动编辑
 const CACHE = ${JSON.stringify(cacheVersion)};
 const ROOT = ${JSON.stringify(root)};

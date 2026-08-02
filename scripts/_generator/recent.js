@@ -6,6 +6,10 @@
 const http = require('http');
 const https = require('https');
 
+// 防御 SSRF：仅允许 http/https，禁止内网/回环/链路本地地址
+const BLOCKED_HOSTS = /^(127\.|10\.|192\.168\.|169\.254\.|::1$|fe80:|fc00:|fd)/i;
+const MAX_BYTES = 5 * 1024 * 1024; // 单次响应上限 5MB，防止超大 RSS 撑爆内存
+
 let cachedRecent = null;
 
 module.exports = hexo => {
@@ -35,10 +39,26 @@ module.exports = hexo => {
   hexo.locals.set('recentUpdates', () => cachedRecent || []);
 };
 
+// 校验 URL 协议与主机，拒绝内网/回环地址，防 SSRF
+function assertSafeUrl(urlStr) {
+  let u;
+  try { u = new URL(urlStr); } catch { throw new Error('invalid url'); }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') {
+    throw new Error('unsupported protocol: ' + u.protocol);
+  }
+  const host = u.hostname;
+  if (BLOCKED_HOSTS.test(host) || host === 'localhost') {
+    throw new Error('blocked host: ' + host);
+  }
+  return u;
+}
+
 function fetchText(url, timeout, maxRedirects) {
-  maxRedirects = maxRedirects == null ? 5 : maxRedirects;
+  maxRedirects = maxRedirects == null ? 3 : maxRedirects;
   return new Promise((resolve, reject) => {
-    const lib = url.startsWith('https') ? https : http;
+    let u;
+    try { u = assertSafeUrl(url); } catch (e) { return reject(e); }
+    const lib = u.protocol === 'https:' ? https : http;
     const req = lib.get(url, { headers: { 'User-Agent': 'hexo-theme-tranquility' } }, res => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         res.resume();
@@ -50,13 +70,27 @@ function fetchText(url, timeout, maxRedirects) {
         return reject(new Error('HTTP ' + res.statusCode));
       }
       let data = '';
+      let size = 0;
+      let aborted = false;
       res.setEncoding('utf8');
-      res.on('data', chunk => { data += chunk; });
-      res.on('end', () => resolve(data));
+      res.on('data', chunk => {
+        if (aborted) return;
+        size += chunk.length;
+        if (size > MAX_BYTES) {
+          aborted = true;
+          res.destroy(new Error('response too large'));
+          return;
+        }
+        data += chunk;
+      });
+      res.on('end', () => { if (!aborted) resolve(data); });
       res.on('error', reject);
     });
     req.on('error', reject);
-    req.setTimeout(timeout, () => req.destroy(new Error('timeout')));
+    // 超时时同时销毁请求与未到达的响应流，避免句柄泄漏
+    req.setTimeout(timeout, () => {
+      req.destroy(new Error('timeout'));
+    });
   });
 }
 

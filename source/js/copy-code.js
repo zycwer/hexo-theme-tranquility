@@ -1,4 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    // 回退到 execCommand，兼容非安全上下文（HTTP）或旧浏览器
+    return new Promise((resolve, reject) => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        resolve();
+      } catch (e) {
+        reject(e);
+      } finally {
+        document.body.removeChild(ta);
+      }
+    });
+  }
+
   const getCopyButton = () => {
     const button = document.createElement("div")
     button.textContent = '复制代码'
@@ -14,8 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const codeEl = codeBlock.querySelector('code');
         if (!codeEl) throw new Error('no code element');
-        if (!navigator.clipboard) throw new Error('clipboard API unavailable (non-secure context?)');
-        await navigator.clipboard.writeText(codeEl.innerText);
+        await copyText(codeEl.innerText);
         copyButton.innerText = '已复制!'
       } catch (err) {
         console.warn('复制失败:', err && err.message);

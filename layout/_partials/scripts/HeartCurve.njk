@@ -17,6 +17,7 @@
     const canvas = document.querySelector('#heart-curve');
     if (!canvas) throw Error('no canvas element!');
 
+    this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.ctx.translate(2 * w / 3, h / 2);
     this.ctx.lineJoin = 'round';
@@ -126,6 +127,21 @@
     mobileAdjust(mq);
     if (mq.addEventListener) mq.addEventListener('change', mobileAdjust);
     else if (mq.addListener) mq.addListener(mobileAdjust);
+
+    // 滚出视口暂停动画，节省 CPU/电量
+    // 仅在无悬停设备（移动端）启用，避免与桌面 hover 暂停逻辑冲突
+    if (mq.matches && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            heartCurve.resume();
+          } else {
+            heartCurve.pause();
+          }
+        });
+      }, { threshold: 0 });
+      if (heartCurve.canvas) io.observe(heartCurve.canvas);
+    }
 
     function mobileAdjust(media) {
       var wallEl = document.querySelector('#wall-main');
