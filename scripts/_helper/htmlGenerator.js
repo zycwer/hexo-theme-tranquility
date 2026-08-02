@@ -11,7 +11,7 @@ function escapeHtml(s) {
 module.exports = function (args) {
   if (!args || !args.json || !args.json.length) return '';
 
-  const cls = args.class;
+  const cls = args.class || 'related';
   const items = args.json.map(item => {
     const title = escapeHtml(item.title);
     const path = escapeHtml(item.path);

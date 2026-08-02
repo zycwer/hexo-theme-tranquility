@@ -17,11 +17,13 @@ module.exports = hexo => {
       urls.push({ loc, lastmod, changefreq, priority });
     };
 
-    // 首页（用根路径，避免 /index.html 与 / 产生重复 URL）
-    add('', Date.now(), 'daily', '1.0');
+    // 首页 lastmod 用最新文章日期，而非构建时间戳（避免每次构建都变化影响 SEO 判断）
+    const sortedPosts = locals.posts.sort('-date');
+    const latestPost = sortedPosts.first();
+    add('', latestPost ? (latestPost.updated || latestPost.date) : Date.now(), 'daily', '1.0');
 
     // 文章
-    locals.posts.sort('-date').each(post => {
+    sortedPosts.each(post => {
       add(post.path, post.updated || post.date, 'weekly', '0.8');
     });
 

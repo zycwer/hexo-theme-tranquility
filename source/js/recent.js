@@ -32,7 +32,9 @@
   });
   dots.forEach(function (dot) {
     dot.addEventListener('click', function () {
-      show(parseInt(dot.getAttribute('data-index'), 10));
+      var idx = parseInt(dot.getAttribute('data-index'), 10);
+      if (isNaN(idx)) return;
+      show(idx);
     });
   });
   document.addEventListener('keydown', function (e) {

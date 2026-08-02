@@ -14,9 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const codeEl = codeBlock.querySelector('code');
         if (!codeEl) throw new Error('no code element');
+        if (!navigator.clipboard) throw new Error('clipboard API unavailable (non-secure context?)');
         await navigator.clipboard.writeText(codeEl.innerText);
         copyButton.innerText = '已复制!'
-      } catch {
+      } catch (err) {
+        console.warn('复制失败:', err && err.message);
         copyButton.innerText = '发生错误'
       } finally {
         setTimeout(() => {
