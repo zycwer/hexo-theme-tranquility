@@ -68,6 +68,10 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
+# 字体开发调试产物（不纳入版本管理）
+_font/debug.*
+_font/res.*
+
 # Yarn Integrity file
 .yarn-integrity
 

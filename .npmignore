@@ -14,9 +14,9 @@ _config-template.yml
 # 英文 README（npm 包主页只保留中文 README.md）
 README_EN.md
 
-# 字体调试文件（仅本地开发用，不打包）
-_font/debug.html
-_font/debug.js
+# 字体开发调试产物（仅本地开发用，不打包）
+_font/debug.*
+_font/res.*
 
 # 调试与日志
 *.log

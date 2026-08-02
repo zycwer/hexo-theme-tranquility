@@ -40,6 +40,18 @@ function compress(text, { source, name, style }) {
   try {
     const data = new Uint8Array(fs.readFileSync(source)).buffer;
     const font = opentype.parse(data);
+    // 检测源字体中缺失的字符（如生僻字/繁体字超出 GB2312 子集范围）
+    // 缺失字符将回退为 .notdef，浏览器会以系统字体兜底显示
+    const missing = [];
+    for (const ch of text) {
+      const g = font.charToGlyph(ch);
+      if (!g || g.name === '.notdef' || (g.unicode === undefined && g.name !== '.null')) {
+        missing.push(ch);
+      }
+    }
+    if (missing.length) {
+      console.warn('subfont: 源字体缺失字符（将以系统字体兜底）：%s', Array.from(new Set(missing)).join(' '));
+    }
     const glyphs = [notdefGlyph].concat(font.stringToGlyphs(text));
     const subFont = new opentype.Font({
       unitsPerEm: font.unitsPerEm,
