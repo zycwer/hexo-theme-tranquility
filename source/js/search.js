@@ -62,6 +62,13 @@
           showSearchDialog()
         })
 
+        searchBtn.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            showSearchDialog()
+          }
+        })
+
         searchMask.addEventListener('click', e => {
           if (e.target !== searchMask) return
           closeSearchDialog()
@@ -83,7 +90,7 @@
   function doSearch(data) {
     if (this.value.trim().length <= 0) return clearResult()
 
-    const keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+    const keywords = this.value.trim().toLowerCase().split(/[\s\-]+/).filter(Boolean);
 
     const result = search(data, keywords)
 
@@ -101,11 +108,14 @@
 
         const postContent = post.content.trim().replace(/<[^>]+>/g, '')
 
+        const lowerTitle = postTitle.toLowerCase()
+        const lowerContent = postContent.toLowerCase()
+
         const matchedContentIndices = []
 
         keywords.forEach((keyword, i) => {
-          const index_title = postTitle.toLowerCase().indexOf(keyword);
-          const index_content = postContent.toLowerCase().indexOf(keyword);
+          const index_title = lowerTitle.indexOf(keyword);
+          const index_content = lowerContent.indexOf(keyword);
 
           if (index_title < 0 && index_content < 0) return
 

@@ -5,7 +5,7 @@
 {% endblock link %}
 {% block body %}
   <div class="about-page">
-    <div class="about-page__title">{{ page.title or "关于" }}</div>
+    <div class="about-page__title">{{ (page.title or "关于") | escape }}</div>
     {# Hexo 原生页面：内容来自 source/about/index.md，已由 markdown 渲染为 HTML #}
     <div class="about-page__content post-content">
       {{ page.content | safe }}

@@ -1,4 +1,9 @@
 <script type="text/javascript">
+  // 从 :root CSS 变量读取颜色，暗色模式下线条仍可见；取不到时回退到给定默认值
+  function getCssColor(name, fallback) {
+    var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+    return (v && v.trim()) || fallback;
+  }
   function HeartCurve(w, h) {
     this.w = w;
     this.h = h;
@@ -9,6 +14,10 @@
     this.isPause = false;
     this.init();
   }
+  HeartCurve.prototype.readColors = function () {
+    this.axisColor = getCssColor('--c-text', '#999');
+    this.circleColor = getCssColor('--c-text', '#000');
+  };
   HeartCurve.prototype.init = function () {
     const {
       w,
@@ -23,6 +32,7 @@
     this.ctx.lineJoin = 'round';
     this.a = w / 6.2;
     this.id = null;
+    this.readColors();
     return this;
   };
   HeartCurve.prototype._drawAxis = function () {
@@ -32,7 +42,7 @@
       h
     } = this;
     ctx.lineWidth = 1;
-    ctx.strokeStyle = "#999";
+    ctx.strokeStyle = this.axisColor;
     ctx.beginPath();
     ctx.moveTo(-w * 2 / 3, 0);
     ctx.lineTo(w / 3, 0);
@@ -76,7 +86,8 @@
     this._drawAxis();
     ctx.lineWidth = 2;
     this._drawCure();
-    ctx.strokeStyle = "#000";
+    ctx.strokeStyle = this.circleColor;
+    ctx.fillStyle = this.circleColor;
     ctx.beginPath();
     ctx.arc(-a, 0, a, 0, 2 * Math.PI);
     ctx.stroke();
@@ -112,6 +123,18 @@
       heartCurve = new HeartCurve(400, 400);
     } catch (e) {
       return;
+    }
+
+    // 主题切换（html[data-theme]）时重读 CSS 变量颜色并重绘一帧；
+    // 动画运行中则下一帧自动应用新颜色，暂停/静态模式下手动补绘一次
+    if (window.MutationObserver) {
+      new MutationObserver(function () {
+        heartCurve.readColors();
+        if (heartCurve.isPause) heartCurve.spin();
+      }).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+      });
     }
 
     // 偏好减少动画的用户仅静态绘制一帧，不启动 rAF 循环

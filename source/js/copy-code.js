@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const getCopyButton = () => {
-    const button = document.createElement("div")
+    const button = document.createElement("button")
+    button.type = 'button'
     button.textContent = '复制代码'
     button.className = 'copy-button'
     return button

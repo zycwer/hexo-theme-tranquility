@@ -1,6 +1,7 @@
 // 主题色板：通过 CSS 变量实现深色模式，运行时切换无需重建
 // 模式由 _config.color_mode 控制（light | dark | auto | time），详见 README
 :root {
+  color-scheme: light;
   --c-bg: #fcfcfb;            // 页面/墙覆盖底色
   --c-bg-soft: #eff2f3;       // 次级背景
   --c-bg-muted: #f5f5f5;      // 静音背景（卡片底/分页等）
@@ -29,6 +30,7 @@
   --c-radio-track: #ccc;
   --c-radio-thumb: #fafafa;
   --c-on-accent: #fff;
+  --c-on-paginator: #fff;
   --c-mask: rgba(200, 200, 200, 0.8);
   --c-code-bg: #f7f7f7;
   --c-code-text: #24292e;
@@ -40,6 +42,7 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   --c-bg: #1a1a1a;
   --c-bg-soft: #242424;
   --c-bg-muted: #2a2a2a;
@@ -68,6 +71,7 @@
   --c-radio-track: #4a4a4a;
   --c-radio-thumb: #2a2a2a;
   --c-on-accent: #fff;
+  --c-on-paginator: #1a1a1a;
   --c-mask: rgba(0, 0, 0, 0.7);
   --c-code-bg: #1e1e1e;
   --c-code-text: #e8e8e8;

@@ -3,16 +3,13 @@
 @import '_partials/nav';
 @import '_partials/foot';
 
-.body {
-  z-index: 0;
-}
-
 .head--sticky ~ .body {
   padding-top: 90px;
 }
 
 @media screen and (max-width: 1023px) {
-  .body {
+  .body,
+  .head--sticky ~ .body {
     padding-top: 60px;
   }
 }

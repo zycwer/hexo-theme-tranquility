@@ -22,12 +22,14 @@
       {% elif is_tag() %}
         {{ page.tag | escape }} | {{ config.title | escape }}
       {% else %}
-        {{ page.title | escape }} | {{ config.title | escape }}
+        {{ (page.title or page.name or page.category) | escape }} | {{ config.title | escape }}
       {% endif %}
     </title>
-    <meta name="description" content="{{ (page.excerpt or page.description or config.description) | escape }}"/>
-    <meta name="keywords" content="{% if page.tags and page.tags.length %}{% for _t in page.tags.toArray() %}{% if not loop.first %}, {% endif %}{{ _t.name | escape }}{% endfor %}{% else %}{{ config.keywords | escape }}{% endif %}"/>
-    <link rel="canonical" href="{{ full_url_for(page.path or '/') }}"/>
+    {% set desc = strip_html(page.excerpt) or page.description or config.description %}
+    <meta name="description" content="{{ desc | escape }}"/>
+    {% set _page_tags = page.tags.toArray() if page.tags and page.tags.toArray else (page.tags or []) %}
+    <meta name="keywords" content="{% if page.tags and page.tags.length %}{% for _t in _page_tags %}{% if not loop.first %}, {% endif %}{{ _t.name | escape }}{% endfor %}{% else %}{{ config.keywords | escape }}{% endif %}"/>
+    <link rel="canonical" href="{{ full_url_for(page.path or '/') | escape }}"/>
     {% if config.feed %}
       <link rel="alternate" type="application/rss+xml" title="{{ config.title | escape }}" href="{{ url_for(config.feed.path or '/atom.xml') }}"/>
     {% elif theme.recent_updates and theme.recent_updates.enable and theme.recent_updates.rss_url %}
@@ -40,31 +42,31 @@
     {% if theme.favicon.apple_touch_icon %}
       <link rel="apple-touch-icon"
             sizes="180x180"
-            href="{{ url_for(theme.favicon.apple_touch_icon) }}"/>
+            href="{{ url_for(theme.favicon.apple_touch_icon) | escape }}"/>
     {% endif %}
     {% if theme.favicon.medium %}
       <link rel="icon"
             type="image/png"
             sizes="32x32"
-            href="{{ url_for(theme.favicon.medium) }}"/>
+            href="{{ url_for(theme.favicon.medium) | escape }}"/>
     {% endif %}
     {% if theme.favicon.small %}
       <link rel="icon"
             type="image/png"
             sizes="16x16"
-            href="{{ url_for(theme.favicon.small) }}"/>
+            href="{{ url_for(theme.favicon.small) | escape }}"/>
     {% endif %}
     {% if theme.favicon.safari_pinned_tab %}
       <link rel="mask-icon"
-            href="{{ url_for(theme.favicon.safari_pinned_tab) }}"
+            href="{{ url_for(theme.favicon.safari_pinned_tab) | escape }}"
             color="{{ (theme.android_chrome_color or theme.pwa.theme_color or '') | escape }}"/>
     {% endif %}
     {% if theme.favicon.android_manifest %}
-      <link rel="manifest" href="{{ url_for(theme.favicon.android_manifest) }}"/>
+      <link rel="manifest" href="{{ url_for(theme.favicon.android_manifest) | escape }}"/>
     {% endif %}
     {# Open Graph & Twitter Card：社交分享与 SEO #}
     {% set og_title = page.title or config.title %}
-    {% set og_desc = page.excerpt or page.description or config.description %}
+    {% set og_desc = desc %}
     {% set og_url = full_url_for(page.path or '/') %}
     {% set _og_img = page.cover or theme.index.photo or theme.logo %}
     {% set og_image = '' %}
@@ -83,6 +85,10 @@
     {% set _og_lang = (config.language or 'zh_CN') | replace('-', '_') %}
     <meta property="og:locale" content="{{ _og_lang | escape }}"/>
     {% if og_image %}<meta property="og:image" content="{{ og_image | escape }}"/>{% endif %}
+    {% if is_post() %}
+      {% if page.date %}<meta property="article:published_time" content="{{ date_xml(page.date) }}"/>{% endif %}
+      {% if page.updated %}<meta property="article:modified_time" content="{{ date_xml(page.updated) }}"/>{% endif %}
+    {% endif %}
     {% if is_post() and page.tags and page.tags.length %}
       {% for _t in page.tags.toArray() %}<meta property="article:tag" content="{{ _t.name | escape }}"/>{% endfor %}
     {% endif %}
@@ -212,11 +218,6 @@
     <button id="back-to-top" class="back-to-top" type="button" aria-label="回到顶部">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 4l-8 8h5v8h6v-8h5z" fill="currentColor"/></svg>
     </button>
-    {% if theme.mathjax %}
-      <script id="MathJax-script"
-              async
-              src="{{ cdn }}/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-    {% endif %}
     {% if theme.algolia and theme.algolia.enable %}
       <script src="{{ cdn }}/@docsearch/js@3"></script>
       <script type="text/javascript">

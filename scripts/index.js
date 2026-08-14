@@ -10,3 +10,4 @@ require("./_helper")(hexo);
 require("./_nunjucks")(hexo);
 require("./filters/stylus")(hexo);
 require("./filters/lazy-img")(hexo);
+require("./filters/mermaid")(hexo);

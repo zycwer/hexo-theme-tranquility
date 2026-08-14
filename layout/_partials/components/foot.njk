@@ -3,7 +3,7 @@
     <div class="foot__head">
       {% for line in theme.foot.title %}
         <div class="foot-line">
-          {% for word in line %}<div class="matts">{{ word }}</div>{% endfor %}
+          {% for word in line %}<div class="matts">{{ word | escape }}</div>{% endfor %}
         </div>
       {% endfor %}
     </div>

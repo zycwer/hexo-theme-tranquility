@@ -9,6 +9,7 @@ module.exports = hexo => {
       ...this.theme.config.search,
       root: this.config.root
     };
+    if (!cfg.enable) return;
 
     const sources = [];
     if (cfg.field === 'post' || cfg.field === '') sources.push(locals.posts.sort('-date'));

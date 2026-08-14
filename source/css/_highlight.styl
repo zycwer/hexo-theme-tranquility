@@ -41,7 +41,7 @@ figure.highlight {
   position: relative;
   padding-top: 32px;
   border-radius: 5px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 30px var(--c-shadow);
   line-height: 1.5em;
 
   table {
@@ -91,6 +91,10 @@ figure.highlight .gutter pre {
 }
 
 figure.highlight .copy-button {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
   display: flex;
   position: absolute;
   align-items: center;

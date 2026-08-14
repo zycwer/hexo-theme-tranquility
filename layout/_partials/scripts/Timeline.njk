@@ -2,8 +2,8 @@
   <script type="text/javascript">
     (function () {
       var timelineData = ({{ data | dump | replace('</', '<\\/') }} || {});
-      var types = timelineData.types;
-      var posts = timelineData.posts;
+      var types = timelineData.types || [];
+      var posts = timelineData.posts || [];
       var listEl = document.querySelector("#timeline-list");
 
       function getElRefs(typeList) {

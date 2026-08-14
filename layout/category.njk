@@ -6,19 +6,22 @@
   <div class="wall wall-category{{ '--plain' if not theme.tagcloud.fancy else '' }}">
     <div class="wall-main">
       <div class="wall-category-title">
+        {% set cat_icon = page.icon if page.icon else '/images/icon/icon-article.svg' %}
         <div class="title-icon"
-             style="background-image: url('{{ url_for(page.icon) | escape }}')"></div>
-        {{ (page.title or page.name) | escape }}
+             style="background-image: url('{{ url_for(cat_icon) | escape }}')"></div>
+        {{ (page.title or page.name or page.category) | escape }}
       </div>
       <div class="wall-category-description">{{ page.description | escape }}</div>
       <div class="wall-category-tags">
+        {% if page.tags %}
         <div id="tags-outer">{{ trqlt_tagcloud(page.tags, theme.tagcloud) }}</div>
+        {% endif %}
       </div>
     </div>
   </div>
   <div class="post-list">
     {% if not page.posts %}
-      <p class="post-list-empty">该分类下暂无文章。在文章 front-matter 中添加 <code>category: {{ page.name | escape }}</code> 字段，即可将文章添加至此页。</p>
+      <p class="post-list-empty">该分类下暂无文章。在文章 front-matter 中添加 <code>category: {{ (page.name or page.category) | escape }}</code> 字段，即可将文章添加至此页。</p>
     {% else %}
       {{ partial("_partials/macros/post-list.njk", {posts: page.posts}) }}
     {% endif %}

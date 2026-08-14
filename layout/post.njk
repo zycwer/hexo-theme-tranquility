@@ -32,7 +32,7 @@
       <script src='{{ theme.cdn or 'https://cdn.jsdelivr.net/npm' }}/mermaid@{{ theme.mermaid.version }}/dist/mermaid.min.js'></script>
       <script>
         if (window.mermaid) {
-          mermaid.initialize({{ theme.mermaid.options | dump | replace('</', '<\/') }});
+          mermaid.initialize({{ theme.mermaid.options | dump | replace('</', '<\\/') }});
           // 10.x+ 用 mermaid.run()，9.x 用 mermaid.init()，做兼容 fallback
           if (typeof mermaid.run === 'function') {
             mermaid.run();
@@ -57,5 +57,10 @@
   </div>
 {% endblock body %}
 {% block script %}
-  {% if page.toc %}<script defer src="{{ url_for('js/toc.js') }}"></script>{% endif %}
+  {# MathJax 仅在文章页按需加载（mathjax 为布尔开关），避免全站加载 #}
+  {% if theme.mathjax %}
+    <script id="MathJax-script"
+            async
+            src='{{ theme.cdn or 'https://cdn.jsdelivr.net/npm' }}/mathjax@3.2.2/es5/tex-mml-chtml.js'></script>
+  {% endif %}
 {% endblock script %}
