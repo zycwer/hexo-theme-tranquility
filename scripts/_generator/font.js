@@ -23,7 +23,14 @@ module.exports = function (hexo) {
         hexo.log.warn('zh_font.style 含非法字符：%s', subfont);
         return null;
       }
-      const source = path.resolve(sourceFolder, `${subfont}.${type}`);
+      // 源字体优先使用 woff（体积更小），回退 ttf 以兼容用户自行替换的字体
+      const source = ['.woff', '.ttf']
+        .map(ext => path.resolve(sourceFolder, `${subfont}${ext}`))
+        .find(p => fs.existsSync(p));
+      if (!source) {
+        hexo.log.warn('subfont: 未找到源字体 _font/%s.woff（或 .ttf）', subfont);
+        return null;
+      }
       const data = compress(text, { source, name: fontName, style: subfont }, hexo);
       if (!data) return null;
       return {
