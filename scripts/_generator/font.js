@@ -4,7 +4,12 @@ const opentype = require('opentype.js');
 const path = require('path');
 const fs = require('fs');
 const zlib = require('zlib');
+const crypto = require('crypto');
 const { Buffer } = require('node:buffer');
+
+// 生成字体的内容哈希（路由路径 → 8 位哈希），供资源指纹 filter 复用，
+// 保证替换 _font/ 源字体或子集字符集变化后，字体 URL 指纹随之变化
+const fontHashes = {};
 
 module.exports = function (hexo) {
   hexo.extend.generator.register('subfont', locals => {
@@ -39,13 +44,18 @@ module.exports = function (hexo) {
       }
       const data = compress(text, { source, name: fontName, style: subfont, type }, hexo);
       if (!data) return null;
+      const routePath = path.join('/font', `${subfont}.${type}`);
+      fontHashes[routePath] = crypto.createHash('sha256').update(data).digest('hex').slice(0, 8);
       return {
-        path: path.join('/font', `${subfont}.${type}`),
+        path: routePath,
         data: data
       };
     }).filter(Boolean);
   });
 };
+
+// 供资源指纹 filter 读取生成字体的内容哈希；必须在 module.exports 赋值之后挂载
+module.exports._hashes = fontHashes;
 
 function compress(text, { source, name, style, type }, hexo) {
   try {
