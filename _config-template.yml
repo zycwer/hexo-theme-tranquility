@@ -24,6 +24,13 @@ cdn: https://cdn.jsdelivr.net/npm
 #   landing = 纯个人主页模式（隐藏博客/子页入口，聚焦关于页、大事件与最近更新）
 homepage_mode: blog
 
+# 公告横幅：全站可关闭公告条，关闭状态记于 localStorage，内容更新后自动重新展示
+announcement:
+  enable: false
+  content: 欢迎来到我的个人主页
+  link: # 可选跳转链接
+  link_text: 了解更多
+
 mathjax: false # 加载 LateX 数学公式库
 
 favicon: # 配置网页图标
@@ -66,6 +73,33 @@ index: # 配置首页个性化内容
 # 即可使用主题的 about 布局渲染。内容（markdown）写在页面文件中，无需在此配置。
 # 是否在导航栏显示“关于”入口，由下方 nav.about 控制。
 
+# 项目展示：首页项目卡片区块（静态渲染，无外部请求）
+projects:
+  enable: false
+  title: 我的项目
+  items:
+    - name: 项目名称
+      description: 一句话项目简介
+      link: # 项目主页（可选）
+      repo: # 仓库链接（可选）
+      tags: # 技术标签（可选）
+        - JavaScript
+
+# 技能展示：首页技能区块；level 为 0-100 熟练度（可选，省略则显示为标签）
+skills:
+  enable: false
+  title: 技能
+  groups:
+    - name: 前端
+      items:
+        - name: JavaScript
+          level: 85
+        - name: CSS
+          level: 70
+    - name: 工具
+      items:
+        - name: Git
+
 # 首页最近更新卡片（从外部博客 RSS 拉取，构建时抓取并服务端渲染）
 # 适合 landing 模式：本站不含文章，把外部博客的最新文章以卡片形式展示在首页
 recent_updates:
@@ -81,6 +115,12 @@ foot:
     - "海内存知己"
     - "天涯若比邻"
   linksRows: 4
+
+# 建站运行时长：页脚实时显示（客户端计算，无外部请求）
+uptime:
+  enable: false
+  since: "2020-01-01T00:00:00+08:00" # 建站时间，推荐 ISO 格式（含时区）
+  template: "本站已运行 {d} 天 {h} 小时 {m} 分 {s} 秒"
 
 links: # 朋友
   # - name: "朋友的主页"

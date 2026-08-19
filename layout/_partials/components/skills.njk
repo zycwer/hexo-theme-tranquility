@@ -1,0 +1,30 @@
+{# 技能展示：分组技能条/标签，数据来自 theme.skills.groups（level 为 0-100 熟练度，省略则显示为标签） #}
+<div class="skills" id="skills">
+  <div class="skills__title">{{ (theme.skills.title or "技能") | escape }}</div>
+  <div class="skills__groups">
+    {% for g in theme.skills.groups %}
+      <div class="skills__group">
+        <div class="skills__group-name">{{ g.name | escape }}</div>
+        <div class="skills__group-body">
+          {% for s in g.items %}
+            {# level 为 0-100 的数值时渲染进度条，否则（含越界/非数值）降级为标签 #}
+            {% if s.level is number and s.level >= 0 and s.level <= 100 %}
+              <div class="skill-item">
+                <div class="skill-item__head">
+                  <span class="skill-item__name">{{ s.name | escape }}</span>
+                  <span class="skill-item__pct">{{ s.level }}%</span>
+                </div>
+                <div class="skill-item__bar" role="img"
+                     aria-label="{{ s.name | escape }} {{ s.level }}%">
+                  <div class="skill-item__fill" style="width: {{ s.level }}%"></div>
+                </div>
+              </div>
+            {% else %}
+              <span class="skill-item__tag">{{ s.name | escape }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>

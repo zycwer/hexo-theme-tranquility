@@ -1,0 +1,36 @@
+{# 项目展示：首页作品集卡片区块，数据来自 theme.projects.items（纯静态渲染，无外部请求） #}
+<div class="projects" id="projects">
+  <div class="projects__title">{{ (theme.projects.title or "我的项目") | escape }}</div>
+  <div class="projects__grid">
+    {% for p in theme.projects.items %}
+      <article class="project-card">
+        <div class="project-card__head">
+          {% if p.link %}
+            <a class="project-card__name"
+               href="{{ p.link | escape }}"
+               {% if p.link is string and (p.link.indexOf('http') == 0 or p.link.indexOf('//') == 0) %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ p.name | escape }}</a>
+          {% else %}
+            <span class="project-card__name">{{ p.name | escape }}</span>
+          {% endif %}
+          {% if p.repo %}
+            <a class="project-card__repo"
+               href="{{ p.repo | escape }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               title="查看仓库">↗</a>
+          {% endif %}
+        </div>
+        {% if p.description %}
+          <p class="project-card__desc">{{ p.description | escape }}</p>
+        {% endif %}
+        {% if p.tags and p.tags.length %}
+          <div class="project-card__tags">
+            {% for t in p.tags %}
+              <span class="project-card__tag">{{ t | escape }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+</div>

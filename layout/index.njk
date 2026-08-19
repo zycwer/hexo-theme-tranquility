@@ -58,6 +58,12 @@
       </div>
     </div>
   </div>
+  {% if theme.projects and theme.projects.enable and theme.projects.items %}
+    {% include "_partials/components/projects.njk" %}
+  {% endif %}
+  {% if theme.skills and theme.skills.enable and theme.skills.groups %}
+    {% include "_partials/components/skills.njk" %}
+  {% endif %}
   {% if theme.recent_updates and theme.recent_updates.enable %}
     {% include "_partials/components/recent-updates.njk" %}
   {% endif %}

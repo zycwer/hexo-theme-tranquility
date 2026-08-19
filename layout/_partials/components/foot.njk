@@ -47,5 +47,14 @@
       </svg>
       <a href="https://github.com/zycwer/hexo-theme-tranquility">致远</a>&nbsp;驱动
     </div>
+    {# 建站运行时长：客户端实时计算，由 uptime.enable 控制；since 支持 Date 或字符串（推荐 ISO 格式） #}
+    {% if theme.uptime and theme.uptime.enable and theme.uptime.since %}
+      {% set since = theme.uptime.since %}
+      <div class="foot-uptime"
+           id="site-uptime"
+           data-since="{{ (since.toISOString() if since.toISOString else since) | escape }}"
+           data-template="{{ (theme.uptime.template or '本站已运行 {d} 天 {h} 小时 {m} 分 {s} 秒') | escape }}"></div>
+      <script defer src="{{ url_for('js/uptime.js') }}"></script>
+    {% endif %}
   </div>
 </div>

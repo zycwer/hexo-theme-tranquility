@@ -215,6 +215,44 @@
         <label class="nav-btn" for="navBtn"></label>
       </div>
     </div>
+    {# 公告横幅：可关闭（localStorage 记忆），内容变更后自动重新显示；由 announcement.enable 控制 #}
+    {% if theme.announcement and theme.announcement.enable and theme.announcement.content %}
+      {% set ann = theme.announcement %}
+      <div class="announcement" id="announcement" hidden>
+        <div class="announcement__inner">
+          <span class="announcement__content">{{ ann.content | escape }}</span>
+          {% if ann.link %}
+            <a class="announcement__link"
+               href="{{ ann.link | escape }}"
+               {% if ann.link is string and (ann.link.indexOf('http') == 0 or ann.link.indexOf('//') == 0) %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ (ann.link_text or "了解更多") | escape }}</a>
+          {% endif %}
+        </div>
+        <button class="announcement__close" type="button" aria-label="关闭公告">&times;</button>
+      </div>
+      <script>
+        (function () {
+          var el = document.getElementById('announcement');
+          if (!el) return;
+          // 对「公告文本 + 链接」取 djb2 哈希作为已读标记：内容更新后哈希变化，横幅自动重新显示
+          var link = el.querySelector('.announcement__link');
+          var key = el.querySelector('.announcement__content').textContent +
+            (link ? '|' + link.getAttribute('href') + '|' + link.textContent : '');
+          var h = 5381;
+          for (var i = 0; i < key.length; i++) h = ((h << 5) + h + key.charCodeAt(i)) >>> 0;
+          h = h.toString(36);
+          var k = 'announcement-dismissed';
+          var d = null;
+          try { d = localStorage.getItem(k); } catch (e) {}
+          if (d !== h) {
+            el.hidden = false;
+            el.querySelector('.announcement__close').addEventListener('click', function () {
+              el.hidden = true;
+              try { localStorage.setItem(k, h); } catch (e) {}
+            });
+          }
+        })();
+      </script>
+    {% endif %}
     <div class="body">
       {% block body %}{% endblock body %}
     </div>

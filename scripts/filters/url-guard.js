@@ -11,7 +11,7 @@ module.exports = hexo => {
     // 仅校验这些键下的值，避免误伤普通文本
     const URL_KEYS = new Set([
       'url', 'icon', 'photo', 'face', 'paycode', 'rss_url',
-      'serverurl', 'cdn', 'logo', 'path', 'link',
+      'serverurl', 'cdn', 'logo', 'path', 'link', 'repo',
       'small', 'medium', 'apple_touch_icon', 'safari_pinned_tab', 'android_manifest'
     ]);
 

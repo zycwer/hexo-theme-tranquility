@@ -162,6 +162,8 @@ function encode(sfnt, type) {
 function getSubText(hexo) {
   const c = hexo.theme.config || {};
   const idx = c.index || {};
+  const projects = (c.projects && c.projects.enable && c.projects.items) || [];
+  const skillGroups = (c.skills && c.skills.enable && c.skills.groups) || [];
   const text = [
     c.slogan,
     idx.about && idx.about.title,
@@ -170,7 +172,17 @@ function getSubText(hexo) {
     ...((idx.about && idx.about.text) || []),
     ...(idx.poem || []),
     ...((c.reward && c.reward.text) || []),
-    ...((c.foot && c.foot.title) || [])
+    ...((c.foot && c.foot.title) || []),
+    // 新增功能文案：公告 / 项目 / 技能 / 建站时长
+    (c.announcement && c.announcement.enable && c.announcement.content),
+    (c.announcement && c.announcement.enable && c.announcement.link_text),
+    (c.projects && c.projects.enable && c.projects.title),
+    ...projects.map(p => p.name),
+    ...projects.map(p => p.description),
+    (c.skills && c.skills.enable && c.skills.title),
+    ...skillGroups.map(g => g.name),
+    ...skillGroups.reduce((acc, g) => acc.concat((g.items || []).map(s => s.name)), []),
+    (c.uptime && c.uptime.enable && c.uptime.template)
   ].filter(s => s != null);
   return Array.from(new Set(text.join('').split(''))).sort().join('');
   // must be sorted and .notdef at first position. see: https://github.com/opentypejs/opentype.js/issues/94

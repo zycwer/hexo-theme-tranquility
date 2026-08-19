@@ -49,6 +49,7 @@ Full installation, configuration, and advanced customization tutorials are avail
 - Hitokoto slogan that refreshes on every page load
 - Dark mode (light/dark/scheduled/follow-browser, one-click toggle in the navbar)
 - Open Graph social cards, JSON-LD structured data, sitemap, robots.txt, RSS auto-discovery, and PWA support
+- Projects showcase, skills display, dismissible announcement banner, and site uptime counter in the footer
 - Back-to-top button, accessibility motion degradation, font loading optimization
 - Responsive across desktop, tablet, and mobile for comfortable reading
 - Custom font extraction and subsetting, balancing aesthetics and performance

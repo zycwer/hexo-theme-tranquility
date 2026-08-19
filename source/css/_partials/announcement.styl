@@ -1,0 +1,51 @@
+// 公告横幅：可关闭公告条，全页面生效（由 announcement.enable 控制）
+.announcement {
+  position: relative;
+  background-color: var(--c-bg-soft);
+  border-bottom: 1px solid var(--c-border);
+  font-size: $font-size-small;
+}
+
+.announcement__inner {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 10px 44px 10px 20px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: var(--c-text);
+}
+
+.announcement__content {
+  line-height: 1.6;
+}
+
+.announcement__link {
+  color: var(--c-accent);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--c-accent-hover);
+    text-decoration: underline;
+  }
+}
+
+.announcement__close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: var(--c-text-muted);
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 8px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--c-text);
+  }
+}
