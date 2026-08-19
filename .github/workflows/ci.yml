@@ -30,7 +30,14 @@ jobs:
       - name: Scaffold Hexo site with theme installed
         run: |
           mkdir site && cd site
-          npm init -y >/dev/null
+          # package.json 必须含 hexo 字段，hexo-cli 才会将其识别为 Hexo 站点
+          cat > package.json <<'EOF'
+          {
+            "name": "ci-smoke-site",
+            "private": true,
+            "hexo": { "version": "8.1.2" }
+          }
+          EOF
           npm install "$GITHUB_WORKSPACE" hexo hexo-renderer-marked hexo-generator-index hexo-generator-tag --no-audit --no-fund
 
       - name: Write site config & sample content
@@ -51,6 +58,7 @@ jobs:
       - name: Build site
         run: |
           cd site
+          set -o pipefail # 让 tee 管道透传 hexo 的退出码，构建失败即步骤失败
           npx hexo generate 2>&1 | tee build.log
           if grep -qE '^ERROR' build.log; then
             echo "::error::hexo generate reported errors (see build.log above)"
