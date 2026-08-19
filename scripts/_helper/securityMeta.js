@@ -73,22 +73,43 @@ module.exports = hexo => {
       connect.add('https://*.algolianet.com');
     }
 
-    const join = s => Array.from(s).join(' ');
-    const directives = [
-      `default-src 'self'`,
-      `script-src ${join(script)}`,
-      `style-src ${join(style)}`,
-      `img-src ${join(img)}`,
-      `font-src ${join(font)}`,
-      `connect-src ${join(connect)}`,
-      `frame-src ${join(frame)}`,
-      `media-src 'self'`,
-      `object-src 'none'`,
-      `base-uri 'self'`,
-      `form-action 'self'`
-    ].concat(Array.isArray(cfg.csp_extra) ? cfg.csp_extra : []);
+    // 指令表：值为来源数组。csp_extra 中的同名指令来源会被合并进对应指令
+    // （CSP 规范规定同一 policy 内同名指令重复出现时后者被忽略，直接拼接会导致追加失效）
+    const directives = {
+      'default-src': ["'self'"],
+      'script-src': Array.from(script),
+      'style-src': Array.from(style),
+      'img-src': Array.from(img),
+      'font-src': Array.from(font),
+      'connect-src': Array.from(connect),
+      'frame-src': Array.from(frame),
+      'media-src': ["'self'"],
+      'object-src': ["'none'"],
+      'base-uri': ["'self'"],
+      'form-action': ["'self'"]
+    };
 
-    const tags = [`<meta http-equiv="Content-Security-Policy" content="${esc(directives.join('; '))}"/>`];
+    (Array.isArray(cfg.csp_extra) ? cfg.csp_extra : []).forEach(entry => {
+      if (typeof entry !== 'string') return;
+      const sep = entry.indexOf(' ');
+      if (sep <= 0) return; // 无来源的指令无效，跳过
+      const name = entry.slice(0, sep).trim().toLowerCase();
+      const value = entry.slice(sep + 1).trim();
+      if (!name || !value) return;
+      if (directives[name]) {
+        value.split(/\s+/).forEach(v => {
+          if (!directives[name].includes(v)) directives[name].push(v);
+        });
+      } else {
+        directives[name] = value.split(/\s+/);
+      }
+    });
+
+    const policy = Object.keys(directives)
+      .map(name => `${name} ${directives[name].join(' ')}`)
+      .join('; ');
+
+    const tags = [`<meta http-equiv="Content-Security-Policy" content="${esc(policy)}"/>`];
 
     // Referrer-Policy：仅向跨域目标发送 origin，避免完整 URL 泄露浏览路径
     const rp = cfg.referrer_policy === false ? null : (cfg.referrer_policy || 'strict-origin-when-cross-origin');
