@@ -11,3 +11,5 @@ require("./_nunjucks")(hexo);
 require("./filters/stylus")(hexo);
 require("./filters/lazy-img")(hexo);
 require("./filters/mermaid")(hexo);
+require("./filters/url-guard")(hexo);
+require("./filters/asset-fingerprint")(hexo);

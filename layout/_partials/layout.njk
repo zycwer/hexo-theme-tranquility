@@ -6,6 +6,10 @@
       <meta name="google-adsense-account" content="{{ theme.google_ad.meta_tag | escape }}"/>
     {% endif %}
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    {# 安全策略：CSP / Referrer-Policy / Permissions-Policy，由 security.enable 控制 #}
+    {% if theme.security and theme.security.enable %}
+      {{ securityMeta() | safe }}
+    {% endif %}
     {% set cdn = theme.cdn or 'https://cdn.jsdelivr.net/npm' %}
     <link rel="preconnect" href="{{ cdn | replace('/npm', '') }}" crossorigin/>
     {% if theme.slogan_hitokoto %}

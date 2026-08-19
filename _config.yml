@@ -158,10 +158,26 @@ baidu_analytics: # <app_id>
 zh_font:
   enable: true
   fontName: sourceHanSerif
-  type: ttf
+  type: woff # 输出格式：woff（推荐，体积约为 ttf 一半）| ttf
   style:
     - normal
     - bold
+
+# 安全策略：CSP（内容安全策略）+ Referrer-Policy + Permissions-Policy
+# 静态托管（如 GitHub Pages）无法设置 HTTP 响应头，meta 标签是落地 CSP 的途径；
+# 策略来源白名单按已开启的功能（评论/统计/一言/CDN）自动收集，无需手动维护。
+# 若第三方挂件被 CSP 拦截，可将所需来源追加到 csp_extra，或整体关闭。
+security:
+  enable: true
+  csp_extra: # 追加自定义 CSP 指令，如 "worker-src 'self'"
+    # - "worker-src 'self'"
+  referrer_policy: strict-origin-when-cross-origin # 跨域仅发送 origin，防完整 URL 泄露；置 false 关闭
+  permissions_policy: "camera=(), microphone=(), geolocation=()" # 默认禁用敏感能力；置 false 关闭
+
+# 静态资源指纹：为主题自带的 css/js/图片引用追加内容哈希（?v=xxxxxxxx）
+# 浏览器可永久强缓存，主题更新后哈希变化 URL 即变，缓存自动失效
+fingerprint:
+  enable: true
 
 # 配置时间线 参考 README.md
 timeline:

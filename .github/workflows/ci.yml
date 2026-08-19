@@ -1,0 +1,89 @@
+# 持续集成：构建冒烟测试 + 代码安全扫描
+# 冒烟测试：用真实 Hexo 站点安装主题并全量构建，出现任何 ERROR 即失败
+# CodeQL：JavaScript 代码安全扫描（每次 push/PR + 每周一例行）
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * 1' # 每周一 02:00 UTC 例行扫描
+
+jobs:
+  smoke:
+    name: Build smoke test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout theme
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Scaffold Hexo site with theme installed
+        run: |
+          mkdir site && cd site
+          npm init -y >/dev/null
+          npm install "$GITHUB_WORKSPACE" hexo hexo-renderer-marked hexo-generator-index hexo-generator-tag --no-audit --no-fund
+
+      - name: Write site config & sample content
+        run: |
+          cd site
+          cat > _config.yml <<'EOF'
+          title: CI Smoke Test
+          url: https://example.com
+          theme: tranquility
+          permalink: :title/
+          theme_config:
+            pwa:
+              enable: true
+          EOF
+          mkdir -p source/_posts
+          printf -- '---\ntitle: hello\ncategories: [featTest]\ndate: 2026-01-01 12:00:00\n---\n\n# Hello\n\n中文内容测试。\n\n```mermaid\ngraph LR\n  A --> B\n```\n' > source/_posts/hello.md
+
+      - name: Build site
+        run: |
+          cd site
+          npx hexo generate 2>&1 | tee build.log
+          if grep -qE '^ERROR' build.log; then
+            echo "::error::hexo generate reported errors (see build.log above)"
+            exit 1
+          fi
+
+      - name: Assert build artifacts
+        run: |
+          cd site
+          test -f public/index.html
+          test -f public/css/layout.css
+          test -f public/font/normal.woff
+          test -f public/sw.js
+          test -f public/manifest.json
+          test -f public/offline.html
+          grep -q 'Content-Security-Policy' public/index.html
+          grep -q '?v=' public/index.html
+          echo "All artifacts verified."
+
+  codeql:
+    name: CodeQL security scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3

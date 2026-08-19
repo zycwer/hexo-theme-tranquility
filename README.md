@@ -9,6 +9,7 @@
 <p align="center">
 <a href="https://github.com/zycwer/hexo-theme-tranquility/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/zycwer/hexo-theme-tranquility?label=release&color=orange"></a>
 <a href="https://www.npmjs.com/package/hexo-theme-tranquility"><img alt="npm" src="https://img.shields.io/npm/v/hexo-theme-tranquility?logo=npm&label=npm"></a>
+<a href="https://github.com/zycwer/hexo-theme-tranquility/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/zycwer/hexo-theme-tranquility/ci.yml?branch=main&label=CI"></a>
 <a href="https://hexo.io/"><img src="https://img.shields.io/badge/Hexo-%3E%3D8.0.0-blue?logo=hexo"></a>
 <a href="https://github.com/zycwer/hexo-theme-tranquility/blob/main/LICENSE"><img src="https://img.shields.io/github/license/zycwer/hexo-theme-tranquility"></a>
 <a href="https://docs.qwrcb.top"><img src="https://img.shields.io/badge/docs-docs.qwrcb.top-green"></a>

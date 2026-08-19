@@ -158,10 +158,23 @@ baidu_analytics: # <app_id>
 zh_font:
   enable: true
   fontName: sourceHanSerif
-  type: ttf
+  type: woff
   style:
     - normal
     - bold
+
+# 安全策略：CSP（内容安全策略）+ Referrer-Policy + Permissions-Policy
+# 来源白名单按已开启的功能（评论/统计/一言/CDN）自动收集
+security:
+  enable: true
+  csp_extra: # 追加自定义 CSP 指令，如 "worker-src 'self'"
+    # - "worker-src 'self'"
+  referrer_policy: strict-origin-when-cross-origin # 置 false 关闭
+  permissions_policy: "camera=(), microphone=(), geolocation=()" # 置 false 关闭
+
+# 静态资源指纹：css/js/图片引用追加内容哈希（?v=xxxxxxxx），强缓存 + 更新即时失效
+fingerprint:
+  enable: true
 
 # 配置时间线 参考 README.md
 timeline:

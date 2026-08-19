@@ -1,6 +1,10 @@
-// PWA 支持：生成 manifest.json 与 sw.js（Service Worker）
-// 配置 theme.pwa.enable 开启。manifest 引用 favicon 作为图标，sw 采用
-// 静态资源缓存优先 + HTML 网络优先策略，离线可访问已缓存页面
+// PWA 支持：生成 manifest.json、sw.js（Service Worker）与 offline.html（离线兜底页）
+// 配置 theme.pwa.enable 开启。SW 策略：
+//   HTML     —— 网络优先，失败回退缓存，再回退离线页
+//   静态资源 —— stale-while-revalidate：命中缓存立即返回，后台静默更新
+// 预缓存清单与页面资源指纹（fingerprint）保持一致，避免缓存键不匹配
+
+const { assetHash } = require('../filters/asset-fingerprint');
 
 // 按扩展名推断图标 MIME，避免 svg 被误判为 image/svg（无效）
 function mimeFromPath(p) {
@@ -47,25 +51,33 @@ module.exports = hexo => {
 
     const root = (this.config.root || '/').replace(/\/$/, '');
     const sw = buildSW(root, hexo);
+    const offline = buildOfflinePage(cfg);
 
     return [
       { path: 'manifest.json', data: JSON.stringify(manifest, null, 2) },
-      { path: 'sw.js', data: sw }
+      { path: 'sw.js', data: sw },
+      { path: 'offline.html', data: offline }
     ];
   });
 };
 
-// 简洁 Service Worker：静态资源缓存优先，HTML 网络优先失败回退缓存
-// CACHE 版本号每次构建变化，确保主题更新后旧缓存被清理
+// 预缓存版本化资源 URL：与 asset-fingerprint 输出的 ?v= 指纹一致
+function versioned(root, hexo, relPath) {
+  const hash = assetHash(hexo, relPath);
+  return root + relPath + (hash ? '?v=' + hash : '');
+}
+
 function buildSW(root, hexo) {
   // generate 模式用时间戳确保主题更新后旧缓存被清理；
   // server 模式热重载频繁，用固定版本避免反复清空缓存丧失离线能力
   const isServer = hexo.env && hexo.env.cmd === 'server';
   const cacheVersion = 'tranquility-' + (isServer ? 'dev' : ((hexo.theme.config.pwa || {}).cache_version || Date.now()));
+  const css = versioned(root, hexo, '/css/layout.css');
   return `// 由 hexo-theme-tranquility 自动生成，请勿手动编辑
 const CACHE = ${JSON.stringify(cacheVersion)};
 const ROOT = ${JSON.stringify(root)};
-const PRECACHE = [ROOT + '/', ROOT + '/css/layout.css'];
+const OFFLINE = ROOT + '/offline.html';
+const PRECACHE = [ROOT + '/', ${JSON.stringify(css)}, OFFLINE];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -84,24 +96,65 @@ self.addEventListener('fetch', e => {
 
   const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
   if (isHTML) {
+    // HTML：网络优先，失败回退缓存，再回退离线页
     e.respondWith(fetch(req).then(res => {
       if (res.ok) {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(req, copy));
       }
       return res;
-    }).catch(() => caches.match(req).then(r => r || caches.match(ROOT + '/')));
+    }).catch(() => caches.match(req).then(r => r || caches.match(OFFLINE))));
     return;
   }
-  // 静态资源：缓存优先
-  e.respondWith(caches.match(req).then(cached => cached || fetch(req).then(res => {
-    // 仅缓存成功响应，避免 404/500 等被缓存
-    if (res.ok) {
-      const copy = res.clone();
-      caches.open(CACHE).then(c => c.put(req, copy));
-    }
-    return res;
-  })));
+  // 静态资源：stale-while-revalidate —— 命中缓存立即返回，后台静默更新
+  e.respondWith(caches.match(req).then(cached => {
+    const refresh = fetch(req).then(res => {
+      // 仅缓存成功响应，避免 404/500 等被缓存
+      if (res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy));
+      }
+      return res;
+    }).catch(() => cached);
+    return cached || refresh;
+  }));
 });
+`;
+}
+
+// 自包含离线兜底页：无外部依赖（样式内联），断网时也可渲染
+function buildOfflinePage(cfg) {
+  const themeColor = cfg.theme_color || '#fcfcfb';
+  const bgColor = cfg.background_color || '#fcfcfb';
+  return `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex"/>
+<title>离线</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px;
+    font-family: serif, sans-serif; background: ${bgColor}; color: #444;
+    text-align: center; padding: 24px;
+  }
+  h1 { font-size: 28px; margin: 0; font-weight: normal; }
+  p { margin: 0; color: #888; }
+  a {
+    display: inline-block; padding: 8px 28px; border: 1px solid #bbb;
+    border-radius: 4px; color: #444; text-decoration: none; margin-top: 8px;
+  }
+  a:hover { border-color: ${themeColor}; }
+</style>
+</head>
+<body>
+  <h1>当前离线</h1>
+  <p>无法连接网络，且该页面尚未缓存。</p>
+  <a href="/">重试</a>
+</body>
+</html>
 `;
 }
