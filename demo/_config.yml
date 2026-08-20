@@ -1,0 +1,359 @@
+# ============================================================================
+# Tranquility 主题演示站配置
+# 部署地址：https://zycwer.github.io/hexo-theme-tranquility/
+# 由 GitHub Actions 在每次 push 到 main 时自动重新构建（.github/workflows/deploy-demo.yml）
+# 主题配置写在 theme_config 下，与用户安装主题后的 _config.yml 覆盖方式一致
+# ============================================================================
+
+# 站点基础信息
+title: Tranquility
+subtitle: 宁静致远 · 主题演示站
+description: hexo-theme-tranquility 特性全览演示站：项目展示、技能、公告、PWA、搜索、Mermaid、MathJax 等特性一网打尽
+keywords: hexo,theme,tranquility,demo
+author: zycwer
+language: zh-CN
+timezone: Asia/Shanghai
+
+# URL：项目页部署在仓库子路径下，root 必须与仓库名一致
+url: https://zycwer.github.io/hexo-theme-tranquility
+root: /hexo-theme-tranquility/
+permalink: posts/:title/
+permalink_defaults:
+pretty_urls:
+  trailing_index: true
+  trailing_html: true
+
+# 目录
+source_dir: source
+public_dir: public
+tag_dir: tags
+archive_dir: archives
+category_dir: categories
+skip_render:
+
+# 写作
+new_post_name: :title.md
+default_layout: post
+titlecase: false
+external_link:
+  enable: true
+  field: site
+  exclude: ''
+filename_case: 0
+render_drafts: false
+post_asset_folder: false
+relative_link: false
+future: true
+syntax_highlighter: highlight.js
+highlight:
+  line_number: true
+  auto_detect: false
+  tab_replace: ''
+  wrap: true
+  hljs: false
+prismjs:
+  preprocess: true
+  line_number: true
+  tab_replace: ''
+
+# 首页分页
+index_generator:
+  path: ''
+  per_page: 6
+  order_by: -date
+pagination_dir: page
+
+# 日期
+date_format: YYYY-MM-DD
+time_format: HH:mm:ss
+updated_option: 'mtime'
+meta_generator: true
+
+# RSS（hexo-generator-feed）：主题检测到该配置后自动输出 RSS auto-discovery
+feed:
+  enable: true
+  type: atom
+  path: atom.xml
+  content: true
+  limit: 20
+
+# ----------------------------------------------------------------------------
+# 主题配置
+# ----------------------------------------------------------------------------
+theme: tranquility
+
+theme_config:
+  slogan: "宁静致远，方得始终"
+  # 一言：开启后首页 slogan 客户端请求 hitokoto API 展示随机一言
+  slogan_hitokoto: true
+  email: zycwer@example.com
+  logo: "/images/logo.svg"
+
+  # 深色模式：auto = 跟随浏览器 + 支持手动切换
+  color_mode: auto
+  color_mode_time:
+    start: 18
+    end: 6
+
+  cdn: https://cdn.jsdelivr.net/npm
+
+  homepage_mode: blog
+
+  # 公告横幅（v1.7.0 新特性）：可关闭，内容更新后自动重新展示
+  announcement:
+    enable: true
+    content: 欢迎访问 Tranquility 主题演示站，本站由 GitHub Actions 在每次提交后自动构建
+    link: https://github.com/zycwer/hexo-theme-tranquility
+    link_text: 查看源码
+
+  # MathJax 数学公式（配合数学演示文章）
+  mathjax: true
+
+  favicon:
+    small: /images/favicon-16x16.png
+    medium: /images/favicon-32x32.png
+    apple_touch_icon: /images/apple-touch-icon.png
+    safari_pinned_tab: /images/logo.svg
+
+  # 子页：按分类聚合的专题页面
+  subpage:
+    enable: true
+    pages:
+      - name: featTest
+        path: feat
+        title: 特性演示
+        icon: /images/icon/icon-code.svg
+        description: 主题各特性的演示文章
+      - name: baseTest
+        path: base
+        title: 基础排版
+        icon: /images/icon/icon-pi.svg
+        description: Markdown 基础排版测试
+
+  index:
+    motto: "长风破浪会有时！"
+    poem:
+      - 君不见高堂明镜悲白发
+      - 朝如青丝暮成雪
+    photo: /images/about.jpg
+    about:
+      title: 关于
+      text:
+        - 这是一份写给「宁静」的答卷
+        -
+        - 不追热点，不加繁饰
+        -
+        - 只把每一个特性做到恰到好处
+
+  # 项目展示（v1.7.0 新特性）
+  projects:
+    enable: true
+    title: 我的项目
+    items:
+      - name: hexo-theme-tranquility
+        description: 本站所用主题：为个人主页与多学科博主设计的 Hexo 主题
+        link: https://github.com/zycwer/hexo-theme-tranquility
+        repo: https://github.com/zycwer/hexo-theme-tranquility
+        tags:
+          - Hexo
+          - Nunjucks
+          - Stylus
+      - name: 主题文档站
+        description: 完整配置文档（中文 / English）
+        link: https://docs.qwrcb.top
+        tags:
+          - Docusaurus
+      - name: 演示站源码
+        description: 本演示站的构建配置与 workflow，可作部署参考
+        link: https://github.com/zycwer/hexo-theme-tranquility/tree/main/demo
+        repo: https://github.com/zycwer/hexo-theme-tranquility
+        tags:
+          - GitHub Actions
+
+  # 技能展示（v1.7.0 新特性）
+  skills:
+    enable: true
+    title: 技能
+    groups:
+      - name: 前端
+        items:
+          - name: JavaScript
+            level: 85
+          - name: CSS
+            level: 70
+          - name: Nunjucks
+            level: 75
+      - name: 后端
+        items:
+          - name: Node.js
+            level: 60
+          - name: Hexo 插件开发
+            level: 80
+      - name: 工具
+        items:
+          - name: Git
+          - name: GitHub Actions
+          - name: Docker
+
+  # 最近更新：构建时抓取主题仓库 commits Atom，首页展示主题最新提交动态
+  recent_updates:
+    enable: true
+    rss_url: https://github.com/zycwer/hexo-theme-tranquility/commits/main.atom
+    max_count: 3
+    title: 主题最近更新
+    show_excerpt: true
+    excerpt_length: 80
+
+  foot:
+    title:
+      - "海内存知己"
+      - "天涯若比邻"
+    linksRows: 4
+
+  # 建站运行时长（v1.7.0 新特性）
+  uptime:
+    enable: true
+    since: "2026-01-01T00:00:00+08:00"
+    template: "本站已运行 {d} 天 {h} 小时 {m} 分 {s} 秒"
+
+  links:
+    - name: "主题文档"
+      url: https://docs.qwrcb.top
+    - name: "GitHub"
+      url: https://github.com/zycwer/hexo-theme-tranquility
+
+  social:
+    - name: "GitHub"
+      icon: "/images/logo-github.svg"
+      url: https://github.com/zycwer
+
+  contacts:
+    - name: "zycwer@example.com"
+      icon: "/images/icon/icon-email.svg"
+      url: "mailto:zycwer@example.com"
+
+  # 赞赏：头像与二维码图片位于本演示站 source/assets/
+  reward:
+    enable: true
+    face: /assets/author-face.jpg
+    paycode: /assets/pay-code.png
+    text: "给作者倒杯卡布奇诺"
+    btnText: 喜欢作者
+
+  # 评论系统：giscus 需要 Discussions 的 repo_id / category_id（giscus.app 获取），
+  # 取到后填入并置 enable: true 即可，主题会自动放宽 CSP 并支持深色模式联动
+  comments:
+    enable: false
+    giscus:
+      repo: zycwer/hexo-theme-tranquility
+      repo_id:
+      category: Announcements
+      category_id:
+      mapping: pathname
+      reactions_enabled: 1
+      input_position: bottom
+      lang: zh-CN
+      theme: auto
+    waline:
+      serverURL:
+      lang: zh-CN
+      emoji:
+    disqus:
+      shortname:
+
+  # 相关文章（依赖 hexo-related-popular-posts 插件，demo 已安装）
+  related_post:
+    enable: true
+    config:
+      maxCount: 5
+      PPMixingRate: 0.4
+
+  # 中文子集字体（woff 体积约为 ttf 一半）
+  zh_font:
+    enable: true
+    fontName: sourceHanSerif
+    type: woff
+    style:
+      - normal
+      - bold
+
+  # 安全策略：CSP + Referrer-Policy + Permissions-Policy（来源白名单按已开启功能自动收集）
+  security:
+    enable: true
+    csp_extra:
+      - "worker-src 'self'"
+    referrer_policy: strict-origin-when-cross-origin
+    permissions_policy: "camera=(), microphone=(), geolocation=()"
+
+  # 资源指纹：css/js/图片/字体引用追加内容哈希，强缓存 + 更新即时失效
+  fingerprint:
+    enable: true
+
+  # 首页时间线：文章 front-matter 中 timeline: article/app/event 即收录
+  timeline:
+    enable: true
+    order: false
+    items:
+      - name: article
+        color: "#ee936c"
+        icon: /images/icon/icon-article.svg
+        checked: false
+      - name: app
+        color: "#60a465"
+        icon: /images/icon/icon-app.svg
+        checked: true
+      - name: event
+        color: "#568dc4"
+        icon: /images/icon/icon-event.svg
+        checked: false
+
+  # 标签云
+  tagcloud:
+    fancy: true
+    min_font: 14
+    max_font: 30
+
+  mermaid:
+    enable: true
+    version: 10.9.3
+    options:
+      startOnload: true
+
+  # 本地搜索（无需任何外部服务）
+  search:
+    path: search.json
+    enable: true
+    field: post
+    content: true
+
+  algolia:
+    enable: false
+    appId: appId
+    apiKey: apiKey
+    indexName: indexName
+    insights: true
+    debug: false
+
+  nav:
+    sticky: true
+    about: true
+
+  google_ad:
+    enable: false
+    meta_tag: "G-XXXXXXXXXX"
+
+  sitemap:
+    enable: true
+
+  robots:
+    enable: true
+
+  # PWA：可安装、离线可访问（github.io 为 HTTPS，Service Worker 可正常注册）
+  pwa:
+    enable: true
+    name: Tranquility 主题演示站
+    short_name: Tranquility
+    description: hexo-theme-tranquility 特性全览演示站
+    display: standalone
+    theme_color: "#fcfcfb"
+    background_color: "#fcfcfb"

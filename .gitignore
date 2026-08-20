@@ -109,3 +109,10 @@ dist
 
 # TernJS port file
 .tern-port
+
+# 演示站（demo/）构建产物：主题副本、依赖与 Hexo 缓存均不纳入版本管理
+demo/themes/
+demo/node_modules/
+demo/public/
+demo/db.json
+demo/build.log

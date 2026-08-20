@@ -37,6 +37,7 @@ Full installation, configuration, and advanced customization tutorials are avail
 
 ## Demo Sites
 
+- [Tranquility Official Demo](https://zycwer.github.io/hexo-theme-tranquility/) (full feature showcase, rebuilt automatically on every commit)
 - [Tranquility](https://theme.hozen.site/tranquility/) (original theme demo)
 - [Hozen's Homepage](https://www.hozen.site)
 

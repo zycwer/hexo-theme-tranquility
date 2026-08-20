@@ -38,6 +38,7 @@
 
 ## 演示站
 
+- [Tranquility 官方演示站](https://zycwer.github.io/hexo-theme-tranquility/)（特性全览，每次提交自动构建）
 - [致远](https://theme.hozen.site/tranquility/)（原主题演示站）
 - [浩然的主页](https://www.hozen.site)
 
