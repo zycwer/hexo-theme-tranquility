@@ -106,8 +106,9 @@ theme_config:
     link: https://github.com/zycwer/hexo-theme-tranquility
     link_text: 查看源码
 
-  # MathJax 数学公式（配合数学演示文章）
-  mathjax: true
+  # MathJax 数学公式：演示站指向本地 vendor（source/vendors/tex-svg.js），
+  # 不依赖第三方 CDN（jsdelivr 在部分网络不可达）；SVG 输出无需字体文件
+  mathjax: /vendors/tex-svg.js
 
   favicon:
     small: /images/favicon-16x16.png
@@ -316,6 +317,9 @@ theme_config:
   mermaid:
     enable: true
     version: 10.9.3
+    # 演示站指向本地 vendor（source/vendors/mermaid.min.js），不依赖第三方 CDN
+    # （jsdelivr 在部分网络不可达会导致图表一直卡在原始文本）
+    url: /vendors/mermaid.min.js
     options:
       startOnload: true
 

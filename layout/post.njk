@@ -29,7 +29,10 @@
       </div>
     </div>
     {% if theme.mermaid.enable %}
-      <script src='{{ theme.cdn or 'https://cdn.jsdelivr.net/npm' }}/mermaid@{{ theme.mermaid.version }}/dist/mermaid.min.js'></script>
+      {# mermaid.url 可覆盖默认 CDN 拼接（完整本地路径或任意可达源，url_for 自动补子路径前缀） #}
+      {% set mermaidUrl = theme.mermaid.url or ((theme.cdn or 'https://cdn.jsdelivr.net/npm') ~ '/mermaid@' ~ theme.mermaid.version ~ '/dist/mermaid.min.js') %}
+      <script src='{{ url_for(mermaidUrl) | escape }}'
+              onerror="(function(){var d=document.createElement('div');d.className='vendor-fail';d.textContent='Mermaid 图表加载失败（脚本源不可达），可配置 mermaid.url 指向可达源或本地文件';document.querySelector('.post-content__body').appendChild(d)})()"></script>
       <script>
         if (window.mermaid) {
           mermaid.initialize({{ theme.mermaid.options | dump | replace('</', '<\\/') }});
@@ -57,10 +60,16 @@
   </div>
 {% endblock body %}
 {% block script %}
-  {# MathJax 仅在文章页按需加载（mathjax 为布尔开关），避免全站加载 #}
+  {# MathJax 仅在文章页按需加载：true 走默认 CDN；传字符串则以完整 URL 覆盖（本地路径或任意可达源） #}
   {% if theme.mathjax %}
+    {% if theme.mathjax is string %}
+      {% set mathjaxUrl = theme.mathjax %}
+    {% else %}
+      {% set mathjaxUrl = (theme.cdn or 'https://cdn.jsdelivr.net/npm') ~ '/mathjax@3.2.2/es5/tex-mml-chtml.js' %}
+    {% endif %}
     <script id="MathJax-script"
             async
-            src='{{ theme.cdn or 'https://cdn.jsdelivr.net/npm' }}/mathjax@3.2.2/es5/tex-mml-chtml.js'></script>
+            src='{{ url_for(mathjaxUrl) | escape }}'
+            onerror="(function(){var d=document.createElement('div');d.className='vendor-fail';d.textContent='数学公式渲染失败（MathJax 源不可达），可配置 mathjax 指向可达源或本地文件';document.querySelector('.post-content__body').appendChild(d)})()"></script>
   {% endif %}
 {% endblock script %}

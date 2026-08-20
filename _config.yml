@@ -32,7 +32,7 @@ announcement:
   link: # 可选，"了解更多"跳转链接，如 https://example.com
   link_text: 了解更多 # 链接文案
 
-mathjax: false # 加载 LateX 数学公式库
+mathjax: false # LaTeX 数学公式库：true 走默认 CDN；也可填脚本完整 URL（本地路径或自选源，默认 jsdelivr 在部分网络不可达）
 
 favicon: # 配置网页图标
   small: /images/favicon-16x16.png
@@ -247,6 +247,7 @@ tagcloud:
 mermaid:
   enable: true # 启用 Mermaid 增强
   version: 10.9.3 # 固定版本,避免 latest 因上游 breaking change 失效(11.x 为 ESM,需改用 type="module" 加载)
+  url: # 可选，脚本完整 URL（本地路径如 /vendors/mermaid.min.js 或任意可达 CDN），留空走默认 jsdelivr 拼接
   options:
     startOnload: true
 
