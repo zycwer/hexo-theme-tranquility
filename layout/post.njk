@@ -67,6 +67,17 @@
     {% else %}
       {% set mathjaxUrl = (theme.cdn or 'https://cdn.jsdelivr.net/npm') ~ '/mathjax@3.2.2/es5/tex-mml-chtml.js' %}
     {% endif %}
+    {# MathJax 3 默认不启用 $...$ 行内公式，必须在脚本加载前注入配置（用户已定义 window.MathJax 时不覆盖） #}
+    <script>
+      if (!window.MathJax) {
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          }
+        };
+      }
+    </script>
     <script id="MathJax-script"
             async
             src='{{ url_for(mathjaxUrl) | escape }}'
