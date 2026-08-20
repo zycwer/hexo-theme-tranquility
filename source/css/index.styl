@@ -542,6 +542,8 @@ for v, k in timeline_colors {
   &__track {
     position: relative;
     flex: 1;
+    // 允许窄屏收缩（flex 项默认 min-width:auto 会把两侧箭头挤出屏幕）
+    min-width: 0;
     min-height: 160px;
     margin: 0 10px;
   }
@@ -588,6 +590,10 @@ for v, k in timeline_colors {
 .recent-card {
   display: none;
   max-width: 600px;
+  // 允许窄屏收缩；外部 RSS 文本不可控（可能含长串无空格字符），
+  // anywhere 使超长词也可断行，避免把卡片/箭头撑出屏幕
+  min-width: 0;
+  overflow-wrap: anywhere;
   margin: 0 auto;
   padding: 24px 28px;
   background: var(--c-bg-card);
@@ -922,5 +928,20 @@ for v, k in timeline_colors {
   // 窄屏单列下增加条目间距，保证呼吸感
   .skills__group-body {
     gap: 18px;
+  }
+
+  // 窄屏轮播：缩小箭头与轨道边距，给卡片让出宽度
+  .recent-updates__arrow {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+
+  .recent-updates__track {
+    margin: 0 6px;
+  }
+
+  .recent-card {
+    padding: 18px 16px;
   }
 }
