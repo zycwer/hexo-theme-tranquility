@@ -1,4 +1,6 @@
 // 公告横幅：可关闭公告条，全页面生效（由 announcement.enable 控制）
+// 设计语言与主题保持一致：文案用宋体（子集字体已收录公告文本），
+// 链接为圆角描边 chip（与标签/RSS 徽标同款），整体居中呈现
 .announcement {
   position: relative;
   background-color: var(--c-bg-soft);
@@ -11,24 +13,36 @@
   margin: 0 auto;
   padding: 10px 44px 10px 20px;
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 4px 16px;
+  gap: 6px 14px;
   color: var(--c-text);
 }
 
 .announcement__content {
   line-height: 1.6;
+  font-family: sourceHanSerif;
 }
 
+// "了解更多"链接：圆角描边 chip 按钮，与主题的标签/RSS 徽标同一设计语言
 .announcement__link {
-  color: var(--c-accent);
+  display: inline-block;
+  font-size: $font-size-smallest;
+  line-height: 1.7;
+  color: var(--c-text-soft);
+  background: var(--c-bg-muted);
+  border: 1px solid var(--c-border);
+  border-radius: 3px;
+  padding: 1px 10px;
   text-decoration: none;
   white-space: nowrap;
+  transition: color 200ms ease, border-color 200ms ease;
 
   &:hover {
-    color: var(--c-accent-hover);
-    text-decoration: underline;
+    color: var(--c-accent);
+    border-color: var(--c-accent-soft);
+    text-decoration: none;
   }
 }
 
@@ -47,5 +61,11 @@
 
   &:hover {
     color: var(--c-text);
+  }
+}
+
+@media screen and (max-width: 415px) {
+  .announcement__inner {
+    padding: 8px 40px 8px 16px;
   }
 }

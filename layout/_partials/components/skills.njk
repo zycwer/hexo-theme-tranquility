@@ -6,12 +6,13 @@
       <div class="skills__group">
         <div class="skills__group-name">{{ g.name | escape }}</div>
         <div class="skills__group-body">
+          {# 有 level 的技能渲染为熟练度进度条 #}
           {% for s in g.items %}
-            {# level 为 0-100 的数值时渲染进度条，否则（含越界/非数值）降级为标签 #}
             {% if s.level is number and s.level >= 0 and s.level <= 100 %}
               <div class="skill-item">
                 <div class="skill-item__head">
-                  <span class="skill-item__name">{{ s.name | escape }}</span>
+                  {# title 供悬停查看完整名称（窄屏下名称可能折行） #}
+                  <span class="skill-item__name" title="{{ s.name | escape }}">{{ s.name | escape }}</span>
                   <span class="skill-item__pct">{{ s.level }}%</span>
                 </div>
                 <div class="skill-item__bar" role="img"
@@ -19,10 +20,19 @@
                   <div class="skill-item__fill" style="width: {{ s.level }}%"></div>
                 </div>
               </div>
-            {% else %}
-              <span class="skill-item__tag">{{ s.name | escape }}</span>
             {% endif %}
           {% endfor %}
+          {# 无 level（含越界/非数值）的技能统一收纳为一行标签，与进度条风格保持一致 #}
+          {% set tagHtml %}
+            {% for s in g.items %}
+              {% if not (s.level is number and s.level >= 0 and s.level <= 100) %}
+                <span class="skill-item__tag">{{ s.name | escape }}</span>
+              {% endif %}
+            {% endfor %}
+          {% endset %}
+          {% if tagHtml | trim %}
+            <div class="skill-item__tags">{{ tagHtml | trim | safe }}</div>
+          {% endif %}
         </div>
       </div>
     {% endfor %}

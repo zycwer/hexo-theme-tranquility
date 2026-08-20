@@ -158,6 +158,10 @@ for item in hexo-config('timeline.items') {
   margin: 200px auto;
   display: flex;
   justify-content: space-between;
+  // 屏幕安全边距：窄屏不贴边，兼容刘海屏/手势操作栏（env 安全区）
+  box-sizing: border-box;
+  padding-left: unquote('max(24px, env(safe-area-inset-left))');
+  padding-right: unquote('max(24px, env(safe-area-inset-right))');
 }
 
 .about-photo {
@@ -205,6 +209,10 @@ for item in hexo-config('timeline.items') {
   display: flex;
   flex-direction: column;
   align-items: center;
+  // 屏幕安全边距：窄屏不贴边，兼容刘海屏/手势操作栏（env 安全区）
+  box-sizing: border-box;
+  padding-left: unquote('max(24px, env(safe-area-inset-left))');
+  padding-right: unquote('max(24px, env(safe-area-inset-right))');
 }
 
 .timeline-head {
@@ -492,6 +500,10 @@ for v, k in timeline_colors {
 .recent-updates {
   max-width: 900px;
   margin: 200px auto;
+  // 屏幕安全边距：窄屏不贴边，兼容刘海屏/手势操作栏（env 安全区）
+  box-sizing: border-box;
+  padding-left: unquote('max(24px, env(safe-area-inset-left))');
+  padding-right: unquote('max(24px, env(safe-area-inset-right))');
 
   &__head {
     display: flex;
@@ -583,6 +595,10 @@ for v, k in timeline_colors {
   border-radius: 8px;
   box-shadow: 0 2px 12px var(--c-shadow);
   text-align: center;
+  // 最近更新内容（日期/标题/摘要）统一使用宋体，与主题标题字面一致；
+  // 同 recent-card__title 的理由：外部 RSS 字符不受子集字体覆盖，
+  // 直接使用单一系统宋体字面，避免同一文本内两种宋体交错
+  font-family: "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", serif;
 
   &.is-active {
     display: block;
@@ -712,6 +728,10 @@ for v, k in timeline_colors {
 .projects {
   max-width: 900px;
   margin: 100px auto;
+  // 屏幕安全边距：窄屏不贴边，兼容刘海屏/手势操作栏（env 安全区）
+  box-sizing: border-box;
+  padding-left: unquote('max(24px, env(safe-area-inset-left))');
+  padding-right: unquote('max(24px, env(safe-area-inset-right))');
 }
 
 .projects__title {
@@ -800,6 +820,10 @@ for v, k in timeline_colors {
 .skills {
   max-width: 900px;
   margin: 100px auto;
+  // 屏幕安全边距：窄屏不贴边，兼容刘海屏/手势操作栏（env 安全区）
+  box-sizing: border-box;
+  padding-left: unquote('max(24px, env(safe-area-inset-left))');
+  padding-right: unquote('max(24px, env(safe-area-inset-right))');
 }
 
 .skills__title {
@@ -813,31 +837,41 @@ for v, k in timeline_colors {
 .skills__groups {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px 40px;
+  gap: 34px 40px;
 }
 
 .skills__group-name {
   font-size: 18px;
   font-weight: bold;
   color: var(--c-text-heading);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .skills__group-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .skill-item__head {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
+  gap: 12px;
   font-size: $font-size-small;
   color: var(--c-text-soft);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
+// 技能名：允许在窄屏优雅折行（配合下方 pct 不压缩，两者不会挤在一起错位）
+.skill-item__name {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+// 百分比数值：固定不压缩、不折行，始终贴齐进度条右端
 .skill-item__pct {
+  flex: 0 0 auto;
   color: var(--c-text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -856,9 +890,17 @@ for v, k in timeline_colors {
   transition: width 400ms ease-out;
 }
 
+// 无 level 的技能：收纳为一行可换行标签，字号/配色与技能名一致，保持视觉统一
+.skill-item__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
 .skill-item__tag {
-  align-self: flex-start;
-  font-size: $font-size-smaller;
+  font-size: $font-size-small;
+  line-height: 1.6;
   color: var(--c-text-soft);
   background: var(--c-bg-muted);
   border: 1px solid var(--c-border);
@@ -874,5 +916,11 @@ for v, k in timeline_colors {
 
   .skills__groups {
     grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  // 窄屏单列下增加条目间距，保证呼吸感
+  .skills__group-body {
+    gap: 18px;
   }
 }
