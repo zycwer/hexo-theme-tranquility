@@ -2,7 +2,7 @@
   "name": "tranquility-demo-site",
   "version": "1.0.0",
   "private": true,
-  "description": "hexo-theme-tranquility 官方演示站（GitHub Pages 自动构建）",
+  "description": "hexo-theme-tranquility 演示站（GitHub Pages 自动构建）",
   "scripts": {
     "build": "hexo generate",
     "clean": "hexo clean",
