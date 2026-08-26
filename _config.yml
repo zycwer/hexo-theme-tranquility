@@ -16,8 +16,9 @@ color_mode_time:
   end: 6     # 深色模式结束小时（支持跨午夜，如 18→6）
 
 # 第三方库(MathJax / Mermaid / DocSearch)的 CDN 源
-# 默认 jsDelivr;unpkg 国内访问不稳定。国内可改为 https://npm.elemecdn.com
-cdn: https://cdn.jsdelivr.net/npm
+# 默认 npmmirror（阿里国内镜像，国内直连稳定）；海外或需 jsDelivr 时可改为 https://cdn.jsdelivr.net/npm
+# 两种格式均支持：npmmirror 用 /pkg/版本/files/路径，jsDelivr 用 /pkg@版本/路径，主题会自动适配
+cdn: https://registry.npmmirror.com
 
 # 站点模式：
 #   blog    = 默认博客主题（展示子页/博客入口）
@@ -32,7 +33,7 @@ announcement:
   link: # 可选，"了解更多"跳转链接，如 https://example.com
   link_text: 了解更多 # 链接文案
 
-mathjax: false # LaTeX 数学公式库：true 走默认 CDN；也可填脚本完整 URL（本地路径或自选源，默认 jsdelivr 在部分网络不可达）
+mathjax: false # LaTeX 数学公式库：true 走默认 CDN（npmmirror）；也可填脚本完整 URL（本地路径或自选源）
 
 favicon: # 配置网页图标
   small: /images/favicon-16x16.png
@@ -247,7 +248,7 @@ tagcloud:
 mermaid:
   enable: true # 启用 Mermaid 增强
   version: 10.9.3 # 固定版本,避免 latest 因上游 breaking change 失效(11.x 为 ESM,需改用 type="module" 加载)
-  url: # 可选，脚本完整 URL（本地路径如 /vendors/mermaid.min.js 或任意可达 CDN），留空走默认 jsdelivr 拼接
+  url: # 可选，脚本完整 URL（本地路径如 /vendors/mermaid.min.js 或任意可达 CDN），留空走默认 CDN（npmmirror）拼接
   options:
     startOnload: true
 

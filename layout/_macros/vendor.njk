@@ -1,0 +1,19 @@
+{#
+  第三方库脚本/样式 URL 构造宏：适配两种 CDN 格式
+  - npmmirror（阿里国内镜像）: {cdn}/{pkg}/{version}/files/{path}
+  - jsDelivr 及其兼容镜像:     {cdn}/{pkg}@{version}/{path}
+  参数（nunjucks 宏不支持默认值，调用时需全部显式传入）:
+    cdn     CDN 基础地址（theme.cdn）
+    pkg     包名（作用域包带 @scope/ 前缀）
+    version 版本号（npmmirror 也支持 "3" 这类范围，经 302 跳转解析）
+    path    jsDelivr 格式下的文件路径；留空表示解析包默认入口
+    npmPath npmmirror 格式下的文件路径；留空则回退用 path（npmmirror 必须显式路径，
+            包默认入口需给出，如 DocSearch 的 dist/umd/index.js）
+#}
+{% macro url(cdn, pkg, version, path, npmPath) -%}
+  {%- if cdn and 'npmmirror.com' in cdn -%}
+    {{- cdn | trim }}/{{ pkg }}/{{ version }}/files/{{ npmPath or path -}}
+  {%- else -%}
+    {{- cdn | trim }}/{{ pkg }}@{{ version }}{% if path %}/{{ path }}{% endif %}
+  {%- endif -%}
+{%- endmacro %}

@@ -1,4 +1,5 @@
 {% extends "_partials/layout.njk" %}
+{% from "_macros/vendor.njk" import url as vendorUrl %}
 {% block link %}
   <link rel="stylesheet" type="text/css" href="{{ url_for("/css/post.css") }}"/>
 {% endblock link %}
@@ -30,7 +31,7 @@
     </div>
     {% if theme.mermaid.enable %}
       {# mermaid.url 可覆盖默认 CDN 拼接（完整本地路径或任意可达源，url_for 自动补子路径前缀） #}
-      {% set mermaidUrl = theme.mermaid.url or ((theme.cdn or 'https://cdn.jsdelivr.net/npm') ~ '/mermaid@' ~ theme.mermaid.version ~ '/dist/mermaid.min.js') %}
+      {% set mermaidUrl = theme.mermaid.url or vendorUrl(theme.cdn or 'https://registry.npmmirror.com', 'mermaid', theme.mermaid.version, 'dist/mermaid.min.js', '') %}
       <script src='{{ url_for(mermaidUrl) | escape }}'
               onerror="(function(){var d=document.createElement('div');d.className='vendor-fail';d.textContent='Mermaid 图表加载失败（脚本源不可达），可配置 mermaid.url 指向可达源或本地文件';document.querySelector('.post-content__body').appendChild(d)})()"></script>
       <script>
@@ -65,7 +66,7 @@
     {% if theme.mathjax is string %}
       {% set mathjaxUrl = theme.mathjax %}
     {% else %}
-      {% set mathjaxUrl = (theme.cdn or 'https://cdn.jsdelivr.net/npm') ~ '/mathjax@3.2.2/es5/tex-mml-chtml.js' %}
+      {% set mathjaxUrl = vendorUrl(theme.cdn or 'https://registry.npmmirror.com', 'mathjax', '3.2.2', 'es5/tex-mml-chtml.js', '') %}
     {% endif %}
     {# MathJax 3 默认不启用 $...$ 行内公式，必须在脚本加载前注入配置（用户已定义 window.MathJax 时不覆盖） #}
     <script>

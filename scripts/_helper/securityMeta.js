@@ -19,7 +19,7 @@ module.exports = hexo => {
     }
 
     // CDN（Mermaid / MathJax / DocSearch 等第三方库的 js/css/字体）
-    const cdnOrigin = origin(theme.cdn || 'https://cdn.jsdelivr.net/npm');
+    const cdnOrigin = origin(theme.cdn || 'https://registry.npmmirror.com');
     if (cdnOrigin) {
       script.add(cdnOrigin);
       style.add(cdnOrigin);
