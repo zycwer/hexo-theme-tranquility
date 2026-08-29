@@ -11,7 +11,10 @@ module.exports = hexo => {
     if (!items || !Array.isArray(items)) return {};
     const types = items.map(item => item && item.name).filter(Boolean);
     const order = cfg.order ? 'date' : '-date';
-    const iconOf = type => url_for((items.find(item => item.name === type) || {}).icon || '');
+    // 图标按 name 预建映射，避免逐篇文章线性查找 items
+    const iconByName = {};
+    items.forEach(item => { if (item && item.name) iconByName[item.name] = item.icon || ''; });
+    const iconOf = type => url_for(iconByName[type] || '');
 
     const posts = hexo.locals.get('posts').sort(order)
       .filter(post => types.includes(post.timeline))

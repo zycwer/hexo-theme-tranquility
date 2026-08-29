@@ -1,4 +1,5 @@
 // 搜索功能：加载搜索索引并提供实时搜索
+// 索引加载时一次性完成 HTML 剥离与小写化，搜索仅做字符串匹配，不再逐次重复处理全文
 // IIFE 封装，仅将 searchInitialize 挂到 window 供模板内联脚本调用
 ;(function () {
   const searchBtn = document.querySelector('#search-btn')
@@ -49,6 +50,8 @@
       .then(res => {
         clearTimeout(timer)
 
+        // 预处理：剥离 HTML、统一小写，仅执行一次；后续每次搜索直接复用
+        const index = (Array.isArray(res) ? res : []).filter(post => post.content).map(preprocess)
         const inputHandler = debounce(doSearch)
 
         searchBtn.style.display = 'flex'
@@ -74,7 +77,7 @@
           closeSearchDialog()
         })
 
-        searchIpt.addEventListener('input', inputHandler.bind(searchIpt, res))
+        searchIpt.addEventListener('input', inputHandler.bind(searchIpt, index))
       })
       .catch(err => {
         clearTimeout(timer)
@@ -87,48 +90,54 @@
     searchResult.innerHTML = ''
   }
 
-  function doSearch(data) {
+  // 预处理单篇文章：标题规整、正文剥离 HTML 标签并预生成小写副本
+  function preprocess(post) {
+    let postTitle = post.title && post.title.trim()
+    postTitle = (postTitle && postTitle.length > 0) ? postTitle : 'Untitled'
+
+    const postContent = post.content.trim().replace(/<[^>]+>/g, '')
+
+    return {
+      title: postTitle,
+      url: post.url,
+      content: postContent,
+      lowerTitle: postTitle.toLowerCase(),
+      lowerContent: postContent.toLowerCase()
+    }
+  }
+
+  function doSearch(index) {
     if (this.value.trim().length <= 0) return clearResult()
 
     const keywords = this.value.trim().toLowerCase().split(/[\s\-]+/).filter(Boolean);
 
-    const result = search(data, keywords)
+    const result = search(index, keywords)
 
     renderSearchResult(result, searchResult)
   }
 
-  function search(data, keywords) {
+  function search(index, keywords) {
     const matchedPost = []
 
-    data
-      .filter(post => post.content)
-      .forEach(post => {
-        let postTitle = post.title && post.title.trim()
-        postTitle = (postTitle && postTitle.length > 0) ? postTitle : 'Untitled'
+    index.forEach(entry => {
+      const matchedContentIndices = []
 
-        const postContent = post.content.trim().replace(/<[^>]+>/g, '')
+      keywords.forEach(keyword => {
+        const index_title = entry.lowerTitle.indexOf(keyword);
+        const index_content = entry.lowerContent.indexOf(keyword);
 
-        const lowerTitle = postTitle.toLowerCase()
-        const lowerContent = postContent.toLowerCase()
+        if (index_title < 0 && index_content < 0) return
 
-        const matchedContentIndices = []
-
-        keywords.forEach((keyword, i) => {
-          const index_title = lowerTitle.indexOf(keyword);
-          const index_content = lowerContent.indexOf(keyword);
-
-          if (index_title < 0 && index_content < 0) return
-
-          // 仅在正文命中时记录位置，标题命中用 -1 标记（取正文开头）
-          matchedContentIndices.push(index_content >= 0 ? index_content : 0)
-        });
-
-        if (matchedContentIndices.length) matchedPost.push({
-          url: post.url,
-          content: trimContent(matchedContentIndices, postContent, keywords),
-          title: postTitle
-        })
+        // 仅在正文命中时记录位置，标题命中用 -1 标记（取正文开头）
+        matchedContentIndices.push(index_content >= 0 ? index_content : 0)
       });
+
+      if (matchedContentIndices.length) matchedPost.push({
+        url: entry.url,
+        content: trimContent(matchedContentIndices, entry, keywords),
+        title: entry.title
+      })
+    });
 
     return matchedPost
   }
@@ -166,13 +175,24 @@
     el.appendChild(list)
   }
 
-  function trimContent(keyIndexs, content, keywords, wordLen = 20) {
-    // 不使用 d 标志（hasIndices），兼容更多浏览器；手动计算区间
-    const reg = /[\u4e00-\u9fa5]|\w+/g
-    const splitIndex = []
-    let arr
-    while ((arr = reg.exec(content)) !== null)
-      splitIndex.push([arr.index, arr.index + arr[0].length])
+  // 词元边界（[start, end] 区间列表）按文章惰性计算并缓存：仅命中搜索的文章需要，
+  // 每篇至多计算一次，后续搜索直接复用
+  function tokensOf(entry) {
+    if (!entry.tokens) {
+      // 不使用 d 标志（hasIndices），兼容更多浏览器；手动计算区间
+      const reg = /[\u4e00-\u9fa5]|\w+/g
+      const splitIndex = []
+      let arr
+      while ((arr = reg.exec(entry.content)) !== null)
+        splitIndex.push([arr.index, arr.index + arr[0].length])
+      entry.tokens = splitIndex
+    }
+    return entry.tokens
+  }
+
+  function trimContent(keyIndexs, entry, keywords, wordLen = 20) {
+    const content = entry.content
+    const splitIndex = tokensOf(entry)
 
     return keyIndexs.map(key => {
       // 内容无可用词元（纯标点/emoji 等）时，直接截取开头作为摘要

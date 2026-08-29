@@ -28,6 +28,13 @@
   }
 
   render();
-  // 每秒一次 textContent 更新，开销可忽略；页面隐藏时浏览器自动节流
-  setInterval(render, 1000);
+  // 每秒一次 textContent 更新，开销可忽略；页面隐藏时显式暂停，回到前台恢复
+  var timer = setInterval(render, 1000);
+  document.addEventListener('visibilitychange', function () {
+    clearInterval(timer);
+    if (!document.hidden) {
+      render();
+      timer = setInterval(render, 1000);
+    }
+  });
 })();
