@@ -1,6 +1,6 @@
-// 搜索功能：加载搜索索引并提供实时搜索
+// 搜索功能：索引懒加载（首次激活搜索才请求），输入实时检索
 // 索引加载时一次性完成 HTML 剥离与小写化，搜索仅做字符串匹配，不再逐次重复处理全文
-// IIFE 封装，仅将 searchInitialize 挂到 window 供模板内联脚本调用
+// 通过 script[data-search-index] 传入索引地址，defer 加载后自动初始化，无需内联脚本
 ;(function () {
   const searchBtn = document.querySelector('#search-btn')
   const searchIpt = document.querySelector('#search-input')
@@ -10,12 +10,14 @@
 
   let searchStatus = 0
 
-  function showSearchDialog() {
+  function showSearchDialog(loadIndex) {
     if (searchStatus) return
     searchMask.style.display = 'block'
     document.body.style.overflow = 'hidden'
     searchIpt.focus()
     searchStatus = 1
+    // 打开弹窗即开始拉取索引；已加载过则为无操作
+    loadIndex()
   }
 
   function closeSearchDialog() {
@@ -30,60 +32,88 @@
     // 入口判空：缺少任一关键元素直接退出，避免后续抛错
     if (!searchBtn || !searchMask || !searchIpt || !searchResult || !searchClearBtn) return
 
-    // 快捷键绑在 fetch 之前，索引加载失败也能用 Ctrl+K / Esc 打开/关闭弹窗
+    let index = null
+    let indexPromise = null
+
+    // 索引懒加载：单例 Promise 防重复请求；失败后置空允许重试
+    function loadIndex() {
+      if (indexPromise) return indexPromise
+
+      searchResult.innerHTML = '<div class="search-loading">正在加载搜索索引…</div>'
+
+      const controller = new AbortController()
+      const timer = setTimeout(() => { controller.abort() }, 8000)
+      indexPromise = fetch(url, { signal: controller.signal })
+        .then(res => {
+          if (!res.ok) throw new Error('HTTP ' + res.status)
+          return res.json()
+        })
+        .then(res => {
+          clearTimeout(timer)
+          // 预处理：剥离 HTML、统一小写，仅执行一次；后续每次搜索直接复用
+          index = (Array.isArray(res) ? res : []).filter(post => post.content).map(preprocess)
+          // 索引就绪时若用户已输入关键词，立即补一次搜索；否则清掉加载提示
+          if (searchIpt.value.trim()) doSearch.call(searchIpt)
+          else searchResult.innerHTML = ''
+          return index
+        })
+        .catch(err => {
+          clearTimeout(timer)
+          indexPromise = null
+          console.error('search index load failed:', err)
+          searchResult.innerHTML = '<div class="search-error">搜索索引加载失败，<a href="javascript:;" id="search-retry">重试</a></div>'
+          const retry = document.getElementById('search-retry')
+          if (retry) retry.addEventListener('click', loadIndex)
+        })
+      return indexPromise
+    }
+
+    function doSearch() {
+      if (this.value.trim().length <= 0) return clearResult()
+
+      // 索引未就绪：触发加载，就绪后会自动执行一次搜索
+      if (!index) {
+        loadIndex()
+        return
+      }
+
+      const keywords = this.value.trim().toLowerCase().split(/[\s\-]+/).filter(Boolean)
+      renderSearchResult(search(index, keywords), searchResult)
+    }
+
+    // 快捷键绑在索引加载之前，加载失败也能用 Ctrl+K / Esc 打开/关闭弹窗
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         if (searchStatus) closeSearchDialog()
-        else showSearchDialog()
+        else showSearchDialog(loadIndex)
       }
       if (e.key === 'Escape') closeSearchDialog()
     })
 
-    // fetch 增加 8s 超时（AbortController），失败时降级提示
-    const controller = new AbortController()
-    const timer = setTimeout(() => { controller.abort() }, 8000)
-    fetch(url, { signal: controller.signal })
-      .then(res => {
-        if (!res.ok) throw new Error('HTTP ' + res.status)
-        return res.json()
-      })
-      .then(res => {
-        clearTimeout(timer)
+    searchClearBtn.addEventListener('click', () => {
+      searchIpt.value = ''
+      clearResult()
+    })
 
-        // 预处理：剥离 HTML、统一小写，仅执行一次；后续每次搜索直接复用
-        const index = (Array.isArray(res) ? res : []).filter(post => post.content).map(preprocess)
-        const inputHandler = debounce(doSearch)
+    searchBtn.addEventListener('click', () => {
+      showSearchDialog(loadIndex)
+    })
 
-        searchBtn.style.display = 'flex'
+    searchBtn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        showSearchDialog(loadIndex)
+      }
+    })
 
-        searchClearBtn.addEventListener('click', () => {
-          searchIpt.value = ''
-          clearResult()
-        })
+    searchMask.addEventListener('click', e => {
+      if (e.target !== searchMask) return
+      closeSearchDialog()
+    })
 
-        searchBtn.addEventListener('click', () => {
-          showSearchDialog()
-        })
-
-        searchBtn.addEventListener('keydown', e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            showSearchDialog()
-          }
-        })
-
-        searchMask.addEventListener('click', e => {
-          if (e.target !== searchMask) return
-          closeSearchDialog()
-        })
-
-        searchIpt.addEventListener('input', inputHandler.bind(searchIpt, index))
-      })
-      .catch(err => {
-        clearTimeout(timer)
-        console.error('search index load failed:', err)
-        if (searchResult) searchResult.innerHTML = '<div class="search-error">搜索索引加载失败</div>'
-      })
+    searchIpt.addEventListener('input', debounce(function () {
+      doSearch.call(this)
+    }))
   }
 
   function clearResult() {
@@ -104,16 +134,6 @@
       lowerTitle: postTitle.toLowerCase(),
       lowerContent: postContent.toLowerCase()
     }
-  }
-
-  function doSearch(index) {
-    if (this.value.trim().length <= 0) return clearResult()
-
-    const keywords = this.value.trim().toLowerCase().split(/[\s\-]+/).filter(Boolean);
-
-    const result = search(index, keywords)
-
-    renderSearchResult(result, searchResult)
   }
 
   function search(index, keywords) {
@@ -245,5 +265,17 @@
     }
   }
 
-  window.searchInitialize = searchInitialize
+  function bootstrap() {
+    const el = document.querySelector('script[data-search-index]')
+    const url = el && el.getAttribute('data-search-index')
+    if (url) searchInitialize(url)
+  }
+
+  // defer 脚本在 DOM 解析完成后执行，元素已就绪；
+  // 若被以非 defer 方式引入（如用户自定义模板），兜底 DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrap)
+  } else {
+    bootstrap()
+  }
 })();

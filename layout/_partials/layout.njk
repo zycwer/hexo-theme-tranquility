@@ -273,10 +273,9 @@
         });
       </script>
     {% elif theme.search and theme.search.enable %}
-      <script src="{{url_for('js/search.js')}}"></script>
-      <script>
-        searchInitialize({{ url_for(theme.search.path) | dump | replace('</', '<\\/') }})
-      </script>
+      {# defer + data 属性传索引地址：脚本自初始化，索引在首次激活搜索时才懒加载 #}
+      <script defer src="{{ url_for('js/search.js') }}"
+              data-search-index="{{ url_for(theme.search.path) | escape }}"></script>
     {% endif %}
     <script defer src="{{url_for('js/copy-code.js')}}"></script>
     <script defer src="{{url_for('js/theme.js')}}"></script>

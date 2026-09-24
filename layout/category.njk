@@ -30,8 +30,10 @@
 {% endblock body %}
 {% block script %}
   {% if theme.tagcloud.fancy %}
+    {# defer：脚本在 DOM 解析后、load 事件前执行，下方 load 回调调用时 TagCanvas 已就绪 #}
     <script type="text/javascript"
             charset="utf-8"
+            defer
             src="{{ url_for('/js/tagcanvas.min.js') }}"></script>
     <script type="text/javascript">
       window.addEventListener('load', function () {

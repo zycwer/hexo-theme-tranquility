@@ -22,7 +22,7 @@
 
 #search-btn {
   width: max-content;
-  display: none;
+  display: flex;
   align-items: center;
 }
 
@@ -131,6 +131,13 @@
 .search-result-empty {
   text-align: center;
   padding: 10px 0;
+}
+
+// 索引懒加载期间的提示态
+.search-loading {
+  text-align: center;
+  padding: 10px 0;
+  color: $black-lighter;
 }
 
 .search-error {
