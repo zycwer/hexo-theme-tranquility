@@ -6,9 +6,10 @@ module.exports = hexo => {
     const cfg = theme.robots || {};
     if (cfg.enable === false) return;
 
-    const root = (this.config.root || '/').replace(/\/$/, '');
-    const base = (this.config.url || '').replace(/\/$/, '');
-    const sitemapUrl = base + root + '/sitemap.xml';
+    // 用 full_url_for 拼接：config.url 在子路径部署时已含 root，
+    // 手动 base+root 会拼出双重路径（如 /blog/blog/sitemap.xml）
+    const fullUrlFor = hexo.extend.helper.get('full_url_for').bind(this);
+    const sitemapUrl = fullUrlFor('sitemap.xml');
 
     const lines = [
       'User-agent: *',

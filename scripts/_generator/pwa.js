@@ -51,7 +51,7 @@ module.exports = hexo => {
 
     const root = (this.config.root || '/').replace(/\/$/, '');
     const sw = buildSW(root, hexo);
-    const offline = buildOfflinePage(cfg);
+    const offline = buildOfflinePage(cfg, root);
 
     return [
       { path: 'manifest.json', data: JSON.stringify(manifest, null, 2) },
@@ -123,7 +123,8 @@ self.addEventListener('fetch', e => {
 }
 
 // 自包含离线兜底页：无外部依赖（样式内联），断网时也可渲染
-function buildOfflinePage(cfg) {
+// root：站点根路径（子路径部署时重试链接需带回前缀）
+function buildOfflinePage(cfg, root) {
   const themeColor = cfg.theme_color || '#fcfcfb';
   const bgColor = cfg.background_color || '#fcfcfb';
   return `<!DOCTYPE html>
@@ -153,7 +154,7 @@ function buildOfflinePage(cfg) {
 <body>
   <h1>当前离线</h1>
   <p>无法连接网络，且该页面尚未缓存。</p>
-  <a href="/">重试</a>
+  <a href="${root}/">重试</a>
 </body>
 </html>
 `;

@@ -12,11 +12,16 @@
         <div class="foot-item">
           <div class="foot-item__head">朋友</div>
           <div class="foot-item__body">
-            {% set friendsLinks = theme.links.concat({
-                          'name': '申请友链',
-                          'url': 'mailto:' + theme.email + '?subject=申请' + config.url + '的友链',
-                          'icon': '/images/icon/icon-link+.svg'
-                        }) %}
+            {# email 未配置时不追加「申请友链」项，避免渲染出 mailto:undefined #}
+            {% if theme.email %}
+              {% set friendsLinks = theme.links.concat({
+                            'name': '申请友链',
+                            'url': 'mailto:' + theme.email + '?subject=申请' + config.url + '的友链',
+                            'icon': '/images/icon/icon-link+.svg'
+                          }) %}
+            {% else %}
+              {% set friendsLinks = theme.links %}
+            {% endif %}
             {{ partial("_partials/macros/group-link.njk", {links: friendsLinks, groupSize: theme.foot.linksRows}) }}
           </div>
         </div>

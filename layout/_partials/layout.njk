@@ -75,12 +75,11 @@
     {% set og_url = full_url_for(page.path or '/') %}
     {% set _og_img = page.cover or theme.index.photo or theme.logo %}
     {% set og_image = '' %}
-    {% if _og_img %}
-      {% if _og_img.indexOf('http') == 0 or _og_img.indexOf('//') == 0 %}
-        {% set og_image = _og_img %}
-      {% else %}
-        {% set og_image = full_url_for(_og_img) %}
-      {% endif %}
+    {# is string 守卫：cover 等字段误填非字符串时不至于构建崩溃 #}
+    {% if _og_img is string and (_og_img.indexOf('http') == 0 or _og_img.indexOf('//') == 0) %}
+      {% set og_image = _og_img %}
+    {% elif _og_img is string %}
+      {% set og_image = full_url_for(_og_img) %}
     {% endif %}
     <meta property="og:type" content="{% if is_post() %}article{% else %}website{% endif %}"/>
     <meta property="og:title" content="{{ og_title | escape }}"/>
@@ -154,12 +153,11 @@
       {% elif jsonld_type == 'article' %}
         {% set _art_img = page.cover or theme.index.photo or theme.logo %}
         {% set _art_img_abs = '' %}
-        {% if _art_img %}
-          {% if _art_img.indexOf('http') == 0 or _art_img.indexOf('//') == 0 %}
-            {% set _art_img_abs = _art_img %}
-          {% else %}
-            {% set _art_img_abs = full_url_for(_art_img) %}
-          {% endif %}
+        {# is string 守卫：cover 等字段误填非字符串时不至于构建崩溃 #}
+        {% if _art_img is string and (_art_img.indexOf('http') == 0 or _art_img.indexOf('//') == 0) %}
+          {% set _art_img_abs = _art_img %}
+        {% elif _art_img is string %}
+          {% set _art_img_abs = full_url_for(_art_img) %}
         {% endif %}
         {% set _kw = '' %}
         {% if page.tags and page.tags.length %}
@@ -265,9 +263,10 @@
       <script src="{{ vendorUrl(cdn, '@docsearch/js', '3', '', 'dist/umd/index.js') }}"></script>
       <script type="text/javascript">
         docsearch({
-          appId: {{ theme.algolia.appId | dump | replace('</', '<\\/') }},
-          apiKey: {{ theme.algolia.apiKey | dump | replace('</', '<\\/') }},
-          indexName: {{ theme.algolia.indexName | dump | replace('</', '<\\/') }},
+          {# or '' 兜底：未配置凭据时 dump(undefined) 返回 undefined，后续 replace 会抛错 #}
+          appId: {{ (theme.algolia.appId or '') | dump | replace('</', '<\\/') }},
+          apiKey: {{ (theme.algolia.apiKey or '') | dump | replace('</', '<\\/') }},
+          indexName: {{ (theme.algolia.indexName or '') | dump | replace('</', '<\\/') }},
           insights: {{ 'true' if theme.algolia.insights else 'false' }},
           container: 'div#algolia-search',
           debug: {{ 'true' if theme.algolia.debug else 'false' }}
