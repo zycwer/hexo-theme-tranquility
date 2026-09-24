@@ -7,7 +7,7 @@ module.exports = hexo => {
     const cfg = theme.security || {};
     const esc = s => String(s).replace(/"/g, '&quot;');
 
-    const script = new Set(["'self'", "'unsafe-inline'"]); // 主题含内联脚本（主题色/统计/搜索初始化）
+    const script = new Set(["'self'", "'unsafe-inline'"]); // 主题含内联脚本（主题色/公告/统计）
     const style = new Set(["'self'", "'unsafe-inline'"]); // 含内联 @font-face 与少量行内样式
     const font = new Set(["'self'", 'data:']);
     const img = new Set(["'self'", 'data:', 'https:']); // 放行 https 外链图片，阻断非安全协议
