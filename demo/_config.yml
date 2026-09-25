@@ -84,7 +84,7 @@ theme: tranquility
 
 theme_config:
   slogan: "宁静致远，方得始终"
-  # 一言：开启后首页 slogan 客户端请求 hitokoto API 展示随机一言
+  # 一言：开启后首页 slogan 客户端请求 hitokoto API，仅取诗词分类（古诗文）
   slogan_hitokoto: true
   email: zycwer@example.com
   logo: "/images/logo.svg"
@@ -273,7 +273,7 @@ theme_config:
   zh_font:
     enable: true
     fontName: sourceHanSerif
-    type: woff
+    type: woff2
     style:
       - normal
       - bold

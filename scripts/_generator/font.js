@@ -1,6 +1,7 @@
 // 中文字体子集提取：从主题配置文本中提取所需字符，用 opentype.js 生成精简字体
-// 输出格式由 zh_font.type 决定：woff（默认，体积约为 ttf 的一半）/ ttf
+// 输出格式由 zh_font.type 决定：woff2（默认，体积约为 woff 的 70%）/ woff / ttf
 const opentype = require('opentype.js');
+const wawoff2 = require('wawoff2');
 const path = require('path');
 const fs = require('fs');
 const zlib = require('zlib');
@@ -12,7 +13,7 @@ const { Buffer } = require('node:buffer');
 const fontHashes = {};
 
 module.exports = function (hexo) {
-  hexo.extend.generator.register('subfont', locals => {
+  hexo.extend.generator.register('subfont', async locals => {
     const zhFont = hexo.theme.config.zh_font || {};
     const { enable, fontName, type, style } = zhFont;
     if (!enable) return;
@@ -20,8 +21,8 @@ module.exports = function (hexo) {
       hexo.log.warn('zh_font 配置不完整：需指定 fontName/type/style');
       return;
     }
-    if (type !== 'woff' && type !== 'ttf') {
-      hexo.log.warn('zh_font.type 仅支持 woff / ttf，当前为 %s', type);
+    if (!['woff2', 'woff', 'ttf'].includes(type)) {
+      hexo.log.warn('zh_font.type 仅支持 woff2 / woff / ttf，当前为 %s', type);
       return;
     }
 
@@ -29,38 +30,42 @@ module.exports = function (hexo) {
     const text = getSubText(hexo);
     hexo.log.info('Extract subfont:', text);
 
-    return style.map(subfont => {
+    // generator 支持 Promise 返回；逐个 await 保证哈希登记与路由数据顺序确定
+    const routes = [];
+    for (const subfont of style) {
       if (/[\/\\]|\.\./.test(subfont)) {
         hexo.log.warn('zh_font.style 含非法字符：%s', subfont);
-        return null;
+        continue;
       }
-      // 源字体优先使用 woff（体积更小），回退 ttf 以兼容用户自行替换的字体
-      const source = ['.woff', '.ttf']
+      // 源字体优先使用 woff2（体积最小），回退 woff/ttf 以兼容用户自行替换的字体
+      const source = ['.woff2', '.woff', '.ttf']
         .map(ext => path.resolve(sourceFolder, `${subfont}${ext}`))
         .find(p => fs.existsSync(p));
       if (!source) {
-        hexo.log.warn('subfont: 未找到源字体 _font/%s.woff（或 .ttf）', subfont);
-        return null;
+        hexo.log.warn('subfont: 未找到源字体 _font/%s.woff2（或 .woff/.ttf）', subfont);
+        continue;
       }
-      const data = compress(text, { source, name: fontName, style: subfont, type }, hexo);
-      if (!data) return null;
+      const data = await compress(text, { source, name: fontName, style: subfont, type }, hexo);
+      if (!data) continue;
       const routePath = path.join('/font', `${subfont}.${type}`);
       fontHashes[routePath] = crypto.createHash('sha256').update(data).digest('hex').slice(0, 8);
-      return {
-        path: routePath,
-        data: data
-      };
-    }).filter(Boolean);
+      routes.push({ path: routePath, data });
+    }
+    return routes;
   });
 };
 
 // 供资源指纹 filter 读取生成字体的内容哈希；必须在 module.exports 赋值之后挂载
 module.exports._hashes = fontHashes;
 
-function compress(text, { source, name, style, type }, hexo) {
+async function compress(text, { source, name, style, type }, hexo) {
   try {
     const notdefGlyph = new opentype.Glyph({ name: '.notdef', advanceWidth: 650, path: new opentype.Path() });
-    const data = new Uint8Array(fs.readFileSync(source)).buffer;
+    let data = new Uint8Array(fs.readFileSync(source)).buffer;
+    // woff2 源字体：先解压为 ttf 再交由 opentype.js 解析
+    if (path.extname(source) === '.woff2') {
+      data = new Uint8Array(await wawoff2.decompress(Buffer.from(data))).buffer;
+    }
     const font = opentype.parse(data);
     // 检测源字体中缺失的字符（如生僻字/繁体字超出 GB2312 子集范围）
     // 缺失字符从子集文本中剔除，避免 opentype.js 产生 "Undefined CHARARRAY" 警告；
@@ -79,7 +84,7 @@ function compress(text, { source, name, style, type }, hexo) {
       hexo.log.warn('subfont: 源字体缺失字符（将以系统字体兜底）：%s', Array.from(missing).join(' '));
     }
     const subGlyphs = font.stringToGlyphs(available.join(''));
-    // 源字体经 pyftsubset 子集化后 post 表为 version 3（不含 glyph name），
+    // 源字体经子集化后 post 表多为 version 3（不含 glyph name），
     // opentype.js 解析时 glyph.name 为 undefined，构建新字体时会输出
     // "Undefined CHARARRAY" 警告。这里按 unicode 为每个 glyph 补一个合法 name。
     subGlyphs.forEach((g, i) => {
@@ -96,7 +101,10 @@ function compress(text, { source, name, style, type }, hexo) {
       styleName: style,
       glyphs
     });
-    return encode(Buffer.from(subFont.toArrayBuffer()), type);
+    const sfnt = Buffer.from(subFont.toArrayBuffer());
+    if (type === 'woff2') return Buffer.from(await wawoff2.compress(sfnt));
+    if (type === 'woff') return encode(sfnt);
+    return sfnt;
   } catch (err) {
     hexo.log.warn('subfont compress failed for %s: %s', source, err && err.message);
     return null;
@@ -105,9 +113,7 @@ function compress(text, { source, name, style, type }, hexo) {
 
 // 将 sfnt（TTF）字节封装为 WOFF：逐表 zlib 压缩 + WOFF 头/目录重组。
 // WOFF 结构见 https://www.w3.org/TR/WOFF/ ：44 字节头 + 20 字节/表目录 + 压缩表数据（4 字节对齐）
-function encode(sfnt, type) {
-  if (type !== 'woff') return sfnt;
-
+function encode(sfnt) {
   const numTables = sfnt.readUInt16BE(4); // sfnt 头：4 字节版本号 + UInt16 numTables
   const tables = [];
   let totalSfntSize = 12 + numTables * 16;

@@ -74,7 +74,7 @@ jobs:
           cd site
           test -f public/index.html
           test -f public/css/layout.css
-          test -f public/font/normal.woff
+          test -f public/font/normal.woff2
           test -f public/sw.js
           test -f public/manifest.json
           test -f public/offline.html

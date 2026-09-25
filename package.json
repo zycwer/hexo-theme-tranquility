@@ -1,6 +1,6 @@
 {
   "name": "hexo-theme-tranquility",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "一款为个人主页及多学科领域博主设计的 Hexo 主题（致远 / Tranquility）",
   "files": [
     "layout",
@@ -36,6 +36,7 @@
     "hexo-renderer-stylus": "^3.0.1",
     "moment": "^2.30.1",
     "nunjucks": "^3.2.4",
-    "opentype.js": "^1.3.4"
+    "opentype.js": "^1.3.4",
+    "wawoff2": "^2.0.1"
   }
 }
