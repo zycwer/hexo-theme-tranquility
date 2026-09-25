@@ -35,6 +35,22 @@ announcement:
 
 mathjax: false # LaTeX 数学公式库：true 走默认 CDN（npmmirror）；也可填脚本完整 URL（本地路径或自选源）
 
+# 樱花飘落：全站页面装饰动画（花瓣飘过正文上方，不拦截任何交互）
+# prefers-reduced-motion 用户与低端移动端自动降级/减量
+sakura:
+  enable: false
+  density: 16 # 同屏花瓣数量，移动端自动减半
+
+# 音乐播放器：APlayer 迷你模式浮动于左下角（JS/CSS 走 CDN，不增加包体积）
+# 切页时通过 localStorage 记忆曲目与进度，自动尝试续播（被浏览器拦截则暂停在原进度）
+music:
+  enable: false
+  songs: # 歌单（name/artist/url/cover 均必填；url 需为可直链访问的音频地址）
+    - name: 歌曲名
+      artist: 歌手
+      url: https://example.com/song.mp3
+      cover: https://example.com/cover.jpg
+
 favicon: # 配置网页图标
   small: /images/favicon-16x16.png
   medium: /images/favicon-32x32.png
@@ -269,6 +285,7 @@ algolia:
 nav:
   sticky: false
   about: false # 是否在导航栏显示“关于”入口（页面内容由 source/about/index.md 提供）
+  archive: false # 是否在导航栏显示“归档”入口（需安装 hexo-generator-archive，hexo init 默认自带）
 
 google_ad:
   enable: false

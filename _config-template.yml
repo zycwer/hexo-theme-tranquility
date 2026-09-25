@@ -265,6 +265,7 @@ algolia:
 nav:
   sticky: false
   about: false # 是否在导航栏显示“关于”入口（页面内容由 source/about/index.md 提供）
+  archive: false # 是否在导航栏显示“归档”入口（需安装 hexo-generator-archive，hexo init 默认自带）
 
 google_ad:
   enable: false

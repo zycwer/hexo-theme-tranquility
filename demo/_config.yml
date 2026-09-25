@@ -110,6 +110,24 @@ theme_config:
   # MathJax 数学公式：走主题默认 CDN（npmmirror），演示主题开箱即用的行为
   mathjax: true
 
+  # 樱花飘落（v1.9.0 新特性）：全站装饰动画，花瓣飘过正文上方不拦截交互
+  sakura:
+    enable: true
+    density: 16
+
+  # 音乐播放器（v1.9.0 新特性）：APlayer 迷你模式浮动于左下角，切页记忆进度
+  music:
+    enable: true
+    songs:
+      - name: SoundHelix Song 1
+        artist: T. Schürger
+        url: https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3
+        cover: /images/about.jpg
+      - name: SoundHelix Song 2
+        artist: T. Schürger
+        url: https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3
+        cover: /images/about.jpg
+
   favicon:
     small: /images/favicon-16x16.png
     medium: /images/favicon-32x32.png
@@ -339,6 +357,7 @@ theme_config:
   nav:
     sticky: true
     about: true
+    archive: true
 
   google_ad:
     enable: false

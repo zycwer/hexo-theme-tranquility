@@ -1,0 +1,46 @@
+// 樱花飘落：花瓣层与动画（由 sakura.enable 控制，未开启时不编译进 layout.css）
+.sakura-layer {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  // 悬浮于内容之上、导航之下：花瓣可飘过正文但绝不拦截交互
+  z-index: 90;
+  pointer-events: none;
+}
+
+.petal {
+  position: absolute;
+  top: -6vh;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  // 经典樱花花瓣形：两对对角圆角
+  border-radius: 150% 0 150% 0;
+  background: linear-gradient(135deg, #ffe9f3, #ffb7d1);
+  opacity: var(--o);
+  animation: petal-fall var(--d) linear var(--delay) infinite;
+  will-change: transform;
+}
+
+// 下落 + 左右摇摆 + 旋转组合为一个关键帧序列（单一 transform，全程合成器执行）
+@keyframes petal-fall {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate3d(var(--sway), 28vh, 0) rotate(calc(var(--rot) * 0.25));
+  }
+
+  50% {
+    transform: translate3d(calc(var(--sway) * -1), 56vh, 0) rotate(calc(var(--rot) * 0.5));
+  }
+
+  75% {
+    transform: translate3d(var(--sway), 84vh, 0) rotate(calc(var(--rot) * 0.75));
+  }
+
+  100% {
+    transform: translate3d(0, 112vh, 0) rotate(var(--rot));
+  }
+}

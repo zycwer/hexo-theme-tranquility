@@ -13,6 +13,7 @@ module.exports = hexo => {
     const img = new Set(["'self'", 'data:', 'https:']); // 放行 https 外链图片，阻断非安全协议
     const connect = new Set(["'self'"]);
     const frame = new Set(["'self'"]);
+    const media = new Set(["'self'"]);
 
     function origin(url) {
       try { return new URL(url).origin; } catch (e) { return null; }
@@ -28,6 +29,9 @@ module.exports = hexo => {
 
     // 一言 API（客户端 fetch）
     if (theme.slogan_hitokoto) connect.add('https://v1.hitokoto.cn');
+
+    // 音乐播放器（APlayer）：歌曲/封面来自用户配置的外部地址，放行 https 媒体源
+    if (theme.music && theme.music.enable) media.add('https:');
 
     // 百度统计（脚本 + 上报信标）
     if (theme.baidu_analytics) {
@@ -83,7 +87,7 @@ module.exports = hexo => {
       'font-src': Array.from(font),
       'connect-src': Array.from(connect),
       'frame-src': Array.from(frame),
-      'media-src': ["'self'"],
+      'media-src': Array.from(media),
       'object-src': ["'none'"],
       'base-uri': ["'self'"],
       'form-action': ["'self'"]

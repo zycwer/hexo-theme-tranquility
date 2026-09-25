@@ -4,6 +4,10 @@
 @import '_partials/foot';
 @import '_partials/announcement';
 
+if (hexo-config('sakura.enable')) {
+  @import '_partials/sakura';
+}
+
 .head--sticky ~ .body {
   padding-top: 90px;
 }

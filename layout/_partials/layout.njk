@@ -206,6 +206,10 @@
                 <a class="nav-menu-item" href='{{ url_for("/blog/") }}'>博客</a>
               {% endif %}
             {% endif %}
+            {% if theme.nav and theme.nav.archive %}
+              {# 需安装 hexo-generator-archive（hexo init 默认自带）生成 /archives/ #}
+              <a class="nav-menu-item" href='{{ url_for("/archives/") }}'>归档</a>
+            {% endif %}
             {% if theme.nav and theme.nav.about %}
               <a class="nav-menu-item" href='{{ url_for("/about/") }}'>关于</a>
             {% endif %}
@@ -280,6 +284,20 @@
     <script defer src="{{url_for('js/copy-code.js')}}"></script>
     <script defer src="{{url_for('js/theme.js')}}"></script>
     <script defer src="{{url_for('js/back-to-top.js')}}"></script>
+    {% if theme.sakura and theme.sakura.enable %}
+      {# 花瓣层 + defer 脚本：密度经 data 属性传入，未开启时零开销 #}
+      <div class="sakura-layer" id="sakura-layer" aria-hidden="true"
+           data-density="{{ theme.sakura.density or 16 }}"></div>
+      <script defer src="{{ url_for('js/sakura.js') }}"></script>
+    {% endif %}
+    {% if theme.music and theme.music.enable and theme.music.songs %}
+      {# APlayer 走 CDN；歌单以 JSON 块传入（CSP 安全，无内联执行），music.js 负责初始化与跨页记忆 #}
+      <link rel="stylesheet"
+            href="{{ vendorUrl(cdn, 'aplayer', '1.10.1', 'dist/APlayer.min.css', 'dist/APlayer.min.css') }}"/>
+      <script type="application/json" id="music-playlist">{{ theme.music.songs | dump | replace('</', '<\\/') }}</script>
+      <script defer src="{{ vendorUrl(cdn, 'aplayer', '1.10.1', 'dist/APlayer.min.js', 'dist/APlayer.min.js') }}"></script>
+      <script defer src="{{ url_for('js/music.js') }}"></script>
+    {% endif %}
     {% if theme.pwa and theme.pwa.enable %}
       <script>
         if ('serviceWorker' in navigator) {

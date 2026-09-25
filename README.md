@@ -51,6 +51,7 @@ hexo clean && hexo s
 **写作功能**
 
 - 文章封面、目录、置顶、摘要、相关文章、标签云
+- [归档页](https://docs.qwrcb.top/docs/configuration/basic/nav)：按年份分组的时间线式文章归档，导航栏可选入口
 - 代码高亮、[数学公式](https://docs.qwrcb.top/docs/configuration/writing/math)（MathJax）、[Mermaid 图表](https://docs.qwrcb.top/docs/configuration/writing/mermaid)
 
 **SEO 与可发现性**
@@ -63,6 +64,8 @@ hexo clean && hexo s
 
 - 深色模式四策略（浅色 / 深色 / 定时 / 跟随浏览器，导航栏一键切换）
 - PWA 离线访问、图片懒加载、资源内容指纹强缓存、中文字体子集化
+- 樱花飘落装饰动画（`prefers-reduced-motion` 自动降级，不拦截交互）
+- 音乐播放器：APlayer 迷你模式浮动于左下角，跨页记忆曲目与播放进度
 - 回到顶部按钮、`prefers-reduced-motion` 无障碍降级、三端自适应
 - CSP 安全策略、构建期 URL 校验、XSS 注入防护
 

@@ -1,0 +1,111 @@
+@import '_variables';
+
+.wall-archive-title {
+  font-weight: 600;
+  font-size: 72px;
+  animation: flyIn 500ms ease-out;
+}
+
+.wall-archive-description {
+  font-size: 22px;
+  font-weight: normal;
+  margin-top: 10px;
+}
+
+@keyframes flyIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.archive {
+  max-width: 720px;
+  margin: 80px auto 120px;
+  // 屏幕安全边距：窄屏不贴边，兼容刘海屏/手势操作栏（env 安全区）
+  box-sizing: border-box;
+  padding-left: unquote('max(24px, env(safe-area-inset-left))');
+  padding-right: unquote('max(24px, env(safe-area-inset-right))');
+
+  .archive-empty {
+    text-align: center;
+    color: $black-lighter;
+  }
+}
+
+// 年份标题：后接渐隐分隔线，作为分组锚点
+.archive-year {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-weight: bold;
+  font-family: $font-family-serif;
+  color: var(--c-text-heading);
+  margin: 40px 0 16px;
+
+  &::after {
+    content: '';
+    flex: 1;
+    margin-left: 16px;
+    border-top: 1px solid var(--c-border);
+  }
+}
+
+// 条目：左侧时间轴边线 + 圆点，悬停时点亮
+.archive-item {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 8px 0 8px 8px;
+  border-left: 2px solid var(--c-border);
+  margin-left: 4px;
+  position: relative;
+  transition: border-color 200ms ease-out;
+
+  // 时间轴圆点
+  &::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c-border);
+    transform: translateY(-50%);
+    transition: background-color 200ms ease-out;
+  }
+
+  &:hover {
+    border-left-color: var(--c-accent);
+
+    &::before {
+      background: var(--c-accent);
+    }
+
+    .archive-item__title {
+      color: var(--c-accent-hover);
+    }
+  }
+}
+
+.archive-item__date {
+  flex: none;
+  width: 48px;
+  color: var(--c-post-info);
+  font-size: 14px;
+  font-family: monospace;
+}
+
+.archive-item__title {
+  color: var(--c-link);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 200ms ease-out;
+}
