@@ -1,0 +1,29 @@
+# 临时 workflow：撤回误发的 npm 版本（用后即删）
+name: Unpublish from npm (temp)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '要撤回的版本号（如 1.8.0）'
+        required: true
+
+jobs:
+  unpublish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Unpublish version
+        run: npm unpublish "hexo-theme-tranquility@${{ github.event.inputs.version }}" --force
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
