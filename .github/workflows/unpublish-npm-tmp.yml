@@ -24,6 +24,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Unpublish version
-        run: npm unpublish "hexo-theme-tranquility@${{ github.event.inputs.version }}" --force
+        run: npm deprecate "hexo-theme-tranquility@${{ github.event.inputs.version }}" "该版本已撤回，请使用最新版本"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
