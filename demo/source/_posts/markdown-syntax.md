@@ -4,6 +4,7 @@ date: 2026-08-10 09:30:00
 categories: [baseTest]
 tags: [Markdown, 排版]
 timeline: article
+toc: true
 ---
 
 本文覆盖 Hexo + Tranquility 的基础排版：标题、列表、表格、引用、图片与代码高亮。
